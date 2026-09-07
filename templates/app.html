@@ -1,3 +1,611 @@
-app.html
-login.html
-onboarding.html
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>OrderFlow</title>
+
+<style>
+:root{
+    --green:#1d5a47;
+    --dark:#0f211a;
+    --bg:#f4f7f5;
+    --card:#fff;
+    --line:#dfe8e2;
+    --muted:#718079;
+    --red:#a3423a;
+    --amber:#8c641e
+}
+
+*{
+    box-sizing:border-box
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:#17221e;
+    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+
+.app{
+    min-height:100vh
+}
+
+.top{
+    height:64px;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 18px;
+    position:sticky;
+    top:0;
+    z-index:20
+}
+
+.logo{
+    font-size:19px;
+    font-weight:900
+}
+
+.logo span{
+    color:#2c755b
+}
+
+.site{
+    font-size:11px;
+    color:var(--muted);
+    text-align:right
+}
+
+.site b{
+    display:block;
+    color:#17221e
+}
+
+.layout{
+    display:grid;
+    grid-template-columns:225px 1fr;
+    min-height:calc(100vh - 64px)
+}
+
+aside{
+    background:#10251d;
+    color:white;
+    padding:18px 12px
+}
+
+.navbtn{
+    display:block;
+    width:100%;
+    text-align:left;
+    border:0;
+    background:transparent;
+    color:#c5d3cc;
+    padding:11px;
+    border-radius:10px;
+    margin-bottom:4px;
+    font-weight:750;
+    font-size:12px
+}
+
+.navbtn:hover,
+.navbtn.active{
+    background:#1d5a47;
+    color:#fff
+}
+
+.navgroup{
+    font-size:9px;
+    color:#718c80;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    padding:15px 10px 6px
+}
+
+main{
+    padding:24px;
+    max-width:1250px;
+    width:100%;
+    margin:auto
+}
+
+.view{
+    display:none
+}
+
+.view.active{
+    display:block
+}
+
+.head{
+    margin-bottom:18px
+}
+
+.eyebrow{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--green);
+    font-weight:900
+}
+
+.head h1{
+    font-size:29px;
+    margin:4px 0
+}
+
+.head p{
+    color:var(--muted);
+    font-size:12px
+}
+
+.grid4{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px
+}
+
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px
+}
+
+.two{
+    display:grid;
+    grid-template-columns:1.25fr .75fr;
+    gap:12px
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:15px;
+    padding:16px
+}
+
+.kpi .label{
+    font-size:9px;
+    color:var(--muted);
+    text-transform:uppercase;
+    font-weight:800;
+    letter-spacing:.7px
+}
+
+.kpi .value{
+    font-size:25px;
+    font-weight:900;
+    margin-top:5px
+}
+
+.small{
+    font-size:10px;
+    color:var(--muted)
+}
+
+.good{
+    color:#2d765b
+}
+
+.bad{
+    color:var(--red)
+}
+
+.warn{
+    color:var(--amber)
+}
+
+.section{
+    margin-top:12px
+}
+
+.sectionhead{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:9px
+}
+
+.sectionhead h2{
+    font-size:15px;
+    margin:0
+}
+
+.btn{
+    border:1px solid var(--line);
+    background:#fff;
+    color:#17221e;
+    padding:9px 11px;
+    border-radius:9px;
+    font-size:11px;
+    font-weight:800
+}
+
+.btn.primary{
+    background:var(--green);
+    color:#fff;
+    border-color:var(--green)
+}
+
+.btn.danger{
+    color:var(--red)
+}
+
+.actions{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap
+}
+
+.table{
+    overflow:auto
+}
+
+.table table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:11px
+}
+
+.table th{
+    text-align:left;
+    color:var(--muted);
+    font-size:9px;
+    text-transform:uppercase;
+    padding:8px;
+    border-bottom:1px solid var(--line)
+}
+
+.table td{
+    padding:10px 8px;
+    border-bottom:1px solid #edf1ef
+}
+
+.money{
+    font-weight:850
+}
+
+.pill{
+    display:inline-flex;
+    border-radius:999px;
+    padding:5px 8px;
+    background:#e7f1eb;
+    color:var(--green);
+    font-size:9px;
+    font-weight:850
+}
+
+.pill.pending{
+    background:#fbf0d8;
+    color:var(--amber)
+}
+
+.pill.paid{
+    background:#e5f1eb;
+    color:#286c53
+}
+
+.pill.bad{
+    background:#f7e5e3
+}
+
+.form{
+    display:grid;
+    gap:9px
+}
+
+.formgrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px
+}
+
+.form label{
+    font-size:10px;
+    font-weight:850
+}
+
+.form input,
+.form select{
+    width:100%;
+    padding:10px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    background:#fff
+}
+
+.notice{
+    padding:12px;
+    border-radius:11px;
+    background:#f8f3e5;
+    color:#74571e;
+    font-size:11px
+}
+
+.bar{
+    height:8px;
+    background:#e8eeeb;
+    border-radius:20px;
+    overflow:hidden
+}
+
+.bar i{
+    display:block;
+    height:100%;
+    background:var(--green)
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:#07150ecc;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:15px
+}
+
+.modal.open{
+    display:flex
+}
+
+.sheet{
+    background:#fff;
+    width:min(620px,100%);
+    max-height:90vh;
+    overflow:auto;
+    border-radius:18px;
+    padding:18px
+}
+
+.close{
+    border:0;
+    background:#edf2ef;
+    border-radius:50%;
+    width:32px;
+    height:32px
+}
+
+.bottom{
+    display:none
+}
+
+.site-select{
+    background:#17382d;
+    color:#fff;
+    border:1px solid #2d604f;
+    padding:7px;
+    border-radius:8px;
+    font-size:10px
+}
+
+@media(max-width:850px){
+    .layout{
+        display:block
+    }
+
+    .layout aside{
+        display:none
+    }
+
+    .grid4,
+    .grid3{
+        grid-template-columns:1fr 1fr
+    }
+
+    .two{
+        grid-template-columns:1fr
+    }
+
+    .bottom{
+        display:grid;
+        position:fixed;
+        bottom:0;
+        left:0;
+        right:0;
+        background:#fff;
+        border-top:1px solid var(--line);
+        grid-template-columns:repeat(5,1fr);
+        z-index:30;
+        padding-bottom:env(safe-area-inset-bottom)
+    }
+
+    .bottom button{
+        border:0;
+        background:#fff;
+        padding:10px 2px;
+        font-size:9px;
+        font-weight:800;
+        color:var(--muted)
+    }
+
+    .bottom button.active{
+        color:var(--green)
+    }
+
+    main{
+        padding:18px 13px 85px
+    }
+
+    .top{
+        padding:0 12px
+    }
+
+    .formgrid{
+        grid-template-columns:1fr
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="top">
+
+<div class="logo">
+ORDER<span>FLOW</span>
+</div>
+
+<div class="site">
+<b>{{organisation.name}}</b>
+{{site.name}}
+</div>
+
+</header>
+
+<div class="layout">
+
+<aside>
+
+<button class="navbtn active" data-view="dashboard">
+⌂ Dashboard
+</button>
+
+<div class="navgroup">
+Operations
+</div>
+
+<button class="navbtn" data-view="sales">
+▣ Sales
+</button>
+
+<button class="navbtn" data-view="stock">
+▤ Stock
+</button>
+
+<button class="navbtn" data-view="purchasing">
+🛒 Purchasing
+</button>
+
+<button class="navbtn" data-view="menu">
+☷ Menu & Costing
+</button>
+
+<div class="navgroup">
+People
+</div>
+
+<button class="navbtn" data-view="staff">
+♙ Staff
+</button>
+
+<button class="navbtn" data-view="payroll">
+£ Payroll
+</button>
+
+<div class="navgroup">
+Finance
+</div>
+
+<button class="navbtn" data-view="finance">
+£ Finance & EBITDA
+</button>
+
+<button class="navbtn" data-view="invoices">
+▤ Invoices
+</button>
+
+<button class="navbtn" data-view="payments">
+↗ Payments
+</button>
+
+<div class="navgroup">
+Management
+</div>
+
+<button class="navbtn" data-view="sites">
+⌂ Sites
+</button>
+
+<button class="navbtn" data-view="settings">
+⚙ Settings
+</button>
+
+<form method="post" action="/logout" style="margin-top:20px">
+
+<button class="navbtn">
+↪ Sign out
+</button>
+
+</form>
+
+</aside>
+
+<main>
+
+<section id="dashboard" class="view active">
+
+<div class="head">
+
+<div class="eyebrow">
+Management dashboard
+</div>
+
+<h1>
+Good day, {{user.name.split()[0]}}.
+</h1>
+
+<p>
+{{organisation.name}} · {{site.name}}. Everything important in one place.
+</p>
+
+</div>
+
+<div class="grid4">
+
+<div class="card kpi">
+<div class="label">Revenue this month</div>
+<div class="value" id="dRevenue">—</div>
+</div>
+
+<div class="card kpi">
+<div class="label">Gross margin</div>
+<div class="value" id="dGP">—</div>
+</div>
+
+<div class="card kpi">
+<div class="label">EBITDA</div>
+<div class="value" id="dEBITDA">—</div>
+<div class="good" id="dEBITDAPct"></div>
+</div>
+
+<div class="card kpi">
+<div class="label">Labour</div>
+<div class="value" id="dLabour">—</div>
+</div>
+
+</div>
+
+<div class="section two">
+
+<div class="card">
+
+<div class="sectionhead">
+<h2>Financial position</h2>
+<span class="small">Current month</span>
+</div>
+
+<div id="dashFinancial"></div>
+
+</div>
+
+<div class="card">
+
+<div class="sectionhead">
+<h2>Attention</h2>
+</div>
+
+<div id="dashAttention"></div>
+
+</div>
+
+</div>
+
+</section>
