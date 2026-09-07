@@ -8,437 +8,395 @@
 
 <style>
 :root{
-    --green:#1d5a47;
-    --dark:#0f211a;
-    --bg:#f4f7f5;
-    --card:#fff;
-    --line:#dfe8e2;
-    --muted:#718079;
-    --red:#a3423a;
-    --amber:#8c641e
+--green:#1d5a47;
+--dark:#0f211a;
+--bg:#f4f7f5;
+--card:#fff;
+--line:#dfe8e2;
+--muted:#718079;
+--red:#a3423a;
+--amber:#8c641e
 }
 
-*{
-    box-sizing:border-box
-}
+*{box-sizing:border-box}
 
 body{
-    margin:0;
-    background:var(--bg);
-    color:#17221e;
-    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+margin:0;
+background:var(--bg);
+color:#17221e;
+font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 }
 
-.app{
-    min-height:100vh
-}
+.app{min-height:100vh}
 
 .top{
-    height:64px;
-    background:#fff;
-    border-bottom:1px solid var(--line);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 18px;
-    position:sticky;
-    top:0;
-    z-index:20
+height:64px;
+background:#fff;
+border-bottom:1px solid var(--line);
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 18px;
+position:sticky;
+top:0;
+z-index:20
 }
 
 .logo{
-    font-size:19px;
-    font-weight:900
+font-size:19px;
+font-weight:900
 }
 
-.logo span{
-    color:#2c755b
-}
+.logo span{color:#2c755b}
 
 .site{
-    font-size:11px;
-    color:var(--muted);
-    text-align:right
+font-size:11px;
+color:var(--muted);
+text-align:right
 }
 
 .site b{
-    display:block;
-    color:#17221e
+display:block;
+color:#17221e
 }
 
 .layout{
-    display:grid;
-    grid-template-columns:225px 1fr;
-    min-height:calc(100vh - 64px)
+display:grid;
+grid-template-columns:225px 1fr;
+min-height:calc(100vh - 64px)
 }
 
 aside{
-    background:#10251d;
-    color:white;
-    padding:18px 12px
+background:#10251d;
+color:white;
+padding:18px 12px
 }
 
 .navbtn{
-    display:block;
-    width:100%;
-    text-align:left;
-    border:0;
-    background:transparent;
-    color:#c5d3cc;
-    padding:11px;
-    border-radius:10px;
-    margin-bottom:4px;
-    font-weight:750;
-    font-size:12px
+display:block;
+width:100%;
+text-align:left;
+border:0;
+background:transparent;
+color:#c5d3cc;
+padding:11px;
+border-radius:10px;
+margin-bottom:4px;
+font-weight:750;
+font-size:12px
 }
 
 .navbtn:hover,
 .navbtn.active{
-    background:#1d5a47;
-    color:#fff
+background:#1d5a47;
+color:#fff
 }
 
 .navgroup{
-    font-size:9px;
-    color:#718c80;
-    text-transform:uppercase;
-    letter-spacing:1px;
-    padding:15px 10px 6px
+font-size:9px;
+color:#718c80;
+text-transform:uppercase;
+letter-spacing:1px;
+padding:15px 10px 6px
 }
 
 main{
-    padding:24px;
-    max-width:1250px;
-    width:100%;
-    margin:auto
+padding:24px;
+max-width:1250px;
+width:100%;
+margin:auto
 }
 
-.view{
-    display:none
-}
+.view{display:none}
 
-.view.active{
-    display:block
-}
+.view.active{display:block}
 
-.head{
-    margin-bottom:18px
-}
+.head{margin-bottom:18px}
 
 .eyebrow{
-    font-size:10px;
-    text-transform:uppercase;
-    letter-spacing:1px;
-    color:var(--green);
-    font-weight:900
+font-size:10px;
+text-transform:uppercase;
+letter-spacing:1px;
+color:var(--green);
+font-weight:900
 }
 
 .head h1{
-    font-size:29px;
-    margin:4px 0
+font-size:29px;
+margin:4px 0
 }
 
 .head p{
-    color:var(--muted);
-    font-size:12px
+color:var(--muted);
+font-size:12px
 }
 
 .grid4{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px
 }
 
 .grid3{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px
 }
 
 .two{
-    display:grid;
-    grid-template-columns:1.25fr .75fr;
-    gap:12px
+display:grid;
+grid-template-columns:1.25fr .75fr;
+gap:12px
 }
 
 .card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:15px;
-    padding:16px
+background:var(--card);
+border:1px solid var(--line);
+border-radius:15px;
+padding:16px
 }
 
 .kpi .label{
-    font-size:9px;
-    color:var(--muted);
-    text-transform:uppercase;
-    font-weight:800;
-    letter-spacing:.7px
+font-size:9px;
+color:var(--muted);
+text-transform:uppercase;
+font-weight:800;
+letter-spacing:.7px
 }
 
 .kpi .value{
-    font-size:25px;
-    font-weight:900;
-    margin-top:5px
+font-size:25px;
+font-weight:900;
+margin-top:5px
 }
 
 .small{
-    font-size:10px;
-    color:var(--muted)
+font-size:10px;
+color:var(--muted)
 }
 
-.good{
-    color:#2d765b
-}
+.good{color:#2d765b}
 
-.bad{
-    color:var(--red)
-}
+.bad{color:var(--red)}
 
-.warn{
-    color:var(--amber)
-}
+.warn{color:var(--amber)}
 
-.section{
-    margin-top:12px
-}
+.section{margin-top:12px}
 
 .sectionhead{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:9px
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:9px
 }
 
 .sectionhead h2{
-    font-size:15px;
-    margin:0
+font-size:15px;
+margin:0
 }
 
 .btn{
-    border:1px solid var(--line);
-    background:#fff;
-    color:#17221e;
-    padding:9px 11px;
-    border-radius:9px;
-    font-size:11px;
-    font-weight:800
+border:1px solid var(--line);
+background:#fff;
+color:#17221e;
+padding:9px 11px;
+border-radius:9px;
+font-size:11px;
+font-weight:800
 }
 
 .btn.primary{
-    background:var(--green);
-    color:#fff;
-    border-color:var(--green)
+background:var(--green);
+color:#fff;
+border-color:var(--green)
 }
 
-.btn.danger{
-    color:var(--red)
-}
+.btn.danger{color:var(--red)}
 
 .actions{
-    display:flex;
-    gap:7px;
-    flex-wrap:wrap
+display:flex;
+gap:7px;
+flex-wrap:wrap
 }
 
-.table{
-    overflow:auto
-}
+.table{overflow:auto}
 
 .table table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:11px
+width:100%;
+border-collapse:collapse;
+font-size:11px
 }
 
 .table th{
-    text-align:left;
-    color:var(--muted);
-    font-size:9px;
-    text-transform:uppercase;
-    padding:8px;
-    border-bottom:1px solid var(--line)
+text-align:left;
+color:var(--muted);
+font-size:9px;
+text-transform:uppercase;
+padding:8px;
+border-bottom:1px solid var(--line)
 }
 
 .table td{
-    padding:10px 8px;
-    border-bottom:1px solid #edf1ef
+padding:10px 8px;
+border-bottom:1px solid #edf1ef
 }
 
-.money{
-    font-weight:850
-}
+.money{font-weight:850}
 
 .pill{
-    display:inline-flex;
-    border-radius:999px;
-    padding:5px 8px;
-    background:#e7f1eb;
-    color:var(--green);
-    font-size:9px;
-    font-weight:850
+display:inline-flex;
+border-radius:999px;
+padding:5px 8px;
+background:#e7f1eb;
+color:var(--green);
+font-size:9px;
+font-weight:850
 }
 
 .pill.pending{
-    background:#fbf0d8;
-    color:var(--amber)
+background:#fbf0d8;
+color:var(--amber)
 }
 
 .pill.paid{
-    background:#e5f1eb;
-    color:#286c53
+background:#e5f1eb;
+color:#286c53
 }
 
-.pill.bad{
-    background:#f7e5e3
-}
+.pill.bad{background:#f7e5e3}
 
 .form{
-    display:grid;
-    gap:9px
+display:grid;
+gap:9px
 }
 
 .formgrid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:9px
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:9px
 }
 
 .form label{
-    font-size:10px;
-    font-weight:850
+font-size:10px;
+font-weight:850
 }
 
 .form input,
 .form select{
-    width:100%;
-    padding:10px;
-    border:1px solid var(--line);
-    border-radius:9px;
-    background:#fff
+width:100%;
+padding:10px;
+border:1px solid var(--line);
+border-radius:9px;
+background:#fff
 }
 
 .notice{
-    padding:12px;
-    border-radius:11px;
-    background:#f8f3e5;
-    color:#74571e;
-    font-size:11px
+padding:12px;
+border-radius:11px;
+background:#f8f3e5;
+color:#74571e;
+font-size:11px
 }
 
 .bar{
-    height:8px;
-    background:#e8eeeb;
-    border-radius:20px;
-    overflow:hidden
+height:8px;
+background:#e8eeeb;
+border-radius:20px;
+overflow:hidden
 }
 
 .bar i{
-    display:block;
-    height:100%;
-    background:var(--green)
+display:block;
+height:100%;
+background:var(--green)
 }
 
 .modal{
-    position:fixed;
-    inset:0;
-    background:#07150ecc;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:50;
-    padding:15px
+position:fixed;
+inset:0;
+background:#07150ecc;
+display:none;
+align-items:center;
+justify-content:center;
+z-index:50;
+padding:15px
 }
 
-.modal.open{
-    display:flex
-}
+.modal.open{display:flex}
 
 .sheet{
-    background:#fff;
-    width:min(620px,100%);
-    max-height:90vh;
-    overflow:auto;
-    border-radius:18px;
-    padding:18px
+background:#fff;
+width:min(620px,100%);
+max-height:90vh;
+overflow:auto;
+border-radius:18px;
+padding:18px
 }
 
 .close{
-    border:0;
-    background:#edf2ef;
-    border-radius:50%;
-    width:32px;
-    height:32px
+border:0;
+background:#edf2ef;
+border-radius:50%;
+width:32px;
+height:32px
 }
 
-.bottom{
-    display:none
-}
+.bottom{display:none}
 
 .site-select{
-    background:#17382d;
-    color:#fff;
-    border:1px solid #2d604f;
-    padding:7px;
-    border-radius:8px;
-    font-size:10px
+background:#17382d;
+color:#fff;
+border:1px solid #2d604f;
+padding:7px;
+border-radius:8px;
+font-size:10px
 }
 
 @media(max-width:850px){
-    .layout{
-        display:block
-    }
 
-    .layout aside{
-        display:none
-    }
+.layout{display:block}
 
-    .grid4,
-    .grid3{
-        grid-template-columns:1fr 1fr
-    }
+.layout aside{display:none}
 
-    .two{
-        grid-template-columns:1fr
-    }
+.grid4,
+.grid3{
+grid-template-columns:1fr 1fr
+}
 
-    .bottom{
-        display:grid;
-        position:fixed;
-        bottom:0;
-        left:0;
-        right:0;
-        background:#fff;
-        border-top:1px solid var(--line);
-        grid-template-columns:repeat(5,1fr);
-        z-index:30;
-        padding-bottom:env(safe-area-inset-bottom)
-    }
+.two{grid-template-columns:1fr}
 
-    .bottom button{
-        border:0;
-        background:#fff;
-        padding:10px 2px;
-        font-size:9px;
-        font-weight:800;
-        color:var(--muted)
-    }
+.bottom{
+display:grid;
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#fff;
+border-top:1px solid var(--line);
+grid-template-columns:repeat(5,1fr);
+z-index:30;
+padding-bottom:env(safe-area-inset-bottom)
+}
 
-    .bottom button.active{
-        color:var(--green)
-    }
+.bottom button{
+border:0;
+background:#fff;
+padding:10px 2px;
+font-size:9px;
+font-weight:800;
+color:var(--muted)
+}
 
-    main{
-        padding:18px 13px 85px
-    }
+.bottom button.active{color:var(--green)}
 
-    .top{
-        padding:0 12px
-    }
+main{
+padding:18px 13px 85px
+}
 
-    .formgrid{
-        grid-template-columns:1fr
-    }
+.top{padding:0 12px}
+
+.formgrid{grid-template-columns:1fr}
+
 }
 </style>
 </head>
@@ -468,9 +426,7 @@ ORDER<span>FLOW</span>
 ⌂ Dashboard
 </button>
 
-<div class="navgroup">
-Operations
-</div>
+<div class="navgroup">Operations</div>
 
 <button class="navbtn" data-view="sales">
 ▣ Sales
@@ -488,9 +444,7 @@ Operations
 ☷ Menu & Costing
 </button>
 
-<div class="navgroup">
-People
-</div>
+<div class="navgroup">People</div>
 
 <button class="navbtn" data-view="staff">
 ♙ Staff
@@ -500,9 +454,7 @@ People
 £ Payroll
 </button>
 
-<div class="navgroup">
-Finance
-</div>
+<div class="navgroup">Finance</div>
 
 <button class="navbtn" data-view="finance">
 £ Finance & EBITDA
@@ -516,9 +468,7 @@ Finance
 ↗ Payments
 </button>
 
-<div class="navgroup">
-Management
-</div>
+<div class="navgroup">Management</div>
 
 <button class="navbtn" data-view="sites">
 ⌂ Sites
@@ -609,3 +559,2437 @@ Good day, {{user.name.split()[0]}}.
 </div>
 
 </section>
+
+<section id="finance" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Finance</div>
+
+<h1>Finance & EBITDA</h1>
+
+<p>
+Management P&L built from the data entered into OrderFlow.
+</p>
+
+</div>
+
+<div class="actions">
+
+<button class="btn" onclick="changeMonth(-1)">
+← Month
+</button>
+
+<button class="btn" onclick="changeMonth(1)">
+Month →
+</button>
+
+<button class="btn primary" onclick="openModal('expenseModal')">
++ Outgoing
+</button>
+
+<button class="btn" onclick="openModal('saleModal')">
++ Sale
+</button>
+
+</div>
+
+<div class="section grid4">
+
+<div class="card kpi">
+<div class="label">Revenue</div>
+<div class="value" id="fRevenue">—</div>
+</div>
+
+<div class="card kpi">
+<div class="label">Gross profit</div>
+<div class="value" id="fGP">—</div>
+<div id="fGPM"></div>
+</div>
+
+<div class="card kpi">
+<div class="label">Labour</div>
+<div class="value" id="fLabour">—</div>
+</div>
+
+<div class="card kpi">
+<div class="label">EBITDA</div>
+<div class="value" id="fEBITDA">—</div>
+<div id="fEBITDAPct"></div>
+</div>
+
+</div>
+
+<div class="section two">
+
+<div class="card">
+
+<div class="sectionhead">
+<h2>Management P&L</h2>
+<span id="fMonth"></span>
+</div>
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Line</th>
+<th>Actual</th>
+</tr>
+
+</thead>
+
+<tbody id="pnl"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="sectionhead">
+<h2>EBITDA bridge</h2>
+</div>
+
+<div id="bridge"></div>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="sales" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Revenue</div>
+
+<h1>Sales</h1>
+
+<p>
+Enter or import sales. POS integration can be connected here later.
+</p>
+
+</div>
+
+<button class="btn primary" onclick="openModal('saleModal')">
++ Record sales
+</button>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Date</th>
+<th>Category</th>
+<th>Net</th>
+<th>VAT</th>
+<th>Gross</th>
+<th>Source</th>
+</tr>
+
+</thead>
+
+<tbody id="salesRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="invoices" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Accounts payable</div>
+
+<h1>Supplier invoices</h1>
+
+<p>
+Capture → approve → schedule → record payment.
+</p>
+
+</div>
+
+<button class="btn primary" onclick="openModal('invoiceModal')">
++ Add invoice
+</button>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Supplier</th>
+<th>Invoice</th>
+<th>Due</th>
+<th>Category</th>
+<th>Gross</th>
+<th>Status</th>
+<th></th>
+</tr>
+
+</thead>
+
+<tbody id="invoiceRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="payments" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Money out</div>
+
+<h1>Payments</h1>
+
+<p>
+Supplier and staff payment instructions with approval history.
+</p>
+
+</div>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Type</th>
+<th>Payee</th>
+<th>Reference</th>
+<th>Amount</th>
+<th>Date</th>
+<th>Status</th>
+</tr>
+
+</thead>
+
+<tbody id="paymentRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="section notice">
+
+OrderFlow currently records payment instructions and their audit trail.
+It does not move real money until a regulated bank/payment provider is connected.
+
+</div>
+
+</section>
+
+<section id="staff" class="view">
+
+<div class="head">
+
+<div class="eyebrow">People</div>
+
+<h1>Staff</h1>
+
+<p>
+Employees, pay rates and holiday settings.
+</p>
+
+</div>
+
+<button class="btn primary" onclick="openModal('employeeModal')">
++ Add employee
+</button>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Name</th>
+<th>Department</th>
+<th>Role</th>
+<th>Pay type</th>
+<th>Rate</th>
+<th>Holiday</th>
+</tr>
+
+</thead>
+
+<tbody id="employeeRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="payroll" class="view">
+
+<div class="head">
+
+<div class="eyebrow">People costs</div>
+
+<h1>Payroll</h1>
+
+<p>
+Prepare, approve and record staff payment runs.
+</p>
+
+</div>
+
+<button class="btn primary" onclick="openModal('payrollModal')">
++ Payroll run
+</button>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Period</th>
+<th>Gross</th>
+<th>Employer costs</th>
+<th>Deductions</th>
+<th>Net</th>
+<th>Status</th>
+<th></th>
+</tr>
+
+</thead>
+
+<tbody id="payrollRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="stock" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Inventory</div>
+
+<h1>Stock</h1>
+
+<p>
+Actual stock levels, cost and movement.
+</p>
+
+</div>
+
+<button class="btn primary" onclick="openModal('stockModal')">
++ Add stock item
+</button>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Item</th>
+<th>Category</th>
+<th>On hand</th>
+<th>Par</th>
+<th>Unit cost</th>
+<th>Status</th>
+</tr>
+
+</thead>
+
+<tbody id="stockRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="purchasing" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Supply chain</div>
+
+<h1>Purchasing</h1>
+
+<p>
+Manage supplier relationships and purchasing data.
+</p>
+
+</div>
+
+<button class="btn primary" onclick="openModal('supplierModal')">
++ Add supplier
+</button>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Supplier</th>
+<th>Contact</th>
+<th>Email</th>
+<th>Terms</th>
+</tr>
+
+</thead>
+
+<tbody id="supplierRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="menu" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Commercial</div>
+
+<h1>Menu & costing</h1>
+
+<p>
+See selling price, recipe cost and gross margin.
+</p>
+
+</div>
+
+<button class="btn primary" onclick="openModal('menuModal')">
++ Menu item
+</button>
+
+<div class="section" id="menuRows"></div>
+
+</section>
+
+<section id="sites" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Multi-site</div>
+
+<h1>Sites</h1>
+
+<p>
+Run one venue or a whole hospitality group from the same account.
+</p>
+
+</div>
+
+<button class="btn primary" onclick="openModal('siteModal')">
++ Add site
+</button>
+
+<div class="section" id="siteRows"></div>
+
+</section>
+
+<section id="settings" class="view">
+
+<div class="head">
+
+<div class="eyebrow">Settings</div>
+
+<h1>{{organisation.name}}</h1>
+
+<p>
+{{organisation.business_type}} · {{organisation.currency}}
+</p>
+
+</div>
+
+<div class="card">
+
+<b>Current site</b>
+
+<div class="small" style="margin-top:4px">
+{{site.name}}
+</div>
+
+<div class="notice" style="margin-top:14px">
+
+Use the Sites section to add locations.
+All operational and financial records are separated by organisation and site.
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+</div>
+
+<nav class="bottom">
+
+<button data-view="dashboard">
+⌂<br>Home
+</button>
+
+<button data-view="finance">
+£<br>Finance
+</button>
+
+<button data-view="invoices">
+▤<br>Invoices
+</button>
+
+<button data-view="payments">
+↗<br>Payments
+</button>
+
+<button data-view="more">
+•••<br>More
+</button>
+
+</nav>
+
+</div>
+
+<div class="modal" id="moreModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>OrderFlow</b>
+
+<button class="close" onclick="closeModal('moreModal')">
+×
+</button>
+
+</div>
+
+<div class="actions">
+
+<button class="btn" onclick="nav('sales');closeModal('moreModal')">
+Sales
+</button>
+
+<button class="btn" onclick="nav('stock');closeModal('moreModal')">
+Stock
+</button>
+
+<button class="btn" onclick="nav('purchasing');closeModal('moreModal')">
+Purchasing
+</button>
+
+<button class="btn" onclick="nav('menu');closeModal('moreModal')">
+Menu
+</button>
+
+<button class="btn" onclick="nav('staff');closeModal('moreModal')">
+Staff
+</button>
+
+<button class="btn" onclick="nav('payroll');closeModal('moreModal')">
+Payroll
+</button>
+
+<button class="btn" onclick="nav('sites');closeModal('moreModal')">
+Sites
+</button>
+
+<button class="btn" onclick="nav('settings');closeModal('moreModal')">
+Settings
+</button>
+
+<form method="post" action="/logout">
+
+<button class="btn danger">
+Sign out
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="modal" id="expenseModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Add outgoing cost</b>
+
+<button class="close" onclick="closeModal('expenseModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="saveExpense(event)">
+
+<label>Category</label>
+
+<select id="expenseCategory">
+<option>Rent</option>
+<option>Business rates</option>
+<option>Utilities</option>
+<option>Insurance</option>
+<option>Repairs & maintenance</option>
+<option>Cleaning</option>
+<option>Laundry</option>
+<option>Waste</option>
+<option>Marketing</option>
+<option>Software</option>
+<option>Accountancy</option>
+<option>Licences</option>
+<option>Bank charges</option>
+<option>Other</option>
+</select>
+
+<label>Description</label>
+
+<input id="expenseDescription" required>
+
+<label>Supplier</label>
+
+<input id="expenseSupplier">
+
+<div class="formgrid">
+
+<div>
+
+<label>Gross (£)</label>
+
+<input id="expenseGross" type="number" step=".01" required>
+
+</div>
+
+<div>
+
+<label>VAT (£)</label>
+
+<input id="expenseVat" type="number" step=".01" value="0">
+
+</div>
+
+</div>
+
+<label>Date</label>
+
+<input id="expenseDate" type="date">
+
+<button class="btn primary">
+Save outgoing
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="saleModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Record sales</b>
+
+<button class="close" onclick="closeModal('saleModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="saveSale(event)">
+
+<label>Category</label>
+
+<select id="saleCategory">
+<option>Food</option>
+<option>Drink</option>
+<option>Other</option>
+</select>
+
+<label>Gross sales (£)</label>
+
+<input id="saleGross" type="number" step=".01" required>
+
+<label>VAT (£)</label>
+
+<input id="saleVat" type="number" step=".01" value="0">
+
+<label>Date</label>
+
+<input id="saleDate" type="date">
+
+<button class="btn primary">
+Record sales
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="invoiceModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Supplier invoice</b>
+
+<button class="close" onclick="closeModal('invoiceModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="saveInvoice(event)">
+
+<div class="formgrid">
+
+<div>
+
+<label>Supplier</label>
+
+<input id="invSupplier" required>
+
+</div>
+
+<div>
+
+<label>Invoice number</label>
+
+<input id="invNumber" required>
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+
+<label>Invoice date</label>
+
+<input id="invDate" type="date">
+
+</div>
+
+<div>
+
+<label>Due date</label>
+
+<input id="invDue" type="date">
+
+</div>
+
+</div>
+
+<label>Category</label>
+
+<select id="invCategory">
+
+<option>Food</option>
+<option>Drink</option>
+<option>Rent</option>
+<option>Utilities</option>
+<option>Cleaning</option>
+<option>Repairs & maintenance</option>
+<option>Other</option>
+
+</select>
+
+<div class="formgrid">
+
+<div>
+
+<label>Net (£)</label>
+
+<input id="invNet" type="number" step=".01" required>
+
+</div>
+
+<div>
+
+<label>VAT (£)</label>
+
+<input id="invVat" type="number" step=".01" value="0">
+
+</div>
+
+</div>
+
+<label>Notes</label>
+
+<input id="invNotes">
+
+<button class="btn primary">
+Create invoice
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="employeeModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Add employee</b>
+
+<button class="close" onclick="closeModal('employeeModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="saveEmployee(event)">
+
+<label>Name</label>
+
+<input id="empName" required>
+
+<label>Email</label>
+
+<input id="empEmail" type="email">
+
+<div class="formgrid">
+
+<div>
+
+<label>Department</label>
+
+<select id="empDept">
+<option>FOH</option>
+<option>BOH</option>
+<option>Management</option>
+</select>
+
+</div>
+
+<div>
+
+<label>Job title</label>
+
+<input id="empTitle">
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+
+<label>Pay type</label>
+
+<select id="empPayType">
+<option>Hourly</option>
+<option>Salary</option>
+</select>
+
+</div>
+
+<div>
+
+<label>Pay rate (£)</label>
+
+<input id="empRate" type="number" step=".01" required>
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+
+<label>Employer NI %</label>
+
+<input id="empNI" type="number" step=".01" value="0">
+
+</div>
+
+<div>
+
+<label>Pension %</label>
+
+<input id="empPension" type="number" step=".01" value="0">
+
+</div>
+
+</div>
+
+<label>Holiday allowance (days)</label>
+
+<input id="empHoliday" type="number" step=".5" value="28">
+
+<button class="btn primary">
+Save employee
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="payrollModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Payroll run</b>
+
+<button class="close" onclick="closeModal('payrollModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="savePayroll(event)">
+
+<div class="formgrid">
+
+<div>
+
+<label>Period start</label>
+
+<input id="payStart" type="date" required>
+
+</div>
+
+<div>
+
+<label>Period end</label>
+
+<input id="payEnd" type="date" required>
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+
+<label>Gross pay (£)</label>
+
+<input id="payGross" type="number" step=".01" required>
+
+</div>
+
+<div>
+
+<label>Employer costs (£)</label>
+
+<input id="payEmployer" type="number" step=".01" value="0">
+
+</div>
+
+</div>
+
+<label>Deductions (£)</label>
+
+<input id="payDeduct" type="number" step=".01" value="0">
+
+<button class="btn primary">
+Create payroll run
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="stockModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Add stock item</b>
+
+<button class="close" onclick="closeModal('stockModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="saveStock(event)">
+
+<label>Item</label>
+
+<input id="stockName" required>
+
+<div class="formgrid">
+
+<div>
+
+<label>Category</label>
+
+<input id="stockCategory" value="Food">
+
+</div>
+
+<div>
+
+<label>Unit</label>
+
+<input id="stockUnit" value="kg">
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+
+<label>On hand</label>
+
+<input id="stockOn" type="number" step=".01" value="0">
+
+</div>
+
+<div>
+
+<label>Par level</label>
+
+<input id="stockPar" type="number" step=".01" value="0">
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+
+<label>Unit cost (£)</label>
+
+<input id="stockCost" type="number" step=".01" value="0">
+
+</div>
+
+<div>
+
+<label>Supplier</label>
+
+<input id="stockSupplier">
+
+</div>
+
+</div>
+
+<button class="btn primary">
+Save stock item
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="supplierModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Add supplier</b>
+
+<button class="close" onclick="closeModal('supplierModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="saveSupplier(event)">
+
+<label>Name</label>
+
+<input id="supName" required>
+
+<label>Contact</label>
+
+<input id="supContact">
+
+<label>Email</label>
+
+<input id="supEmail" type="email">
+
+<label>Phone</label>
+
+<input id="supPhone">
+
+<label>Payment terms (days)</label>
+
+<input id="supTerms" type="number" value="30">
+
+<button class="btn primary">
+Save supplier
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="menuModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Add menu item</b>
+
+<button class="close" onclick="closeModal('menuModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="saveMenu(event)">
+
+<label>Name</label>
+
+<input id="menuName" required>
+
+<label>Category</label>
+
+<input id="menuCategory" value="Main">
+
+<div class="formgrid">
+
+<div>
+
+<label>Selling price (£)</label>
+
+<input id="menuPrice" type="number" step=".01" required>
+
+</div>
+
+<div>
+
+<label>Recipe cost (£)</label>
+
+<input id="menuCost" type="number" step=".01" value="0">
+
+</div>
+
+</div>
+
+<button class="btn primary">
+Save menu item
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="siteModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>Add site</b>
+
+<button class="close" onclick="closeModal('siteModal')">
+×
+</button>
+
+</div>
+
+<form class="form" onsubmit="saveSite(event)">
+
+<label>Site name</label>
+
+<input id="siteName" required>
+
+<label>Address</label>
+
+<input id="siteAddress">
+
+<button class="btn primary">
+Create site
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<div id="toast"
+style="position:fixed;bottom:84px;left:15px;right:15px;max-width:500px;margin:auto;background:#10251d;color:#fff;padding:11px;border-radius:10px;text-align:center;display:none;z-index:80;font-size:11px">
+</div>
+
+<script>
+
+let month=new Date();
+
+const role={{user.role|tojson}};
+
+const $=id=>document.getElementById(id);
+
+function money(n){
+return '£'+Number(n||0).toLocaleString('en-GB',{
+minimumFractionDigits:0,
+maximumFractionDigits:2
+})
+}
+
+function mp(){
+return month.getFullYear()+'-'+String(month.getMonth()+1).padStart(2,'0')
+}
+
+function toast(x){
+$('toast').textContent=x;
+$('toast').style.display='block';
+setTimeout(()=>$('toast').style.display='none',2500)
+}
+
+async function api(url,opt={}){
+let r=await fetch(url,{
+...opt,
+headers:{
+'Content-Type':'application/json',
+...(opt.headers||{})
+}
+});
+
+let d=await r.json();
+
+if(!r.ok)throw Error(d.error||'Request failed');
+
+return d
+}
+
+function openModal(id){
+$(id).classList.add('open')
+}
+
+function closeModal(id){
+$(id).classList.remove('open')
+}
+
+function nav(v){
+
+document.querySelectorAll('.view')
+.forEach(x=>x.classList.remove('active'));
+
+$(v).classList.add('active');
+
+document.querySelectorAll('.navbtn')
+.forEach(x=>x.classList.toggle(
+'active',
+x.dataset.view===v
+));
+
+document.querySelectorAll('.bottom button')
+.forEach(x=>x.classList.toggle(
+'active',
+x.dataset.view===v
+));
+
+load(v);
+
+window.scrollTo(0,0)
+}
+
+document.querySelectorAll('.navbtn')
+.forEach(x=>x.addEventListener(
+'click',
+()=>nav(x.dataset.view)
+));
+
+document.querySelectorAll('.bottom button')
+.forEach(x=>x.addEventListener(
+'click',
+()=>x.dataset.view==='more'
+?openModal('moreModal')
+:nav(x.dataset.view)
+));
+
+function load(v){
+
+if(v==='dashboard')loadDash();
+
+if(v==='finance')loadFinance();
+
+if(v==='sales')loadSales();
+
+if(v==='invoices')loadInvoices();
+
+if(v==='payments')loadPayments();
+
+if(v==='staff')loadStaff();
+
+if(v==='payroll')loadPayroll();
+
+if(v==='stock')loadStock();
+
+if(v==='purchasing')loadSuppliers();
+
+if(v==='menu')loadMenu();
+
+if(v==='sites')loadSites();
+
+}
+
+async function loadDash(){
+
+try{
+
+let d=await api('/api/dashboard');
+
+$('dRevenue').textContent=money(d.revenue);
+
+$('dGP').textContent=d.gross_margin.toFixed(1)+'%';
+
+$('dEBITDA').textContent=money(d.ebitda);
+
+$('dEBITDAPct').textContent=
+d.ebitda_margin.toFixed(1)+'% EBITDA margin';
+
+$('dLabour').textContent=money(d.labour);
+
+$('dashFinancial').innerHTML=`
+
+<div class="small">Revenue</div>
+<div class="money">${money(d.revenue)}</div>
+
+<div class="small" style="margin-top:8px">
+COGS
+</div>
+
+<div class="money">
+${money(d.cogs)}
+</div>
+
+<div class="small" style="margin-top:8px">
+Gross profit
+</div>
+
+<div class="money">
+${money(d.gross_profit)}
+</div>
+
+<div class="small" style="margin-top:8px">
+Labour + overheads
+</div>
+
+<div class="money">
+${money(d.labour+d.overheads)}
+</div>
+
+`;
+
+$('dashAttention').innerHTML=`
+
+<div class="card" style="padding:10px;margin-bottom:7px">
+
+<b>
+${d.outstanding_invoices
+?money(d.outstanding_invoices)
+:'£0'}
+</b>
+
+<div class="small">
+Supplier invoices not yet paid
+</div>
+
+</div>
+
+<div class="card" style="padding:10px;margin-bottom:7px">
+
+<b>${d.low_stock}</b>
+
+<div class="small">
+Stock items below par
+</div>
+
+</div>
+
+<div class="card" style="padding:10px">
+
+<b>${money(d.payroll_due)}</b>
+
+<div class="small">
+Payroll runs awaiting completion
+</div>
+
+</div>
+
+`
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+function changeMonth(n){
+
+month.setMonth(month.getMonth()+n);
+
+loadFinance()
+
+}
+
+async function loadFinance(){
+
+try{
+
+let d=await api('/api/finance?month='+mp());
+
+$('fRevenue').textContent=money(d.revenue);
+
+$('fGP').textContent=money(d.gross_profit);
+
+$('fGPM').textContent=
+d.gross_margin.toFixed(1)+'% gross margin';
+
+$('fLabour').textContent=money(d.labour);
+
+$('fEBITDA').textContent=money(d.ebitda);
+
+$('fEBITDAPct').textContent=
+d.ebitda_margin.toFixed(1)+'% EBITDA margin';
+
+$('fMonth').textContent=d.month;
+
+$('pnl').innerHTML=[
+
+['Revenue',d.revenue],
+
+['Cost of sales',-d.cogs],
+
+['Gross profit',d.gross_profit],
+
+['Labour',-d.labour],
+
+['Overheads',-d.overheads],
+
+['EBITDA',d.ebitda]
+
+].map(x=>`
+
+<tr>
+
+<td>
+<b>${x[0]}</b>
+</td>
+
+<td class="money ${x[1]<0?'bad':''}">
+${money(x[1])}
+</td>
+
+</tr>
+
+`).join('');
+
+$('bridge').innerHTML=`
+
+<div class="small">
+Revenue
+</div>
+
+<h2>
+${money(d.revenue)}
+</h2>
+
+<div class="small">
+− Cost of sales
+</div>
+
+<h3>
+${money(d.cogs)}
+</h3>
+
+<div class="small">
+= Gross profit
+</div>
+
+<h2>
+${money(d.gross_profit)}
+</h2>
+
+<div class="small">
+− Labour
+</div>
+
+<h3>
+${money(d.labour)}
+</h3>
+
+<div class="small">
+− Overheads
+</div>
+
+<h3>
+${money(d.overheads)}
+</h3>
+
+<div class="small">
+= EBITDA
+</div>
+
+<h1>
+${money(d.ebitda)}
+</h1>
+
+`
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function loadSales(){
+
+try{
+
+let d=await api('/api/sales');
+
+$('salesRows').innerHTML=d.sales.map(x=>`
+
+<tr>
+
+<td>${x.sale_date}</td>
+
+<td>${x.category}</td>
+
+<td>${money(x.net)}</td>
+
+<td>${money(x.vat)}</td>
+
+<td class="money">${money(x.gross)}</td>
+
+<td>${x.source}</td>
+
+</tr>
+
+`).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function loadInvoices(){
+
+try{
+
+let d=await api('/api/invoices');
+
+$('invoiceRows').innerHTML=d.invoices.map(x=>{
+
+let a=
+role==='Owner'||
+role==='Admin'||
+role==='Finance'||
+role==='General Manager';
+
+let b=
+a&&x.status==='Awaiting approval'
+?`<button class="btn" onclick="approveInvoice(${x.id})">Approve</button>`
+:a&&x.status==='Approved'
+?`<button class="btn primary" onclick="payInvoice(${x.id})">Record paid</button>`
+:'';
+
+return `
+
+<tr>
+
+<td>${x.supplier}</td>
+
+<td>${x.invoice_number}</td>
+
+<td>${x.due_date}</td>
+
+<td>${x.category}</td>
+
+<td class="money">
+${money(x.gross)}
+</td>
+
+<td>
+
+<span class="pill ${
+x.status==='Paid'
+?'paid'
+:x.status==='Awaiting approval'
+?'pending'
+:''
+}">
+
+${x.status}
+
+</span>
+
+</td>
+
+<td>${b}</td>
+
+</tr>
+
+`
+
+}).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function approveInvoice(id){
+
+try{
+
+await api('/api/invoices/'+id+'/approve',{
+method:'POST'
+});
+
+toast('Invoice approved and payment scheduled');
+
+loadInvoices();
+
+loadPayments();
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function payInvoice(id){
+
+if(!confirm('Record this invoice as paid?'))
+return;
+
+try{
+
+await api('/api/invoices/'+id+'/pay',{
+method:'POST'
+});
+
+toast('Payment recorded');
+
+loadInvoices();
+
+loadPayments();
+
+loadFinance();
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function saveInvoice(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/invoices',{
+method:'POST',
+
+body:JSON.stringify({
+
+supplier:invSupplier.value,
+
+invoice_number:invNumber.value,
+
+invoice_date:invDate.value,
+
+due_date:invDue.value,
+
+category:invCategory.value,
+
+net:Number(invNet.value),
+
+vat:Number(invVat.value),
+
+notes:invNotes.value
+
+})
+
+});
+
+closeModal('invoiceModal');
+
+e.target.reset();
+
+toast('Invoice created');
+
+loadInvoices();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+async function loadPayments(){
+
+try{
+
+let d=await api('/api/payments');
+
+$('paymentRows').innerHTML=d.payments.map(x=>`
+
+<tr>
+
+<td>${x.payment_type}</td>
+
+<td>${x.payee}</td>
+
+<td>${x.reference}</td>
+
+<td class="money">
+${money(x.amount)}
+</td>
+
+<td>${x.payment_date}</td>
+
+<td>
+
+<span class="pill ${
+x.status==='Paid'
+?'paid'
+:'pending'
+}">
+
+${x.status}
+
+</span>
+
+</td>
+
+</tr>
+
+`).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function saveExpense(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/expenses',{
+method:'POST',
+
+body:JSON.stringify({
+
+category:expenseCategory.value,
+
+description:expenseDescription.value,
+
+supplier:expenseSupplier.value,
+
+gross:Number(expenseGross.value),
+
+vat:Number(expenseVat.value),
+
+expense_date:expenseDate.value
+
+})
+
+});
+
+closeModal('expenseModal');
+
+e.target.reset();
+
+toast('Outgoing cost added');
+
+loadFinance();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+async function saveSale(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/sales',{
+method:'POST',
+
+body:JSON.stringify({
+
+category:saleCategory.value,
+
+gross:Number(saleGross.value),
+
+vat:Number(saleVat.value),
+
+sale_date:saleDate.value
+
+})
+
+});
+
+closeModal('saleModal');
+
+e.target.reset();
+
+toast('Sales recorded');
+
+loadSales();
+
+loadFinance();
+
+loadDash();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+async function loadStaff(){
+
+try{
+
+let d=await api('/api/employees');
+
+$('employeeRows').innerHTML=d.employees.map(x=>`
+
+<tr>
+
+<td>
+
+<b>${x.name}</b>
+
+<div class="small">
+${x.email}
+</div>
+
+</td>
+
+<td>${x.department}</td>
+
+<td>${x.job_title||'—'}</td>
+
+<td>${x.pay_type}</td>
+
+<td>${money(x.pay_rate)}</td>
+
+<td>${x.holiday_allowance} days</td>
+
+</tr>
+
+`).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function saveEmployee(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/employees',{
+method:'POST',
+
+body:JSON.stringify({
+
+name:empName.value,
+
+email:empEmail.value,
+
+department:empDept.value,
+
+job_title:empTitle.value,
+
+pay_type:empPayType.value,
+
+pay_rate:Number(empRate.value),
+
+ni_rate:Number(empNI.value),
+
+pension_rate:Number(empPension.value),
+
+holiday_allowance:Number(empHoliday.value)
+
+})
+
+});
+
+closeModal('employeeModal');
+
+e.target.reset();
+
+toast('Employee added');
+
+loadStaff();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+async function loadPayroll(){
+
+try{
+
+let d=await api('/api/payroll');
+
+$('payrollRows').innerHTML=d.runs.map(x=>{
+
+let a=
+role==='Owner'||
+role==='Admin'||
+role==='Finance'||
+role==='General Manager';
+
+let b=
+a&&x.status==='Draft'
+?`<button class="btn" onclick="approvePayroll(${x.id})">Approve</button>`
+:a&&x.status==='Approved'
+?`<button class="btn primary" onclick="payPayroll(${x.id})">Record paid</button>`
+:'';
+
+return `
+
+<tr>
+
+<td>
+${x.period_start} – ${x.period_end}
+</td>
+
+<td>
+${money(x.gross_pay)}
+</td>
+
+<td>
+${money(x.employer_costs)}
+</td>
+
+<td>
+${money(x.deductions)}
+</td>
+
+<td class="money">
+${money(x.net_pay)}
+</td>
+
+<td>
+
+<span class="pill ${
+x.status==='Paid'
+?'paid'
+:'pending'
+}">
+
+${x.status}
+
+</span>
+
+</td>
+
+<td>${b}</td>
+
+</tr>
+
+`
+
+}).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function savePayroll(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/payroll',{
+method:'POST',
+
+body:JSON.stringify({
+
+period_start:payStart.value,
+
+period_end:payEnd.value,
+
+gross_pay:Number(payGross.value),
+
+employer_costs:Number(payEmployer.value),
+
+deductions:Number(payDeduct.value)
+
+})
+
+});
+
+closeModal('payrollModal');
+
+e.target.reset();
+
+toast('Payroll run created');
+
+loadPayroll();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+async function approvePayroll(id){
+
+try{
+
+await api('/api/payroll/'+id+'/approve',{
+method:'POST'
+});
+
+toast('Payroll approved and payment scheduled');
+
+loadPayroll();
+
+loadPayments();
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function payPayroll(id){
+
+if(!confirm('Record this payroll as paid?'))
+return;
+
+try{
+
+await api('/api/payroll/'+id+'/pay',{
+method:'POST'
+});
+
+toast('Staff payment recorded');
+
+loadPayroll();
+
+loadPayments();
+
+loadFinance();
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function loadStock(){
+
+try{
+
+let d=await api('/api/stock');
+
+$('stockRows').innerHTML=d.stock.map(x=>{
+
+let low=x.on_hand<x.par_level;
+
+return `
+
+<tr>
+
+<td>
+
+<b>${x.name}</b>
+
+<div class="small">
+${x.supplier||''}
+</div>
+
+</td>
+
+<td>${x.category}</td>
+
+<td>${x.on_hand} ${x.unit}</td>
+
+<td>${x.par_level}</td>
+
+<td>${money(x.unit_cost)}</td>
+
+<td>
+
+<span class="pill ${low?'bad':''}">
+
+${low?'Below par':'OK'}
+
+</span>
+
+</td>
+
+</tr>
+
+`
+
+}).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function saveStock(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/stock',{
+method:'POST',
+
+body:JSON.stringify({
+
+name:stockName.value,
+
+category:stockCategory.value,
+
+unit:stockUnit.value,
+
+on_hand:Number(stockOn.value),
+
+par_level:Number(stockPar.value),
+
+unit_cost:Number(stockCost.value),
+
+supplier:stockSupplier.value
+
+})
+
+});
+
+closeModal('stockModal');
+
+e.target.reset();
+
+toast('Stock item added');
+
+loadStock();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+async function loadSuppliers(){
+
+try{
+
+let d=await api('/api/suppliers');
+
+$('supplierRows').innerHTML=d.suppliers.map(x=>`
+
+<tr>
+
+<td>
+<b>${x.name}</b>
+</td>
+
+<td>${x.contact}</td>
+
+<td>${x.email}</td>
+
+<td>${x.payment_terms} days</td>
+
+</tr>
+
+`).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function saveSupplier(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/suppliers',{
+method:'POST',
+
+body:JSON.stringify({
+
+name:supName.value,
+
+contact:supContact.value,
+
+email:supEmail.value,
+
+phone:supPhone.value,
+
+payment_terms:Number(supTerms.value)
+
+})
+
+});
+
+closeModal('supplierModal');
+
+e.target.reset();
+
+toast('Supplier added');
+
+loadSuppliers();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+async function loadMenu(){
+
+try{
+
+let d=await api('/api/menu');
+
+$('menuRows').innerHTML=d.menu.map(x=>{
+
+let m=x.selling_price
+?((x.selling_price-x.recipe_cost)/x.selling_price*100)
+:0;
+
+return `
+
+<div class="card"
+style="margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
+
+<div>
+
+<b>${x.name}</b>
+
+<div class="small">
+
+${x.category}
+· Sell ${money(x.selling_price)}
+· Recipe cost ${money(x.recipe_cost)}
+
+</div>
+
+</div>
+
+<span class="pill">
+${m.toFixed(1)}% GP
+</span>
+
+</div>
+
+`
+
+}).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function saveMenu(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/menu',{
+method:'POST',
+
+body:JSON.stringify({
+
+name:menuName.value,
+
+category:menuCategory.value,
+
+selling_price:Number(menuPrice.value),
+
+recipe_cost:Number(menuCost.value)
+
+})
+
+});
+
+closeModal('menuModal');
+
+e.target.reset();
+
+toast('Menu item added');
+
+loadMenu();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+async function loadSites(){
+
+try{
+
+let d=await api('/api/sites');
+
+$('siteRows').innerHTML=d.sites.map(x=>`
+
+<div class="card" style="margin-bottom:7px">
+
+<b>${x.name}</b>
+
+<div class="small">
+${x.address||'No address entered'}
+</div>
+
+</div>
+
+`).join('');
+
+}catch(e){
+toast(e.message)
+}
+
+}
+
+async function saveSite(e){
+
+e.preventDefault();
+
+try{
+
+await api('/api/site',{
+method:'POST',
+
+body:JSON.stringify({
+
+name:siteName.value,
+
+address:siteAddress.value
+
+})
+
+});
+
+closeModal('siteModal');
+
+e.target.reset();
+
+toast('Site created');
+
+loadSites();
+
+}catch(x){
+toast(x.message)
+}
+
+}
+
+loadDash();
+
+</script>
+
+</body>
+</html>
