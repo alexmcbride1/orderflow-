@@ -1,204 +1,642 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create your OrderFlow business</title>
+    <title>OrderFlow — Create your account</title>
 
-<style>
-body{
-    margin:0;
-    background:#f4f7f5;
-    color:#17221e;
-    font-family:system-ui,-apple-system,sans-serif;
-    min-height:100vh;
-    display:grid;
-    place-items:center
-}
+    <style>
+        :root {
+            --dark: #0e211a;
+            --green: #2f765d;
+            --green-dark: #1d5a47;
+            --background: #f4f7f5;
+            --white: #ffffff;
+            --text: #17221e;
+            --muted: #71807a;
+            --border: #dfe8e2;
+            --error-bg: #fff1f0;
+            --error-text: #a33f38;
+        }
 
-.box{
-    width:min(600px,calc(100% - 28px));
-    background:#fff;
-    border:1px solid #dfe8e2;
-    border-radius:22px;
-    padding:28px;
-    box-shadow:0 20px 70px #17382d12
-}
+        * {
+            box-sizing: border-box;
+        }
 
-.logo{
-    font-size:27px;
-    font-weight:900
-}
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+        }
 
-.logo span{
-    color:#2c755b
-}
+        body {
+            background: var(--background);
+            color: var(--text);
 
-.muted{
-    color:#718079;
-    font-size:12px
-}
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
 
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-top:20px
-}
+            min-height: 100vh;
+            padding: 30px 18px;
+        }
 
-label{
-    font-size:11px;
-    font-weight:800
-}
+        .page {
+            width: 100%;
+            max-width: 620px;
+            margin: 0 auto;
+        }
 
-input,select{
-    width:100%;
-    padding:12px;
-    border:1px solid #dfe8e2;
-    border-radius:11px;
-    font-size:14px;
-    box-sizing:border-box
-}
+        .brand {
+            text-align: center;
+            margin-bottom: 26px;
+        }
 
-.full{
-    grid-column:1/-1
-}
+        .logo {
+            font-size: 38px;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -2px;
+            color: var(--text);
+        }
 
-button{
-    grid-column:1/-1;
-    padding:13px;
-    border:0;
-    border-radius:11px;
-    background:#1d5a47;
-    color:white;
-    font-weight:800
-}
+        .logo span {
+            color: var(--green);
+        }
 
-.error{
-    margin-top:14px;
-    padding:10px;
-    border-radius:10px;
-    background:#f7e6e3;
-    color:#9b4038;
-    font-size:12px
-}
+        .tagline {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 14px;
+        }
 
-@media(max-width:600px){
-    .grid{
-        grid-template-columns:1fr
-    }
-}
-</style>
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(23, 56, 45, 0.10);
+        }
 
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .eyebrow {
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 30px;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            font-weight: 850;
+        }
+
+        .intro {
+            margin: 9px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .section-title {
+            margin-top: 26px;
+            margin-bottom: 15px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+
+            font-size: 15px;
+            font-weight: 850;
+            color: var(--dark);
+        }
+
+        .error {
+            background: var(--error-bg);
+            border: 1px solid #f1cbc7;
+            color: var(--error-text);
+
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+
+            font-size: 13px;
+            font-weight: 650;
+            line-height: 1.4;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+
+            font-size: 13px;
+            font-weight: 750;
+            color: var(--text);
+        }
+
+        .hint {
+            display: block;
+            margin-top: 6px;
+
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 50px;
+
+            padding: 0 14px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background: #fbfcfb;
+            color: var(--text);
+
+            font-size: 15px;
+            outline: none;
+
+            transition:
+                border-color 0.15s ease,
+                box-shadow 0.15s ease,
+                background 0.15s ease;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 90px;
+
+            padding: 13px 14px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background: #fbfcfb;
+            color: var(--text);
+
+            font-family: inherit;
+            font-size: 15px;
+
+            resize: vertical;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            background: #ffffff;
+            border-color: var(--green);
+            box-shadow: 0 0 0 4px rgba(47, 118, 93, 0.12);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #9aa59f;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 82px;
+        }
+
+        .show-password {
+            position: absolute;
+
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            border: 0;
+            background: transparent;
+
+            color: var(--green-dark);
+
+            font-size: 12px;
+            font-weight: 800;
+
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .show-password:hover {
+            color: var(--dark);
+        }
+
+        .requirements {
+            background: #f5f8f6;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            padding: 12px 14px;
+            margin-top: 8px;
+
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .requirements strong {
+            color: var(--dark);
+        }
+
+        .submit {
+            width: 100%;
+            height: 55px;
+
+            margin-top: 8px;
+
+            border: 0;
+            border-radius: 13px;
+
+            background: var(--dark);
+            color: #ffffff;
+
+            font-size: 15px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                background 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+        .submit:hover {
+            background: var(--green-dark);
+            box-shadow: 0 8px 24px rgba(14, 33, 26, 0.18);
+        }
+
+        .submit:active {
+            transform: translateY(1px);
+        }
+
+        .login {
+            text-align: center;
+            margin-top: 20px;
+
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .login a {
+            color: var(--green-dark);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .login a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 18px 12px;
+            }
+
+            .card {
+                padding: 23px 18px;
+                border-radius: 20px;
+            }
+
+            .logo {
+                font-size: 34px;
+            }
+
+            h1 {
+                font-size: 27px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="page">
 
-<div class="logo">
-ORDER<span>FLOW</span>
+    <div class="brand">
+
+        <div class="logo">
+            ORDER<span>FLOW</span>
+        </div>
+
+        <div class="tagline">
+            Hospitality management, simplified.
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="heading">
+
+            <div class="eyebrow">
+                Get started
+            </div>
+
+            <h1>
+                Create your OrderFlow account
+            </h1>
+
+            <p class="intro">
+                Set up your business and your first location. You can add more
+                locations and team members once you're inside OrderFlow.
+            </p>
+
+        </div>
+
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="/onboarding">
+
+            <div class="section-title">
+                Your business
+            </div>
+
+            <div class="grid">
+
+                <div class="form-group full">
+
+                    <label for="business_name">
+                        Business name
+                    </label>
+
+                    <input
+                        id="business_name"
+                        name="business_name"
+                        type="text"
+                        placeholder="e.g. The Oak & Crown"
+                        autocomplete="organization"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="business_type">
+                        Business type
+                    </label>
+
+                    <select
+                        id="business_type"
+                        name="business_type"
+                        required
+                    >
+                        <option value="Restaurant">
+                            Restaurant
+                        </option>
+
+                        <option value="Pub">
+                            Pub
+                        </option>
+
+                        <option value="Hotel">
+                            Hotel
+                        </option>
+
+                        <option value="Bar">
+                            Bar
+                        </option>
+
+                        <option value="Cafe">
+                            Café
+                        </option>
+
+                        <option value="Restaurant & Pub">
+                            Restaurant & Pub
+                        </option>
+
+                        <option value="Hospitality Group">
+                            Hospitality Group
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="site_name">
+                        First location
+                    </label>
+
+                    <input
+                        id="site_name"
+                        name="site_name"
+                        type="text"
+                        placeholder="e.g. Derby City Centre"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group full">
+
+                    <label for="address">
+                        Business address
+                    </label>
+
+                    <textarea
+                        id="address"
+                        name="address"
+                        placeholder="Enter the address of your first location"
+                        autocomplete="street-address"
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="section-title">
+                Owner account
+            </div>
+
+            <div class="grid">
+
+                <div class="form-group">
+
+                    <label for="owner_name">
+                        Your name
+                    </label>
+
+                    <input
+                        id="owner_name"
+                        name="owner_name"
+                        type="text"
+                        placeholder="Your full name"
+                        autocomplete="name"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email address
+                    </label>
+
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group full">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Create a secure password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="show-password"
+                            id="passwordToggle"
+                            onclick="togglePassword()"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                    <div class="requirements">
+                        <strong>Password requirement:</strong>
+                        your password must contain at least 8 characters.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="submit"
+            >
+                Create OrderFlow account
+            </button>
+
+        </form>
+
+        <div class="login">
+            Already have an account?
+            <a href="/login">Sign in</a>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        OrderFlow · Hospitality management platform
+    </div>
+
 </div>
 
-<div class="muted">
-Set up your hospitality business
-</div>
 
-{% if error %}
-<div class="error">{{error}}</div>
-{% endif %}
+<script>
 
-<form class="grid" method="post">
+function togglePassword() {
 
-<div class="full">
-<label>Business name</label>
-<input
-    name="business_name"
-    placeholder="Your business or company"
-    required
->
-</div>
+    const password =
+        document.getElementById("password");
 
-<div>
-<label>Business type</label>
+    const toggle =
+        document.getElementById("passwordToggle");
 
-<select name="business_type">
-<option>Pub</option>
-<option>Restaurant</option>
-<option>Hotel</option>
-<option>Bar</option>
-<option>Café</option>
-<option>Hospitality Group</option>
-</select>
+    if (password.type === "password") {
 
-</div>
+        password.type = "text";
+        toggle.textContent = "Hide";
 
-<div>
-<label>First site / venue</label>
+    } else {
 
-<input
-    name="site_name"
-    placeholder="Main site"
-    required
->
+        password.type = "password";
+        toggle.textContent = "Show";
 
-</div>
+    }
+}
 
-<div class="full">
-
-<label>Address</label>
-
-<input
-    name="address"
-    placeholder="Venue address"
->
-
-</div>
-
-<div>
-
-<label>Your name</label>
-
-<input
-    name="owner_name"
-    required
->
-
-</div>
-
-<div>
-
-<label>Email</label>
-
-<input
-    type="email"
-    name="email"
-    required
->
-
-</div>
-
-<div>
-
-<label>Password</label>
-
-<input
-    type="password"
-    name="password"
-    minlength="8"
-    required
->
-
-</div>
-
-<button>
-Create OrderFlow business
-</button>
-
-</form>
-
-</div>
+</script>
 
 </body>
 </html>
