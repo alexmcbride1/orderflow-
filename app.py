@@ -2,6 +2,7 @@ import os
 import sqlite3
 from datetime import date, datetime
 from functools import wraps
+from urllib.parse import quote_plus
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -259,6 +260,23 @@ def init_db():
         active INTEGER NOT NULL DEFAULT 1,
         FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
         FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE
+    );
+    CREATE TABLE IF NOT EXISTS events(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        organisation_id INTEGER NOT NULL,
+        site_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        event_date TEXT NOT NULL,
+        start_time TEXT DEFAULT '',
+        end_time TEXT DEFAULT '',
+        event_type TEXT NOT NULL DEFAULT 'General',
+        notes TEXT DEFAULT '',
+        all_day INTEGER NOT NULL DEFAULT 0,
+        created_by INTEGER,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+        FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE,
+        FOREIGN KEY(created_by) REFERENCES users(id)
     );
     CREATE TABLE IF NOT EXISTS budgets(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -978,10 +996,199 @@ def health():
     return jsonify(status="ok", service="OrderFlow")
 
 
+WEATHER_CODES = {
+    0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+    45: "Fog", 48: "Rime fog", 51: "Light drizzle", 53: "Drizzle",
+    55: "Heavy drizzle", 56: "Freezing drizzle", 57: "Heavy freezing drizzle",
+    61: "Light rain", 63: "Rain", 65: "Heavy rain", 66: "Freezing rain",
+    67: "Heavy freezing rain", 71: "Light snow", 73: "Snow", 75: "Heavy snow",
+    77: "Snow grains", 80: "Rain showers", 81: "Rain showers", 82: "Heavy rain showers",
+    85: "Snow showers", 86: "Heavy snow showers", 95: "Thunderstorm",
+    96: "Thunderstorm with hail", 99: "Thunderstorm with heavy hail"
+}
+
+
+def weather_payload(latitude, longitude, location_label="Your location"):
+    url = "https://api.open-meteo.com/v1/forecast"
+    params = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "current": "temperature_2m,apparent_temperature,weather_code,precipitation,wind_speed_10m",
+        "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset",
+        "forecast_days": 7,
+        "timezone": "auto"
+    }
+    r = requests.get(url, params=params, timeout=10)
+    r.raise_for_status()
+    d = r.json()
+    current = d.get("current", {})
+    daily = d.get("daily", {})
+    days = []
+    dates = daily.get("time", [])
+    codes = daily.get("weather_code", [])
+    highs = daily.get("temperature_2m_max", [])
+    lows = daily.get("temperature_2m_min", [])
+    rain_prob = daily.get("precipitation_probability_max", [])
+    rain_sum = daily.get("precipitation_sum", [])
+    sunrise = daily.get("sunrise", [])
+    sunset = daily.get("sunset", [])
+    for i, day in enumerate(dates):
+        code = codes[i] if i < len(codes) else None
+        days.append({
+            "date": day,
+            "code": code,
+            "description": WEATHER_CODES.get(code, "Weather"),
+            "high": highs[i] if i < len(highs) else None,
+            "low": lows[i] if i < len(lows) else None,
+            "rain_probability": rain_prob[i] if i < len(rain_prob) else None,
+            "rain_mm": rain_sum[i] if i < len(rain_sum) else None,
+            "sunrise": sunrise[i] if i < len(sunrise) else None,
+            "sunset": sunset[i] if i < len(sunset) else None
+        })
+    return {
+        "location": location_label,
+        "timezone": d.get("timezone"),
+        "latitude": latitude,
+        "longitude": longitude,
+        "current": {
+            "temperature": current.get("temperature_2m"),
+            "apparent_temperature": current.get("apparent_temperature"),
+            "wind_speed": current.get("wind_speed_10m"),
+            "precipitation": current.get("precipitation"),
+            "code": current.get("weather_code"),
+            "description": WEATHER_CODES.get(current.get("weather_code"), "Weather")
+        },
+        "daily": days,
+        "source": "Open-Meteo"
+    }
+
+
 @app.get("/api/weather")
 @login_required
 def weather():
-    return jsonify(current={"description": "Weather unavailable", "temperature": 0, "code": 0}, daily=[])
+    u, s = user(), current_site()
+    try:
+        lat = float(request.args.get("lat")) if request.args.get("lat") else None
+        lon = float(request.args.get("lon")) if request.args.get("lon") else None
+    except Exception:
+        return jsonify(error="Invalid location coordinates"), 400
+
+    location_label = "Your location"
+    if lat is None or lon is None:
+        address = (s["address"] if s else "") or (s["name"] if s else "")
+        if not address:
+            return jsonify(error="Location unavailable. Allow location access or add a site address."), 400
+        geo_url = "https://geocoding-api.open-meteo.com/v1/search"
+        try:
+            gr = requests.get(geo_url, params={"name": address, "count": 1, "language": "en", "format": "json"}, timeout=10)
+            gr.raise_for_status()
+            results = gr.json().get("results") or []
+            if not results:
+                return jsonify(error="Could not find the site location. Allow browser location access or update the site address."), 400
+            place = results[0]
+            lat = float(place["latitude"])
+            lon = float(place["longitude"])
+            location_label = ", ".join(x for x in [place.get("name"), place.get("admin1"), place.get("country")] if x)
+        except Exception as exc:
+            return jsonify(error=f"Weather service unavailable: {exc}"), 502
+
+    try:
+        return jsonify(weather_payload(lat, lon, location_label))
+    except requests.RequestException:
+        return jsonify(error="Weather service is temporarily unavailable."), 502
+    except Exception:
+        return jsonify(error="Unable to load weather right now."), 500
+
+
+@app.get("/api/events")
+@login_required
+def get_events():
+    u, s = user(), current_site()
+    month = request.args.get("month") or date.today().strftime("%Y-%m")
+    start, end = month_bounds(month)
+    result = q("""SELECT e.*,u.name created_by_name FROM events e
+                  LEFT JOIN users u ON u.id=e.created_by
+                  WHERE e.organisation_id=? AND e.site_id=? AND e.event_date>=? AND e.event_date<?
+                  ORDER BY e.event_date,e.start_time,e.id""",
+                (u["organisation_id"], s["id"], start, end))
+    return jsonify(events=[dict(x) for x in result], month=month)
+
+
+@app.post("/api/events")
+@login_required
+@manager_required
+def add_event():
+    u, s = user(), current_site()
+    d = request.get_json() or {}
+    title = (d.get("title") or "").strip()
+    event_date = (d.get("event_date") or "").strip()
+    event_type = (d.get("event_type") or "General").strip()
+    start_time = (d.get("start_time") or "").strip()
+    end_time = (d.get("end_time") or "").strip()
+    notes = (d.get("notes") or "").strip()
+    all_day = 1 if d.get("all_day") else 0
+    if not title or not event_date:
+        return jsonify(error="Event title and date are required"), 400
+    try:
+        datetime.strptime(event_date, "%Y-%m-%d")
+        if start_time:
+            datetime.strptime(start_time, "%H:%M")
+        if end_time:
+            datetime.strptime(end_time, "%H:%M")
+    except ValueError:
+        return jsonify(error="Use a valid date and time"), 400
+    event_id = execute("""INSERT INTO events(organisation_id,site_id,title,event_date,start_time,end_time,event_type,notes,all_day,created_by,created_at)
+                          VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
+                       (u["organisation_id"], s["id"], title, event_date, start_time, end_time, event_type, notes, all_day, u["id"], now()))
+    audit("Created", "event", event_id, title)
+    return jsonify(ok=True, id=event_id)
+
+
+@app.delete("/api/events/<int:event_id>")
+@login_required
+@manager_required
+def delete_event(event_id):
+    u, s = user(), current_site()
+    event = q("SELECT * FROM events WHERE id=? AND organisation_id=? AND site_id=?", (event_id, u["organisation_id"], s["id"]), True)
+    if not event:
+        return jsonify(error="Event not found"), 404
+    execute("DELETE FROM events WHERE id=?", (event_id,))
+    audit("Deleted", "event", event_id, event["title"])
+    return jsonify(ok=True)
+
+
+MARKET_INSTRUMENTS = [
+    {"name": "Wheat", "symbol": "W_1", "category": "Grain", "unit": "USD / contract"},
+    {"name": "Corn", "symbol": "C_1", "category": "Grain", "unit": "USD / contract"},
+    {"name": "Sugar", "symbol": "SB1", "category": "Sugar", "unit": "USD / contract"},
+    {"name": "Coffee", "symbol": "KC1", "category": "Coffee", "unit": "USD / contract"},
+    {"name": "Cocoa", "symbol": "CC1", "category": "Cocoa", "unit": "USD / contract"},
+    {"name": "Orange Juice", "symbol": "OJ1", "category": "Fruit", "unit": "USD / contract"},
+    {"name": "Brent Crude", "symbol": "BRENT/USD", "category": "Energy", "unit": "USD / barrel"}
+]
+
+
+@app.get("/api/market")
+@login_required
+def market():
+    api_key = os.environ.get("MARKET_API_KEY", "").strip()
+    if not api_key:
+        return jsonify(configured=False, provider="Twelve Data", message="Add MARKET_API_KEY to enable live market prices.", instruments=MARKET_INSTRUMENTS)
+    rows = []
+    errors = []
+    for item in MARKET_INSTRUMENTS:
+        try:
+            r = requests.get("https://api.twelvedata.com/price", params={"symbol": item["symbol"], "apikey": api_key}, timeout=8)
+            data = r.json()
+            if r.ok and data.get("price") is not None:
+                rows.append({**item, "price": float(data["price"]), "timestamp": data.get("timestamp"), "status": "Live"})
+            else:
+                errors.append(item["name"])
+                rows.append({**item, "price": None, "status": "Unavailable"})
+        except Exception:
+            errors.append(item["name"])
+            rows.append({**item, "price": None, "status": "Unavailable"})
+    return jsonify(configured=True, provider="Twelve Data", instruments=rows, errors=errors, updated_at=now())
 
 
 if __name__ == "__main__":
