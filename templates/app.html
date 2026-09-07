@@ -7,412 +7,519 @@
 
 <style>
 :root{
---green:#1d5a47;
---dark:#0f211a;
---bg:#f4f7f5;
---card:#fff;
---line:#dfe8e2;
---muted:#718079;
---red:#a3423a;
---amber:#8c641e
+  --green:#1d5a47;
+  --dark:#0f211a;
+  --bg:#f4f7f5;
+  --card:#fff;
+  --line:#dfe8e2;
+  --muted:#718079;
+  --red:#a3423a;
+  --amber:#8c641e;
 }
 
 *{box-sizing:border-box}
 
 body{
-margin:0;
-background:var(--bg);
-color:#17221e;
-font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+  margin:0;
+  background:var(--bg);
+  color:#17221e;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
 }
 
 .app{min-height:100vh}
 
 .top{
-height:64px;
-background:#fff;
-border-bottom:1px solid var(--line);
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:0 18px;
-position:sticky;
-top:0;
-z-index:20
+  height:64px;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 18px;
+  position:sticky;
+  top:0;
+  z-index:20
 }
 
 .logo{
-font-size:19px;
-font-weight:900
+  font-size:19px;
+  font-weight:900
 }
 
 .logo span{color:#2c755b}
 
 .site{
-font-size:11px;
-color:var(--muted);
-text-align:right
+  font-size:11px;
+  color:var(--muted);
+  text-align:right
 }
 
 .site b{
-display:block;
-color:#17221e
+  display:block;
+  color:#17221e
 }
 
 .layout{
-display:grid;
-grid-template-columns:225px 1fr;
-min-height:calc(100vh - 64px)
+  display:grid;
+  grid-template-columns:225px 1fr;
+  min-height:calc(100vh - 64px)
 }
 
 aside{
-background:#10251d;
-color:white;
-padding:18px 12px
+  background:#10251d;
+  color:white;
+  padding:18px 12px
 }
 
 .navbtn{
-display:block;
-width:100%;
-text-align:left;
-border:0;
-background:transparent;
-color:#c5d3cc;
-padding:11px;
-border-radius:10px;
-margin-bottom:4px;
-font-weight:750;
-font-size:12px
+  display:block;
+  width:100%;
+  text-align:left;
+  border:0;
+  background:transparent;
+  color:#c5d3cc;
+  padding:11px;
+  border-radius:10px;
+  margin-bottom:4px;
+  font-weight:750;
+  font-size:12px
 }
 
 .navbtn:hover,
 .navbtn.active{
-background:#1d5a47;
-color:#fff
+  background:#1d5a47;
+  color:#fff
 }
 
 .navgroup{
-font-size:9px;
-color:#718c80;
-text-transform:uppercase;
-letter-spacing:1px;
-padding:15px 10px 6px
+  font-size:9px;
+  color:#718c80;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  padding:15px 10px 6px
 }
 
 main{
-padding:24px;
-max-width:1250px;
-width:100%;
-margin:auto
+  padding:24px;
+  max-width:1250px;
+  width:100%;
+  margin:auto
 }
 
 .view{display:none}
-
 .view.active{display:block}
 
-.head{
-margin-bottom:18px
-}
+.head{margin-bottom:18px}
 
 .eyebrow{
-font-size:10px;
-text-transform:uppercase;
-letter-spacing:1px;
-color:var(--green);
-font-weight:900
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--green);
+  font-weight:900
 }
 
 .head h1{
-font-size:29px;
-margin:4px 0
+  font-size:29px;
+  margin:4px 0
 }
 
 .head p{
-color:var(--muted);
-font-size:12px
+  color:var(--muted);
+  font-size:12px
 }
 
 .grid4{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px
 }
 
 .grid3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:10px
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px
 }
 
 .two{
-display:grid;
-grid-template-columns:1.25fr .75fr;
-gap:12px
+  display:grid;
+  grid-template-columns:1.25fr .75fr;
+  gap:12px
 }
 
 .card{
-background:var(--card);
-border:1px solid var(--line);
-border-radius:15px;
-padding:16px
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:16px
 }
 
 .kpi .label{
-font-size:9px;
-color:var(--muted);
-text-transform:uppercase;
-font-weight:800;
-letter-spacing:.7px
+  font-size:9px;
+  color:var(--muted);
+  text-transform:uppercase;
+  font-weight:800;
+  letter-spacing:.7px
 }
 
 .kpi .value{
-font-size:25px;
-font-weight:900;
-margin-top:5px
+  font-size:25px;
+  font-weight:900;
+  margin-top:5px
 }
 
 .small{
-font-size:10px;
-color:var(--muted)
+  font-size:10px;
+  color:var(--muted)
 }
 
 .good{color:#2d765b}
 .bad{color:var(--red)}
 .warn{color:var(--amber)}
 
-.section{
-margin-top:12px
-}
+.section{margin-top:12px}
 
 .sectionhead{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:9px
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:9px
 }
 
 .sectionhead h2{
-font-size:15px;
-margin:0
+  font-size:15px;
+  margin:0
 }
 
 .btn{
-border:1px solid var(--line);
-background:#fff;
-color:#17221e;
-padding:9px 11px;
-border-radius:9px;
-font-size:11px;
-font-weight:800
+  border:1px solid var(--line);
+  background:#fff;
+  color:#17221e;
+  padding:9px 11px;
+  border-radius:9px;
+  font-size:11px;
+  font-weight:800
 }
 
 .btn.primary{
-background:var(--green);
-color:#fff;
-border-color:var(--green)
+  background:var(--green);
+  color:#fff;
+  border-color:var(--green)
 }
 
-.btn.danger{
-color:var(--red)
-}
+.btn.danger{color:var(--red)}
 
 .actions{
-display:flex;
-gap:7px;
-flex-wrap:wrap
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap
 }
 
-.table{
-overflow:auto
-}
+.table{overflow:auto}
 
 .table table{
-width:100%;
-border-collapse:collapse;
-font-size:11px
+  width:100%;
+  border-collapse:collapse;
+  font-size:11px
 }
 
 .table th{
-text-align:left;
-color:var(--muted);
-font-size:9px;
-text-transform:uppercase;
-padding:8px;
-border-bottom:1px solid var(--line)
+  text-align:left;
+  color:var(--muted);
+  font-size:9px;
+  text-transform:uppercase;
+  padding:8px;
+  border-bottom:1px solid var(--line)
 }
 
 .table td{
-padding:10px 8px;
-border-bottom:1px solid #edf1ef
+  padding:10px 8px;
+  border-bottom:1px solid #edf1ef
 }
 
-.money{
-font-weight:850
-}
+.money{font-weight:850}
 
 .pill{
-display:inline-flex;
-border-radius:999px;
-padding:5px 8px;
-background:#e7f1eb;
-color:var(--green);
-font-size:9px;
-font-weight:850
+  display:inline-flex;
+  border-radius:999px;
+  padding:5px 8px;
+  background:#e7f1eb;
+  color:var(--green);
+  font-size:9px;
+  font-weight:850
 }
 
 .pill.pending{
-background:#fbf0d8;
-color:var(--amber)
+  background:#fbf0d8;
+  color:var(--amber)
 }
 
 .pill.paid{
-background:#e5f1eb;
-color:#286c53
+  background:#e5f1eb;
+  color:#286c53
 }
 
 .pill.bad{
-background:#f7e5e3
+  background:#f7e5e3
 }
 
 .form{
-display:grid;
-gap:9px
+  display:grid;
+  gap:9px
 }
 
 .formgrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:9px
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
 }
 
 .form label{
-font-size:10px;
-font-weight:850
+  font-size:10px;
+  font-weight:850
 }
 
 .form input,
 .form select{
-width:100%;
-padding:10px;
-border:1px solid var(--line);
-border-radius:9px;
-background:#fff
+  width:100%;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#fff
 }
 
 .notice{
-padding:12px;
-border-radius:11px;
-background:#f8f3e5;
-color:#74571e;
-font-size:11px
+  padding:12px;
+  border-radius:11px;
+  background:#f8f3e5;
+  color:#74571e;
+  font-size:11px
 }
 
 .bar{
-height:8px;
-background:#e8eeeb;
-border-radius:20px;
-overflow:hidden
+  height:8px;
+  background:#e8eeeb;
+  border-radius:20px;
+  overflow:hidden
 }
 
 .bar i{
-display:block;
-height:100%;
-background:var(--green)
+  display:block;
+  height:100%;
+  background:var(--green)
 }
 
 .modal{
-position:fixed;
-inset:0;
-background:#07150ecc;
-display:none;
-align-items:center;
-justify-content:center;
-z-index:50;
-padding:15px
+  position:fixed;
+  inset:0;
+  background:#07150ecc;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+  padding:15px
 }
 
-.modal.open{
-display:flex
-}
+.modal.open{display:flex}
 
 .sheet{
-background:#fff;
-width:min(620px,100%);
-max-height:90vh;
-overflow:auto;
-border-radius:18px;
-padding:18px
+  background:#fff;
+  width:min(620px,100%);
+  max-height:90vh;
+  overflow:auto;
+  border-radius:18px;
+  padding:18px
 }
 
 .close{
-border:0;
-background:#edf2ef;
-border-radius:50%;
-width:32px;
-height:32px
+  border:0;
+  background:#edf2ef;
+  border-radius:50%;
+  width:32px;
+  height:32px
 }
 
-.bottom{
-display:none
+.bottom{display:none}
+
+.site-select{
+  background:#17382d;
+  color:#fff;
+  border:1px solid #2d604f;
+  padding:7px;
+  border-radius:8px;
+  font-size:10px
+}
+
+.weather-current{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px
+}
+
+.weather-temp{
+  font-size:34px;
+  font-weight:900
+}
+
+.weather-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px
+}
+
+.weather-day{
+  padding:9px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  text-align:center
+}
+
+.weather-icon{font-size:18px}
+
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden
+}
+
+.cal-head{
+  background:#f1f5f2;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:900;
+  padding:8px;
+  text-align:center
+}
+
+.cal-day{
+  min-height:100px;
+  border-top:1px solid var(--line);
+  border-right:1px solid var(--line);
+  padding:7px;
+  background:#fff
+}
+
+.cal-day:nth-child(7n){border-right:0}
+
+.cal-date{
+  font-size:10px;
+  font-weight:900
+}
+
+.cal-event{
+  display:block;
+  margin-top:5px;
+  padding:4px 5px;
+  border-radius:6px;
+  background:#e7f1eb;
+  color:var(--green);
+  font-size:9px;
+  font-weight:800;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis
+}
+
+.market-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px
+}
+
+.market-card{
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#fff
+}
+
+.market-price{
+  font-size:21px;
+  font-weight:900;
+  margin-top:5px
+}
+
+.market-updated{
+  font-size:9px;
+  color:var(--muted)
 }
 
 @media(max-width:850px){
 
-.layout{
-display:block
-}
+  .weather-grid{
+    grid-template-columns:repeat(4,1fr)
+  }
 
-.layout aside{
-display:none
-}
+  .market-grid{
+    grid-template-columns:1fr 1fr
+  }
 
-.grid4,
-.grid3{
-grid-template-columns:1fr 1fr
-}
+  .calendar{
+    overflow:auto;
+    min-width:650px
+  }
 
-.two{
-grid-template-columns:1fr
-}
+  .calendar-wrap{
+    overflow:auto
+  }
 
-.bottom{
-display:grid;
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-background:#fff;
-border-top:1px solid var(--line);
-grid-template-columns:repeat(5,1fr);
-z-index:30;
-padding-bottom:env(safe-area-inset-bottom)
-}
+  .layout{
+    display:block
+  }
 
-.bottom button{
-border:0;
-background:#fff;
-padding:10px 2px;
-font-size:9px;
-font-weight:800;
-color:var(--muted)
-}
+  .layout aside{
+    display:none
+  }
 
-.bottom button.active{
-color:var(--green)
-}
+  .grid4,
+  .grid3{
+    grid-template-columns:1fr 1fr
+  }
 
-main{
-padding:18px 13px 85px
-}
+  .two{
+    grid-template-columns:1fr
+  }
 
-.top{
-padding:0 12px
-}
+  .bottom{
+    display:grid;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#fff;
+    border-top:1px solid var(--line);
+    grid-template-columns:repeat(5,1fr);
+    z-index:30;
+    padding-bottom:env(safe-area-inset-bottom)
+  }
 
-.formgrid{
-grid-template-columns:1fr
-}
+  .bottom button{
+    border:0;
+    background:#fff;
+    padding:10px 2px;
+    font-size:9px;
+    font-weight:800;
+    color:var(--muted)
+  }
 
+  .bottom button.active{
+    color:var(--green)
+  }
+
+  main{
+    padding:18px 13px 85px
+  }
+
+  .top{
+    padding:0 12px
+  }
+
+  .formgrid{
+    grid-template-columns:1fr
+  }
 }
 </style>
 </head>
@@ -422,96 +529,49 @@ grid-template-columns:1fr
 <div class="app">
 
 <header class="top">
+  <div class="logo">ORDER<span>FLOW</span></div>
 
-<div class="logo">
-ORDER<span>FLOW</span>
-</div>
-
-<div class="site">
-<b>{{organisation.name}}</b>
-{{site.name}}
-</div>
-
+  <div class="site">
+    <b>{{organisation.name}}</b>
+    {{site.name}}
+  </div>
 </header>
 
 <div class="layout">
 
 <aside>
 
-<button class="navbtn active" data-view="dashboard">
-⌂ Dashboard
-</button>
+<button class="navbtn active" data-view="dashboard">⌂ Dashboard</button>
 
 <div class="navgroup">Operations</div>
-
-<button class="navbtn" data-view="sales">
-▣ Sales
-</button>
-
-<button class="navbtn" data-view="stock">
-▤ Stock
-</button>
-
-<button class="navbtn" data-view="purchasing">
-🛒 Purchasing
-</button>
-
-<button class="navbtn" data-view="menu">
-☷ Menu & Costing
-</button>
+<button class="navbtn" data-view="sales">▣ Sales</button>
+<button class="navbtn" data-view="stock">▤ Stock</button>
+<button class="navbtn" data-view="purchasing">🛒 Purchasing</button>
+<button class="navbtn" data-view="menu">☷ Menu & Costing</button>
 
 <div class="navgroup">People</div>
-
-<button class="navbtn" data-view="staff">
-♙ Staff
-</button>
-
-<button class="navbtn" data-view="shifts">
-▦ Shifts & Rota
-</button>
-
-<button class="navbtn" data-view="payroll">
-£ Payroll
-</button>
+<button class="navbtn" data-view="staff">♙ Staff</button>
+<button class="navbtn" data-view="shifts">▦ Shifts & Rota</button>
+<button class="navbtn" data-view="payroll">£ Payroll</button>
 
 <div class="navgroup">Finance</div>
+<button class="navbtn" data-view="finance">£ Finance & EBITDA</button>
+<button class="navbtn" data-view="invoices">▤ Invoices</button>
+<button class="navbtn" data-view="payments">↗ Payments</button>
 
-<button class="navbtn" data-view="finance">
-£ Finance & EBITDA
-</button>
-
-<button class="navbtn" data-view="invoices">
-▤ Invoices
-</button>
-
-<button class="navbtn" data-view="payments">
-↗ Payments
-</button>
+<div class="navgroup">Planning & Intelligence</div>
+<button class="navbtn" data-view="calendar">▦ Calendar</button>
+<button class="navbtn" data-view="market">↗ Market Watch</button>
+<button class="navbtn" data-view="weather">☀ Weather</button>
 
 <div class="navgroup">Management</div>
-
-<button class="navbtn" data-view="budgets">
-◫ Budgets
-</button>
-
-<button class="navbtn" data-view="audit">
-◉ Audit Log
-</button>
-
-<button class="navbtn" data-view="sites">
-⌂ Sites
-</button>
-
-<button class="navbtn" data-view="settings">
-⚙ Settings
-</button>
+<button class="navbtn" data-view="budgets">◫ Budgets</button>
+<button class="navbtn" data-view="audit">◉ Audit log</button>
+<button class="navbtn" data-view="sites">⌂ Sites</button>
+<button class="navbtn" data-view="settings">⚙ Settings</button>
 
 <form method="post" action="/logout" style="margin-top:20px">
-
-<button class="navbtn">
-↪ Sign out
-</button>
-
+  <button class="navbtn">↪ Sign out</button>
 </form>
 
 </aside>
@@ -521,71 +581,56 @@ ORDER<span>FLOW</span>
 <section id="dashboard" class="view active">
 
 <div class="head">
-
-<div class="eyebrow">
-Management dashboard
-</div>
-
-<h1>
-Good day, {{user.name.split()[0]}}.
-</h1>
-
-<p>
-{{organisation.name}} · {{site.name}}. Everything important in one place.
-</p>
-
+  <div class="eyebrow">Management dashboard</div>
+  <h1>Good day, {{user.name.split()[0]}}.</h1>
+  <p>{{organisation.name}} · {{site.name}}. Everything important in one place.</p>
 </div>
 
 <div class="grid4">
 
 <div class="card kpi">
-
-<div class="label">
-Revenue this month
-</div>
-
-<div class="value" id="dRevenue">
-—
-</div>
-
+  <div class="label">Revenue this month</div>
+  <div class="value" id="dRevenue">—</div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-Gross margin
-</div>
-
-<div class="value" id="dGP">
-—
-</div>
-
+  <div class="label">Gross margin</div>
+  <div class="value" id="dGP">—</div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-EBITDA
-</div>
-
-<div class="value" id="dEBITDA">
-—
-</div>
-
-<div class="good" id="dEBITDAPct">
-</div>
-
+  <div class="label">EBITDA</div>
+  <div class="value" id="dEBITDA">—</div>
+  <div class="good" id="dEBITDAPct"></div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-Labour
+  <div class="label">Labour</div>
+  <div class="value" id="dLabour">—</div>
 </div>
 
-<div class="value" id="dLabour">
-—
 </div>
+
+<div class="section two">
+
+<div class="card">
+
+<div class="sectionhead">
+  <h2>Financial position</h2>
+  <span class="small">Current month</span>
+</div>
+
+<div id="dashFinancial"></div>
+
+</div>
+
+<div class="card">
+
+<div class="sectionhead">
+  <h2>Attention</h2>
+</div>
+
+<div id="dashAttention"></div>
 
 </div>
 
@@ -596,18 +641,12 @@ Labour
 <div class="card">
 
 <div class="sectionhead">
-
-<h2>
-Financial position
-</h2>
-
-<span class="small">
-Current month
-</span>
-
+  <h2>Weather</h2>
+  <button class="btn" onclick="loadWeather(true)">Refresh</button>
 </div>
 
-<div id="dashFinancial">
+<div id="dashWeather">
+  <div class="small">Loading local forecast…</div>
 </div>
 
 </div>
@@ -615,16 +654,27 @@ Current month
 <div class="card">
 
 <div class="sectionhead">
+  <h2>Upcoming events</h2>
+  <button class="btn" onclick="nav('calendar')">Calendar</button>
+</div>
 
-<h2>
-Attention
-</h2>
+<div id="dashEvents">
+  <div class="small">Loading events…</div>
+</div>
 
 </div>
 
-<div id="dashAttention">
 </div>
 
+<div class="section card">
+
+<div class="sectionhead">
+  <h2>Market Watch</h2>
+  <button class="btn" onclick="nav('market')">Open market</button>
+</div>
+
+<div id="dashMarket">
+  <div class="small">Loading commodity prices…</div>
 </div>
 
 </div>
@@ -635,95 +685,42 @@ Attention
 <section id="finance" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Finance
-</div>
-
-<h1>
-Finance & EBITDA
-</h1>
-
-<p>
-Management P&L built from the data entered into OrderFlow.
-</p>
-
+  <div class="eyebrow">Finance</div>
+  <h1>Finance & EBITDA</h1>
+  <p>Management P&L built from the data entered into OrderFlow.</p>
 </div>
 
 <div class="actions">
 
-<button class="btn" onclick="changeMonth(-1)">
-← Month
-</button>
-
-<button class="btn" onclick="changeMonth(1)">
-Month →
-</button>
-
-<button class="btn primary" onclick="openModal('expenseModal')">
-+ Outgoing
-</button>
-
-<button class="btn" onclick="openModal('saleModal')">
-+ Sale
-</button>
+<button class="btn" onclick="changeMonth(-1)">← Month</button>
+<button class="btn" onclick="changeMonth(1)">Month →</button>
+<button class="btn primary" onclick="openModal('expenseModal')">+ Outgoing</button>
+<button class="btn" onclick="openModal('saleModal')">+ Sale</button>
 
 </div>
 
 <div class="section grid4">
 
 <div class="card kpi">
-
-<div class="label">
-Revenue
-</div>
-
-<div class="value" id="fRevenue">
-—
-</div>
-
+  <div class="label">Revenue</div>
+  <div class="value" id="fRevenue">—</div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-Gross profit
-</div>
-
-<div class="value" id="fGP">
-—
-</div>
-
-<div id="fGPM">
-</div>
-
+  <div class="label">Gross profit</div>
+  <div class="value" id="fGP">—</div>
+  <div id="fGPM"></div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-Labour
-</div>
-
-<div class="value" id="fLabour">
-—
-</div>
-
+  <div class="label">Labour</div>
+  <div class="value" id="fLabour">—</div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-EBITDA
-</div>
-
-<div class="value" id="fEBITDA">
-—
-</div>
-
-<div id="fEBITDAPct">
-</div>
-
+  <div class="label">EBITDA</div>
+  <div class="value" id="fEBITDA">—</div>
+  <div id="fEBITDAPct"></div>
 </div>
 
 </div>
@@ -733,14 +730,8 @@ EBITDA
 <div class="card">
 
 <div class="sectionhead">
-
-<h2>
-Management P&L
-</h2>
-
-<span id="fMonth">
-</span>
-
+  <h2>Management P&L</h2>
+  <span id="fMonth"></span>
 </div>
 
 <div class="table">
@@ -748,16 +739,13 @@ Management P&L
 <table>
 
 <thead>
-
 <tr>
 <th>Line</th>
 <th>Actual</th>
 </tr>
-
 </thead>
 
-<tbody id="pnl">
-</tbody>
+<tbody id="pnl"></tbody>
 
 </table>
 
@@ -768,15 +756,10 @@ Management P&L
 <div class="card">
 
 <div class="sectionhead">
-
-<h2>
-EBITDA bridge
-</h2>
-
+  <h2>EBITDA bridge</h2>
 </div>
 
-<div id="bridge">
-</div>
+<div id="bridge"></div>
 
 </div>
 
@@ -788,24 +771,12 @@ EBITDA bridge
 <section id="sales" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Revenue
+  <div class="eyebrow">Revenue</div>
+  <h1>Sales</h1>
+  <p>Enter or import sales. POS integration can be connected here later.</p>
 </div>
 
-<h1>
-Sales
-</h1>
-
-<p>
-Enter or import sales. POS integration can be connected here later.
-</p>
-
-</div>
-
-<button class="btn primary" onclick="openModal('saleModal')">
-+ Record sales
-</button>
+<button class="btn primary" onclick="openModal('saleModal')">+ Record sales</button>
 
 <div class="section card">
 
@@ -814,7 +785,6 @@ Enter or import sales. POS integration can be connected here later.
 <table>
 
 <thead>
-
 <tr>
 <th>Date</th>
 <th>Category</th>
@@ -823,11 +793,9 @@ Enter or import sales. POS integration can be connected here later.
 <th>Gross</th>
 <th>Source</th>
 </tr>
-
 </thead>
 
-<tbody id="salesRows">
-</tbody>
+<tbody id="salesRows"></tbody>
 
 </table>
 
@@ -841,24 +809,12 @@ Enter or import sales. POS integration can be connected here later.
 <section id="invoices" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Accounts payable
+  <div class="eyebrow">Accounts payable</div>
+  <h1>Supplier invoices</h1>
+  <p>Capture → approve → schedule → record payment.</p>
 </div>
 
-<h1>
-Supplier invoices
-</h1>
-
-<p>
-Capture → approve → schedule → record payment.
-</p>
-
-</div>
-
-<button class="btn primary" onclick="openModal('invoiceModal')">
-+ Add invoice
-</button>
+<button class="btn primary" onclick="openModal('invoiceModal')">+ Add invoice</button>
 
 <div class="section card">
 
@@ -867,7 +823,6 @@ Capture → approve → schedule → record payment.
 <table>
 
 <thead>
-
 <tr>
 <th>Supplier</th>
 <th>Invoice</th>
@@ -877,11 +832,9 @@ Capture → approve → schedule → record payment.
 <th>Status</th>
 <th></th>
 </tr>
-
 </thead>
 
-<tbody id="invoiceRows">
-</tbody>
+<tbody id="invoiceRows"></tbody>
 
 </table>
 
@@ -895,19 +848,9 @@ Capture → approve → schedule → record payment.
 <section id="payments" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Money out
-</div>
-
-<h1>
-Payments
-</h1>
-
-<p>
-Supplier and staff payment instructions with approval history.
-</p>
-
+  <div class="eyebrow">Money out</div>
+  <h1>Payments</h1>
+  <p>Supplier and staff payment instructions with approval history.</p>
 </div>
 
 <div class="section card">
@@ -917,7 +860,6 @@ Supplier and staff payment instructions with approval history.
 <table>
 
 <thead>
-
 <tr>
 <th>Type</th>
 <th>Payee</th>
@@ -926,11 +868,9 @@ Supplier and staff payment instructions with approval history.
 <th>Date</th>
 <th>Status</th>
 </tr>
-
 </thead>
 
-<tbody id="paymentRows">
-</tbody>
+<tbody id="paymentRows"></tbody>
 
 </table>
 
@@ -939,10 +879,8 @@ Supplier and staff payment instructions with approval history.
 </div>
 
 <div class="section notice">
-
 OrderFlow currently records payment instructions and their audit trail.
 It does not move real money until a regulated bank/payment provider is connected.
-
 </div>
 
 </section>
@@ -951,24 +889,12 @@ It does not move real money until a regulated bank/payment provider is connected
 <section id="staff" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-People
+  <div class="eyebrow">People</div>
+  <h1>Staff</h1>
+  <p>Employees, pay rates and holiday settings.</p>
 </div>
 
-<h1>
-Staff
-</h1>
-
-<p>
-Employees, pay rates and holiday settings.
-</p>
-
-</div>
-
-<button class="btn primary" onclick="openModal('employeeModal')">
-+ Add employee
-</button>
+<button class="btn primary" onclick="openModal('employeeModal')">+ Add employee</button>
 
 <div class="section card">
 
@@ -977,7 +903,6 @@ Employees, pay rates and holiday settings.
 <table>
 
 <thead>
-
 <tr>
 <th>Name</th>
 <th>Department</th>
@@ -986,75 +911,9 @@ Employees, pay rates and holiday settings.
 <th>Rate</th>
 <th>Holiday</th>
 </tr>
-
 </thead>
 
-<tbody id="employeeRows">
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</section>
-
-
-<section id="shifts" class="view">
-
-<div class="head">
-
-<div class="eyebrow">
-People planning
-</div>
-
-<h1>
-Shifts & Rota
-</h1>
-
-<p>
-Plan staff hours, breaks and labour cost before payroll.
-</p>
-
-</div>
-
-<div class="actions">
-
-<button class="btn primary" onclick="openShiftModal()">
-+ Add shift
-</button>
-
-<button class="btn" onclick="loadShifts()">
-Refresh
-</button>
-
-</div>
-
-<div class="section card">
-
-<div class="table">
-
-<table>
-
-<thead>
-
-<tr>
-<th>Date</th>
-<th>Employee</th>
-<th>Start</th>
-<th>Finish</th>
-<th>Break</th>
-<th>Hours</th>
-<th>Rate</th>
-<th>Est. cost</th>
-<th>Status</th>
-</tr>
-
-</thead>
-
-<tbody id="shiftRows">
-</tbody>
+<tbody id="employeeRows"></tbody>
 
 </table>
 
@@ -1068,24 +927,12 @@ Refresh
 <section id="payroll" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-People costs
+  <div class="eyebrow">People costs</div>
+  <h1>Payroll</h1>
+  <p>Prepare, approve and record staff payment runs.</p>
 </div>
 
-<h1>
-Payroll
-</h1>
-
-<p>
-Prepare, approve and record staff payment runs.
-</p>
-
-</div>
-
-<button class="btn primary" onclick="openModal('payrollModal')">
-+ Payroll run
-</button>
+<button class="btn primary" onclick="openModal('payrollModal')">+ Payroll run</button>
 
 <div class="section card">
 
@@ -1094,7 +941,6 @@ Prepare, approve and record staff payment runs.
 <table>
 
 <thead>
-
 <tr>
 <th>Period</th>
 <th>Gross</th>
@@ -1104,11 +950,9 @@ Prepare, approve and record staff payment runs.
 <th>Status</th>
 <th></th>
 </tr>
-
 </thead>
 
-<tbody id="payrollRows">
-</tbody>
+<tbody id="payrollRows"></tbody>
 
 </table>
 
@@ -1122,24 +966,12 @@ Prepare, approve and record staff payment runs.
 <section id="stock" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Inventory
+  <div class="eyebrow">Inventory</div>
+  <h1>Stock</h1>
+  <p>Actual stock levels, cost and movement.</p>
 </div>
 
-<h1>
-Stock
-</h1>
-
-<p>
-Actual stock levels, cost and movement.
-</p>
-
-</div>
-
-<button class="btn primary" onclick="openModal('stockModal')">
-+ Add stock item
-</button>
+<button class="btn primary" onclick="openModal('stockModal')">+ Add stock item</button>
 
 <div class="section card">
 
@@ -1148,7 +980,6 @@ Actual stock levels, cost and movement.
 <table>
 
 <thead>
-
 <tr>
 <th>Item</th>
 <th>Category</th>
@@ -1157,11 +988,9 @@ Actual stock levels, cost and movement.
 <th>Unit cost</th>
 <th>Status</th>
 </tr>
-
 </thead>
 
-<tbody id="stockRows">
-</tbody>
+<tbody id="stockRows"></tbody>
 
 </table>
 
@@ -1175,24 +1004,12 @@ Actual stock levels, cost and movement.
 <section id="purchasing" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Supply chain
+  <div class="eyebrow">Supply chain</div>
+  <h1>Purchasing</h1>
+  <p>Manage supplier relationships and purchasing data.</p>
 </div>
 
-<h1>
-Purchasing
-</h1>
-
-<p>
-Manage supplier relationships and purchasing data.
-</p>
-
-</div>
-
-<button class="btn primary" onclick="openModal('supplierModal')">
-+ Add supplier
-</button>
+<button class="btn primary" onclick="openModal('supplierModal')">+ Add supplier</button>
 
 <div class="section card">
 
@@ -1201,18 +1018,15 @@ Manage supplier relationships and purchasing data.
 <table>
 
 <thead>
-
 <tr>
 <th>Supplier</th>
 <th>Contact</th>
 <th>Email</th>
 <th>Terms</th>
 </tr>
-
 </thead>
 
-<tbody id="supplierRows">
-</tbody>
+<tbody id="supplierRows"></tbody>
 
 </table>
 
@@ -1226,26 +1040,173 @@ Manage supplier relationships and purchasing data.
 <section id="menu" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Commercial
+  <div class="eyebrow">Commercial</div>
+  <h1>Menu & costing</h1>
+  <p>See selling price, recipe cost and gross margin.</p>
 </div>
 
-<h1>
-Menu & Costing
-</h1>
+<button class="btn primary" onclick="openModal('menuModal')">+ Menu item</button>
 
-<p>
-See selling price, recipe cost and gross margin.
-</p>
+<div class="section" id="menuRows"></div>
+
+</section>
+
+
+<section id="sites" class="view">
+
+<div class="head">
+  <div class="eyebrow">Multi-site</div>
+  <h1>Sites</h1>
+  <p>Run one venue or a whole hospitality group from the same account.</p>
+</div>
+
+<button class="btn primary" onclick="openModal('siteModal')">+ Add site</button>
+
+<div class="section" id="siteRows"></div>
+
+</section>
+
+
+<section id="shifts" class="view">
+
+<div class="head">
+  <div class="eyebrow">People planning</div>
+  <h1>Shifts & Rota</h1>
+  <p>Plan staff hours, breaks and labour cost before payroll.</p>
+</div>
+
+<div class="actions">
+
+<button class="btn primary" onclick="openShiftModal()">+ Add shift</button>
+<button class="btn" onclick="loadShifts()">Refresh</button>
 
 </div>
 
-<button class="btn primary" onclick="openModal('menuModal')">
-+ Menu item
-</button>
+<div class="section card">
 
-<div class="section" id="menuRows">
+<div class="table">
+
+<table>
+
+<thead>
+<tr>
+<th>Date</th>
+<th>Employee</th>
+<th>Start</th>
+<th>Finish</th>
+<th>Break</th>
+<th>Hours</th>
+<th>Rate</th>
+<th>Est. cost</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="shiftRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="calendar" class="view">
+
+<div class="head">
+  <div class="eyebrow">Planning</div>
+  <h1>Calendar</h1>
+  <p>Keep events, bookings, functions, deliveries, inspections and important dates in one place.</p>
+</div>
+
+<div class="actions">
+
+<button class="btn" onclick="changeCalendarMonth(-1)">← Month</button>
+<button class="btn" onclick="changeCalendarMonth(1)">Month →</button>
+<button class="btn primary" onclick="openEventModal()">+ Add event</button>
+
+</div>
+
+<div class="section card">
+
+<div class="sectionhead">
+  <h2 id="calendarLabel"></h2>
+  <span class="small">Site calendar</span>
+</div>
+
+<div class="calendar-wrap">
+
+<div id="calendarGrid" class="calendar"></div>
+
+</div>
+
+</div>
+
+<div class="section card">
+
+<div class="sectionhead">
+  <h2>Upcoming events</h2>
+</div>
+
+<div id="eventList"></div>
+
+</div>
+
+</section>
+
+
+<section id="market" class="view">
+
+<div class="head">
+  <div class="eyebrow">Procurement intelligence</div>
+  <h1>Market Watch</h1>
+  <p>
+    Live benchmark prices for major food and hospitality-related commodities.
+    These are market benchmarks, not your supplier's actual invoice price.
+  </p>
+</div>
+
+<div class="card notice" id="marketNotice">
+  Loading market data…
+</div>
+
+<div class="section card">
+
+<div class="sectionhead">
+  <h2>Food & hospitality commodities</h2>
+  <button class="btn" onclick="loadMarket()">Refresh</button>
+</div>
+
+<div id="marketGrid" class="market-grid"></div>
+
+</div>
+
+</section>
+
+
+<section id="weather" class="view">
+
+<div class="head">
+  <div class="eyebrow">Local conditions</div>
+  <h1>Weather</h1>
+  <p>
+    Live local conditions and a seven-day forecast.
+    OrderFlow uses your device location when you allow it,
+    with the current venue address as a fallback.
+  </p>
+</div>
+
+<div class="section card">
+
+<div class="sectionhead">
+  <h2>Local forecast</h2>
+  <button class="btn" onclick="loadWeather(true)">Refresh location</button>
+</div>
+
+<div id="weatherFull"></div>
+
 </div>
 
 </section>
@@ -1254,85 +1215,39 @@ See selling price, recipe cost and gross margin.
 <section id="budgets" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Planning
-</div>
-
-<h1>
-Budgets
-</h1>
-
-<p>
-Set monthly revenue, cost and labour targets, then compare them with actual performance.
-</p>
-
+  <div class="eyebrow">Planning</div>
+  <h1>Budgets</h1>
+  <p>Set monthly revenue, cost and labour targets, then compare them with actual performance.</p>
 </div>
 
 <div class="actions">
 
-<button class="btn" onclick="changeBudgetMonth(-1)">
-← Month
-</button>
-
-<button class="btn" onclick="changeBudgetMonth(1)">
-Month →
-</button>
-
-<button class="btn primary" onclick="saveBudget()">
-Save budget
-</button>
+<button class="btn" onclick="changeBudgetMonth(-1)">← Month</button>
+<button class="btn" onclick="changeBudgetMonth(1)">Month →</button>
+<button class="btn primary" onclick="saveBudget()">Save budget</button>
 
 </div>
 
 <div class="section grid4">
 
 <div class="card kpi">
-
-<div class="label">
-Budget revenue
-</div>
-
-<div class="value" id="bRevenue">
-£0
-</div>
-
+  <div class="label">Budget revenue</div>
+  <div class="value" id="bRevenue">£0</div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-Budget labour
-</div>
-
-<div class="value" id="bLabour">
-£0
-</div>
-
+  <div class="label">Budget labour</div>
+  <div class="value" id="bLabour">£0</div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-Budget food cost
-</div>
-
-<div class="value" id="bFood">
-£0
-</div>
-
+  <div class="label">Budget food cost</div>
+  <div class="value" id="bFood">£0</div>
 </div>
 
 <div class="card kpi">
-
-<div class="label">
-Budget overheads
-</div>
-
-<div class="value" id="bOverheads">
-£0
-</div>
-
+  <div class="label">Budget overheads</div>
+  <div class="value" id="bOverheads">£0</div>
 </div>
 
 </div>
@@ -1342,14 +1257,8 @@ Budget overheads
 <div class="card">
 
 <div class="sectionhead">
-
-<h2>
-Monthly budget
-</h2>
-
-<span id="budgetMonthLabel" class="small">
-</span>
-
+  <h2>Monthly budget</h2>
+  <span id="budgetMonthLabel" class="small"></span>
 </div>
 
 <form class="form">
@@ -1357,23 +1266,13 @@ Monthly budget
 <div class="formgrid">
 
 <div>
-
-<label>
-Revenue (£)
-</label>
-
+<label>Revenue (£)</label>
 <input id="budgetRevenue" type="number" step=".01" min="0">
-
 </div>
 
 <div>
-
-<label>
-Food cost (£)
-</label>
-
+<label>Food cost (£)</label>
 <input id="budgetFood" type="number" step=".01" min="0">
-
 </div>
 
 </div>
@@ -1381,31 +1280,18 @@ Food cost (£)
 <div class="formgrid">
 
 <div>
-
-<label>
-Drink cost (£)
-</label>
-
+<label>Drink cost (£)</label>
 <input id="budgetDrink" type="number" step=".01" min="0">
-
 </div>
 
 <div>
-
-<label>
-Labour (£)
-</label>
-
+<label>Labour (£)</label>
 <input id="budgetLabour" type="number" step=".01" min="0">
-
 </div>
 
 </div>
 
-<label>
-Overheads (£)
-</label>
-
+<label>Overheads (£)</label>
 <input id="budgetOverheads" type="number" step=".01" min="0">
 
 </form>
@@ -1415,18 +1301,11 @@ Overheads (£)
 <div class="card">
 
 <div class="sectionhead">
-
-<h2>
-Budget vs Actual
-</h2>
-
-<span class="small" id="budgetActualMonth">
-</span>
-
+  <h2>Budget vs actual</h2>
+  <span class="small" id="budgetActualMonth"></span>
 </div>
 
-<div id="budgetCompare">
-</div>
+<div id="budgetCompare"></div>
 
 </div>
 
@@ -1438,19 +1317,9 @@ Budget vs Actual
 <section id="audit" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Governance
-</div>
-
-<h1>
-Audit Log
-</h1>
-
-<p>
-A record of important actions taken inside this organisation.
-</p>
-
+  <div class="eyebrow">Governance</div>
+  <h1>Audit log</h1>
+  <p>A record of important actions taken inside this organisation.</p>
 </div>
 
 <div class="section card">
@@ -1460,7 +1329,6 @@ A record of important actions taken inside this organisation.
 <table>
 
 <thead>
-
 <tr>
 <th>Time</th>
 <th>User</th>
@@ -1469,11 +1337,9 @@ A record of important actions taken inside this organisation.
 <th>ID</th>
 <th>Detail</th>
 </tr>
-
 </thead>
 
-<tbody id="auditRows">
-</tbody>
+<tbody id="auditRows"></tbody>
 
 </table>
 
@@ -1484,67 +1350,25 @@ A record of important actions taken inside this organisation.
 </section>
 
 
-<section id="sites" class="view">
-
-<div class="head">
-
-<div class="eyebrow">
-Multi-site
-</div>
-
-<h1>
-Sites
-</h1>
-
-<p>
-Run one venue or a whole hospitality group from the same account.
-</p>
-
-</div>
-
-<button class="btn primary" onclick="openModal('siteModal')">
-+ Add site
-</button>
-
-<div class="section" id="siteRows">
-</div>
-
-</section>
-
-
 <section id="settings" class="view">
 
 <div class="head">
-
-<div class="eyebrow">
-Settings
-</div>
-
-<h1>
-{{organisation.name}}
-</h1>
-
-<p>
-{{organisation.business_type}} · {{organisation.currency}}
-</p>
-
+  <div class="eyebrow">Settings</div>
+  <h1>{{organisation.name}}</h1>
+  <p>{{organisation.business_type}} · {{organisation.currency}}</p>
 </div>
 
 <div class="card">
 
-<b>
-Current site
-</b>
+<b>Current site</b>
 
 <div class="small" style="margin-top:4px">
 {{site.name}}
 </div>
 
 <div class="notice" style="margin-top:14px">
-
 Use the Sites section to add locations.
 All operational and financial records are separated by organisation and site.
-
 </div>
 
 </div>
@@ -1552,143 +1376,75 @@ All operational and financial records are separated by organisation and site.
 </section>
 
 </main>
-
 </div>
 
 
 <nav class="bottom">
 
-<button data-view="dashboard">
-⌂<br>
-Home
-</button>
-
-<button data-view="finance">
-£<br>
-Finance
-</button>
-
-<button data-view="invoices">
-▤<br>
-Invoices
-</button>
-
-<button data-view="payments">
-↗<br>
-Payments
-</button>
-
-<button data-view="more">
-•••<br>
-More
-</button>
+<button data-view="dashboard">⌂<br>Home</button>
+<button data-view="finance">£<br>Finance</button>
+<button data-view="invoices">▤<br>Invoices</button>
+<button data-view="payments">↗<br>Payments</button>
+<button data-view="more">•••<br>More</button>
 
 </nav>
 
 </div>
 
 
+<!-- MORE MENU -->
+
 <div class="modal" id="moreModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-OrderFlow
-</b>
-
-<button class="close" onclick="closeModal('moreModal')">
-×
-</button>
-
+  <b>OrderFlow</b>
+  <button class="close" onclick="closeModal('moreModal')">×</button>
 </div>
 
 <div class="actions">
 
-<button class="btn" onclick="nav('sales');closeModal('moreModal')">
-Sales
-</button>
-
-<button class="btn" onclick="nav('stock');closeModal('moreModal')">
-Stock
-</button>
-
-<button class="btn" onclick="nav('purchasing');closeModal('moreModal')">
-Purchasing
-</button>
-
-<button class="btn" onclick="nav('menu');closeModal('moreModal')">
-Menu
-</button>
-
-<button class="btn" onclick="nav('staff');closeModal('moreModal')">
-Staff
-</button>
-
-<button class="btn" onclick="nav('shifts');closeModal('moreModal')">
-Shifts & Rota
-</button>
-
-<button class="btn" onclick="nav('payroll');closeModal('moreModal')">
-Payroll
-</button>
-
-<button class="btn" onclick="nav('budgets');closeModal('moreModal')">
-Budgets
-</button>
-
-<button class="btn" onclick="nav('audit');closeModal('moreModal')">
-Audit Log
-</button>
-
-<button class="btn" onclick="nav('sites');closeModal('moreModal')">
-Sites
-</button>
-
-<button class="btn" onclick="nav('settings');closeModal('moreModal')">
-Settings
-</button>
+<button class="btn" onclick="nav('sales');closeModal('moreModal')">Sales</button>
+<button class="btn" onclick="nav('stock');closeModal('moreModal')">Stock</button>
+<button class="btn" onclick="nav('purchasing');closeModal('moreModal')">Purchasing</button>
+<button class="btn" onclick="nav('menu');closeModal('moreModal')">Menu</button>
+<button class="btn" onclick="nav('staff');closeModal('moreModal')">Staff</button>
+<button class="btn" onclick="nav('payroll');closeModal('moreModal')">Payroll</button>
+<button class="btn" onclick="nav('shifts');closeModal('moreModal')">Shifts & Rota</button>
+<button class="btn" onclick="nav('calendar');closeModal('moreModal')">Calendar</button>
+<button class="btn" onclick="nav('market');closeModal('moreModal')">Market Watch</button>
+<button class="btn" onclick="nav('weather');closeModal('moreModal')">Weather</button>
+<button class="btn" onclick="nav('budgets');closeModal('moreModal')">Budgets</button>
+<button class="btn" onclick="nav('audit');closeModal('moreModal')">Audit log</button>
+<button class="btn" onclick="nav('sites');closeModal('moreModal')">Sites</button>
+<button class="btn" onclick="nav('settings');closeModal('moreModal')">Settings</button>
 
 <form method="post" action="/logout">
-
-<button class="btn danger">
-Sign out
-</button>
-
+<button class="btn danger">Sign out</button>
 </form>
 
 </div>
-
+</div>
 </div>
 
-</div>
 
+<!-- EXPENSE MODAL -->
 
 <div class="modal" id="expenseModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Add outgoing cost
-</b>
-
-<button class="close" onclick="closeModal('expenseModal')">
-×
-</button>
-
+  <b>Add outgoing cost</b>
+  <button class="close" onclick="closeModal('expenseModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveExpense(event)">
 
-<label>
-Category
-</label>
+<label>Category</label>
 
 <select id="expenseCategory">
-
 <option>Rent</option>
 <option>Business rates</option>
 <option>Utilities</option>
@@ -1703,135 +1459,86 @@ Category
 <option>Licences</option>
 <option>Bank charges</option>
 <option>Other</option>
-
 </select>
 
-<label>
-Description
-</label>
-
+<label>Description</label>
 <input id="expenseDescription" required>
 
-<label>
-Supplier
-</label>
-
+<label>Supplier</label>
 <input id="expenseSupplier">
 
 <div class="formgrid">
 
 <div>
-
-<label>
-Gross (£)
-</label>
-
+<label>Gross (£)</label>
 <input id="expenseGross" type="number" step=".01" required>
-
 </div>
 
 <div>
-
-<label>
-VAT (£)
-</label>
-
+<label>VAT (£)</label>
 <input id="expenseVat" type="number" step=".01" value="0">
-
 </div>
 
 </div>
 
-<label>
-Date
-</label>
-
+<label>Date</label>
 <input id="expenseDate" type="date">
 
-<button class="btn primary">
-Save outgoing
-</button>
+<button class="btn primary">Save outgoing</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- SALES MODAL -->
 
 <div class="modal" id="saleModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Record sales
-</b>
-
-<button class="close" onclick="closeModal('saleModal')">
-×
-</button>
-
+  <b>Record sales</b>
+  <button class="close" onclick="closeModal('saleModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveSale(event)">
 
-<label>
-Category
-</label>
+<label>Category</label>
 
 <select id="saleCategory">
-
 <option>Food</option>
 <option>Drink</option>
 <option>Other</option>
-
 </select>
 
-<label>
-Gross sales (£)
-</label>
-
+<label>Gross sales (£)</label>
 <input id="saleGross" type="number" step=".01" required>
 
-<label>
-VAT (£)
-</label>
-
+<label>VAT (£)</label>
 <input id="saleVat" type="number" step=".01" value="0">
 
-<label>
-Date
-</label>
-
+<label>Date</label>
 <input id="saleDate" type="date">
 
-<button class="btn primary">
-Record sales
-</button>
+<button class="btn primary">Record sales</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- INVOICE MODAL -->
 
 <div class="modal" id="invoiceModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Supplier invoice
-</b>
-
-<button class="close" onclick="closeModal('invoiceModal')">
-×
-</button>
-
+  <b>Supplier invoice</b>
+  <button class="close" onclick="closeModal('invoiceModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveInvoice(event)">
@@ -1839,23 +1546,13 @@ Supplier invoice
 <div class="formgrid">
 
 <div>
-
-<label>
-Supplier
-</label>
-
+<label>Supplier</label>
 <input id="invSupplier" required>
-
 </div>
 
 <div>
-
-<label>
-Invoice number
-</label>
-
+<label>Invoice number</label>
 <input id="invNumber" required>
-
 </div>
 
 </div>
@@ -1863,33 +1560,20 @@ Invoice number
 <div class="formgrid">
 
 <div>
-
-<label>
-Invoice date
-</label>
-
+<label>Invoice date</label>
 <input id="invDate" type="date">
-
 </div>
 
 <div>
-
-<label>
-Due date
-</label>
-
+<label>Due date</label>
 <input id="invDue" type="date">
-
 </div>
 
 </div>
 
-<label>
-Category
-</label>
+<label>Category</label>
 
 <select id="invCategory">
-
 <option>Food</option>
 <option>Drink</option>
 <option>Rent</option>
@@ -1897,106 +1581,68 @@ Category
 <option>Cleaning</option>
 <option>Repairs & maintenance</option>
 <option>Other</option>
-
 </select>
 
 <div class="formgrid">
 
 <div>
-
-<label>
-Net (£)
-</label>
-
+<label>Net (£)</label>
 <input id="invNet" type="number" step=".01" required>
-
 </div>
 
 <div>
-
-<label>
-VAT (£)
-</label>
-
+<label>VAT (£)</label>
 <input id="invVat" type="number" step=".01" value="0">
-
 </div>
 
 </div>
 
-<label>
-Notes
-</label>
-
+<label>Notes</label>
 <input id="invNotes">
 
-<button class="btn primary">
-Create invoice
-</button>
+<button class="btn primary">Create invoice</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- EMPLOYEE MODAL -->
 
 <div class="modal" id="employeeModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Add employee
-</b>
-
-<button class="close" onclick="closeModal('employeeModal')">
-×
-</button>
-
+  <b>Add employee</b>
+  <button class="close" onclick="closeModal('employeeModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveEmployee(event)">
 
-<label>
-Name
-</label>
-
+<label>Name</label>
 <input id="empName" required>
 
-<label>
-Email
-</label>
-
+<label>Email</label>
 <input id="empEmail" type="email">
 
 <div class="formgrid">
 
 <div>
-
-<label>
-Department
-</label>
+<label>Department</label>
 
 <select id="empDept">
-
 <option>FOH</option>
 <option>BOH</option>
 <option>Management</option>
-
 </select>
 
 </div>
 
 <div>
-
-<label>
-Job title
-</label>
-
+<label>Job title</label>
 <input id="empTitle">
-
 </div>
 
 </div>
@@ -2004,28 +1650,18 @@ Job title
 <div class="formgrid">
 
 <div>
-
-<label>
-Pay type
-</label>
+<label>Pay type</label>
 
 <select id="empPayType">
-
 <option>Hourly</option>
 <option>Salary</option>
-
 </select>
 
 </div>
 
 <div>
-
-<label>
-Pay rate (£)
-</label>
-
+<label>Pay rate (£)</label>
 <input id="empRate" type="number" step=".01" required>
-
 </div>
 
 </div>
@@ -2033,58 +1669,37 @@ Pay rate (£)
 <div class="formgrid">
 
 <div>
-
-<label>
-Employer NI %
-</label>
-
+<label>Employer NI %</label>
 <input id="empNI" type="number" step=".01" value="0">
-
 </div>
 
 <div>
-
-<label>
-Pension %
-</label>
-
+<label>Pension %</label>
 <input id="empPension" type="number" step=".01" value="0">
-
 </div>
 
 </div>
 
-<label>
-Holiday allowance (days)
-</label>
-
+<label>Holiday allowance (days)</label>
 <input id="empHoliday" type="number" step=".5" value="28">
 
-<button class="btn primary">
-Save employee
-</button>
+<button class="btn primary">Save employee</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- PAYROLL MODAL -->
 
 <div class="modal" id="payrollModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Payroll run
-</b>
-
-<button class="close" onclick="closeModal('payrollModal')">
-×
-</button>
-
+  <b>Payroll run</b>
+  <button class="close" onclick="closeModal('payrollModal')">×</button>
 </div>
 
 <form class="form" onsubmit="savePayroll(event)">
@@ -2092,23 +1707,13 @@ Payroll run
 <div class="formgrid">
 
 <div>
-
-<label>
-Period start
-</label>
-
+<label>Period start</label>
 <input id="payStart" type="date" required>
-
 </div>
 
 <div>
-
-<label>
-Period end
-</label>
-
+<label>Period end</label>
 <input id="payEnd" type="date" required>
-
 </div>
 
 </div>
@@ -2116,88 +1721,54 @@ Period end
 <div class="formgrid">
 
 <div>
-
-<label>
-Gross pay (£)
-</label>
-
+<label>Gross pay (£)</label>
 <input id="payGross" type="number" step=".01" required>
-
 </div>
 
 <div>
-
-<label>
-Employer costs (£)
-</label>
-
+<label>Employer costs (£)</label>
 <input id="payEmployer" type="number" step=".01" value="0">
-
 </div>
 
 </div>
 
-<label>
-Deductions (£)
-</label>
-
+<label>Deductions (£)</label>
 <input id="payDeduct" type="number" step=".01" value="0">
 
-<button class="btn primary">
-Create payroll run
-</button>
+<button class="btn primary">Create payroll run</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- STOCK MODAL -->
 
 <div class="modal" id="stockModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Add stock item
-</b>
-
-<button class="close" onclick="closeModal('stockModal')">
-×
-</button>
-
+  <b>Add stock item</b>
+  <button class="close" onclick="closeModal('stockModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveStock(event)">
 
-<label>
-Item
-</label>
-
+<label>Item</label>
 <input id="stockName" required>
 
 <div class="formgrid">
 
 <div>
-
-<label>
-Category
-</label>
-
+<label>Category</label>
 <input id="stockCategory" value="Food">
-
 </div>
 
 <div>
-
-<label>
-Unit
-</label>
-
+<label>Unit</label>
 <input id="stockUnit" value="kg">
-
 </div>
 
 </div>
@@ -2205,23 +1776,13 @@ Unit
 <div class="formgrid">
 
 <div>
-
-<label>
-On hand
-</label>
-
+<label>On hand</label>
 <input id="stockOn" type="number" step=".01" value="0">
-
 </div>
 
 <div>
-
-<label>
-Par level
-</label>
-
+<label>Par level</label>
 <input id="stockPar" type="number" step=".01" value="0">
-
 </div>
 
 </div>
@@ -2229,2435 +1790,2872 @@ Par level
 <div class="formgrid">
 
 <div>
-
-<label>
-Unit cost (£)
-</label>
-
+<label>Unit cost (£)</label>
 <input id="stockCost" type="number" step=".01" value="0">
-
 </div>
 
 <div>
-
-<label>
-Supplier
-</label>
-
+<label>Supplier</label>
 <input id="stockSupplier">
-
 </div>
 
 </div>
 
-<button class="btn primary">
-Save stock item
-</button>
+<button class="btn primary">Save stock item</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- SUPPLIER MODAL -->
 
 <div class="modal" id="supplierModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Add supplier
-</b>
-
-<button class="close" onclick="closeModal('supplierModal')">
-×
-</button>
-
+  <b>Add supplier</b>
+  <button class="close" onclick="closeModal('supplierModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveSupplier(event)">
 
-<label>
-Name
-</label>
-
+<label>Name</label>
 <input id="supName" required>
 
-<label>
-Contact
-</label>
-
+<label>Contact</label>
 <input id="supContact">
 
-<label>
-Email
-</label>
-
+<label>Email</label>
 <input id="supEmail" type="email">
 
-<label>
-Phone
-</label>
-
+<label>Phone</label>
 <input id="supPhone">
 
-<label>
-Payment terms (days)
-</label>
-
+<label>Payment terms (days)</label>
 <input id="supTerms" type="number" value="30">
 
-<button class="btn primary">
-Save supplier
-</button>
+<button class="btn primary">Save supplier</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- MENU MODAL -->
 
 <div class="modal" id="menuModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Add menu item
-</b>
-
-<button class="close" onclick="closeModal('menuModal')">
-×
-</button>
-
+  <b>Add menu item</b>
+  <button class="close" onclick="closeModal('menuModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveMenu(event)">
 
-<label>
-Name
-</label>
-
+<label>Name</label>
 <input id="menuName" required>
 
-<label>
-Category
-</label>
-
+<label>Category</label>
 <input id="menuCategory" value="Main">
 
 <div class="formgrid">
 
 <div>
-
-<label>
-Selling price (£)
-</label>
-
+<label>Selling price (£)</label>
 <input id="menuPrice" type="number" step=".01" required>
-
 </div>
 
 <div>
-
-<label>
-Recipe cost (£)
-</label>
-
+<label>Recipe cost (£)</label>
 <input id="menuCost" type="number" step=".01" value="0">
-
 </div>
 
 </div>
 
-<button class="btn primary">
-Save menu item
-</button>
+<button class="btn primary">Save menu item</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- SITE MODAL -->
 
 <div class="modal" id="siteModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Add site
-</b>
-
-<button class="close" onclick="closeModal('siteModal')">
-×
-</button>
-
+  <b>Add site</b>
+  <button class="close" onclick="closeModal('siteModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveSite(event)">
 
-<label>
-Site name
-</label>
-
+<label>Site name</label>
 <input id="siteName" required>
 
-<label>
-Address
-</label>
-
+<label>Address</label>
 <input id="siteAddress">
 
-<button class="btn primary">
-Create site
-</button>
+<button class="btn primary">Create site</button>
 
 </form>
 
 </div>
-
 </div>
 
+
+<!-- SHIFT MODAL -->
 
 <div class="modal" id="shiftModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
-
-<b>
-Add shift
-</b>
-
-<button class="close" onclick="closeModal('shiftModal')">
-×
-</button>
-
+  <b>Add shift</b>
+  <button class="close" onclick="closeModal('shiftModal')">×</button>
 </div>
 
 <form class="form" onsubmit="saveShift(event)">
 
-<label>
-Employee
-</label>
+<label>Employee</label>
+<select id="shiftEmployee" required></select>
 
-<select id="shiftEmployee" required>
-</select>
-
-<label>
-Date
-</label>
-
+<label>Date</label>
 <input id="shiftDate" type="date" required>
 
 <div class="formgrid">
 
 <div>
-
-<label>
-Start
-</label>
-
+<label>Start</label>
 <input id="shiftStart" type="time" required>
-
 </div>
 
 <div>
-
-<label>
-Finish
-</label>
-
+<label>Finish</label>
 <input id="shiftEnd" type="time" required>
-
 </div>
 
 </div>
 
-<label>
-Break (minutes)
-</label>
-
+<label>Break (minutes)</label>
 <input id="shiftBreak" type="number" min="0" value="0">
 
-<button class="btn primary">
-Save shift
-</button>
+<button class="btn primary">Save shift</button>
 
 </form>
 
 </div>
-
 </div>
 
 
-<div id="toast"></div>
+<!-- CALENDAR EVENT MODAL -->
+
+<div class="modal" id="eventModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+  <b>Add calendar event</b>
+  <button class="close" onclick="closeModal('eventModal')">×</button>
+</div>
+
+<form class="form" onsubmit="saveEvent(event)">
+
+<label>Event title</label>
+<input id="eventTitle" required placeholder="Private function, delivery, inspection…">
+
+<div class="formgrid">
+
+<div>
+<label>Date</label>
+<input id="eventDate" type="date" required>
+</div>
+
+<div>
+<label>Type</label>
+
+<select id="eventType">
+<option>General</option>
+<option>Private Function</option>
+<option>Booking</option>
+<option>Delivery</option>
+<option>Staff</option>
+<option>Maintenance</option>
+<option>Compliance</option>
+<option>Marketing</option>
+</select>
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+<label>Start</label>
+<input id="eventStart" type="time">
+</div>
+
+<div>
+<label>Finish</label>
+<input id="eventEnd" type="time">
+</div>
+
+</div>
+
+<label>
+<input id="eventAllDay" type="checkbox" style="width:auto;margin-right:7px">
+All day
+</label>
+
+<label>Notes</label>
+<input id="eventNotes" placeholder="Optional notes">
+
+<button class="btn primary">Add event</button>
+
+</form>
+
+</div>
+</div>
+
+
+<div id="toast"
+style="
+position:fixed;
+bottom:84px;
+left:15px;
+right:15px;
+max-width:500px;
+margin:auto;
+background:#10251d;
+color:#fff;
+padding:11px;
+border-radius:10px;
+text-align:center;
+display:none;
+z-index:80;
+font-size:11px">
+</div>
 
 
 <script>
 
-let month=new Date();
+let month = new Date();
+let calendarMonth = new Date();
+let budgetMonth = new Date();
 
-let budgetMonth=new Date();
+const role = {{user.role|tojson}};
 
-const role={{user.role|tojson}};
-
-const $=id=>document.getElementById(id);
+const $ = id => document.getElementById(id);
 
 
 function money(n){
-
-return '£'+Number(n||0).toLocaleString(
-'en-GB',
-{
-minimumFractionDigits:0,
-maximumFractionDigits:2
-}
-)
-
+  return '£' + Number(n || 0).toLocaleString('en-GB',{
+    minimumFractionDigits:0,
+    maximumFractionDigits:2
+  });
 }
 
 
 function mp(){
-
-return month.getFullYear()+
-'-'+
-String(month.getMonth()+1).padStart(2,'0')
-
-}
-
-
-function bp(){
-
-return budgetMonth.getFullYear()+
-'-'+
-String(budgetMonth.getMonth()+1).padStart(2,'0')
-
+  return month.getFullYear() + '-' +
+    String(month.getMonth()+1).padStart(2,'0');
 }
 
 
 function toast(x){
+  $('toast').textContent = x;
+  $('toast').style.display = 'block';
 
-$('toast').textContent=x;
-
-$('toast').style.display='block';
-
-setTimeout(
-()=>$('toast').style.display='none',
-2500
-)
-
+  setTimeout(()=>{
+    $('toast').style.display = 'none';
+  },2500);
 }
 
 
 async function api(url,opt={}){
+  let r = await fetch(url,{
+    ...opt,
+    headers:{
+      'Content-Type':'application/json',
+      ...(opt.headers || {})
+    }
+  });
 
-let r=await fetch(
-url,
-{
-...opt,
-headers:{
-'Content-Type':'application/json',
-...(opt.headers||{})
-}
-}
-);
+  let d = await r.json();
 
-let d=await r.json();
+  if(!r.ok){
+    throw Error(d.error || 'Request failed');
+  }
 
-if(!r.ok)
-throw Error(d.error||'Request failed');
-
-return d
-
+  return d;
 }
 
 
 function openModal(id){
-
-$(id).classList.add('open')
-
+  $(id).classList.add('open');
 }
 
 
 function closeModal(id){
-
-$(id).classList.remove('open')
-
+  $(id).classList.remove('open');
 }
 
 
 function nav(v){
 
-document
-.querySelectorAll('.view')
-.forEach(x=>x.classList.remove('active'));
+  if(v === 'more'){
+    openModal('moreModal');
+    return;
+  }
 
-$(v).classList.add('active');
+  document.querySelectorAll('.view').forEach(x=>{
+    x.classList.remove('active');
+  });
 
-document
-.querySelectorAll('.navbtn')
-.forEach(
-x=>x.classList.toggle(
-'active',
-x.dataset.view===v
-)
-);
+  const target = $(v);
 
-document
-.querySelectorAll('.bottom button')
-.forEach(
-x=>x.classList.toggle(
-'active',
-x.dataset.view===v
-)
-);
+  if(!target){
+    return;
+  }
 
-load(v);
+  target.classList.add('active');
 
-window.scrollTo(0,0)
+  document.querySelectorAll('.navbtn').forEach(x=>{
+    x.classList.toggle('active',x.dataset.view === v);
+  });
 
+  document.querySelectorAll('.bottom button').forEach(x=>{
+    x.classList.toggle('active',x.dataset.view === v);
+  });
+
+  load(v);
+
+  window.scrollTo(0,0);
 }
 
 
-document
-.querySelectorAll('.navbtn')
-.forEach(
-x=>x.addEventListener(
-'click',
-()=>nav(x.dataset.view)
-)
-);
+document.querySelectorAll('.navbtn').forEach(x=>{
+  x.addEventListener('click',()=>{
+    if(x.dataset.view){
+      nav(x.dataset.view);
+    }
+  });
+});
 
 
-document
-.querySelectorAll('.bottom button')
-.forEach(
-x=>x.addEventListener(
-'click',
-()=>x.dataset.view==='more'
-?openModal('moreModal')
-:nav(x.dataset.view)
-)
-);
+document.querySelectorAll('.bottom button').forEach(x=>{
+  x.addEventListener('click',()=>{
+    if(x.dataset.view === 'more'){
+      openModal('moreModal');
+    }else{
+      nav(x.dataset.view);
+    }
+  });
+});
 
 
 function load(v){
 
-if(v==='dashboard')loadDash();
+  if(v === 'dashboard'){
+    loadDash();
+    loadWeather(false);
+    loadUpcomingEvents();
+    loadMarket();
+  }
 
-if(v==='finance')loadFinance();
+  if(v === 'finance'){
+    loadFinance();
+  }
 
-if(v==='sales')loadSales();
+  if(v === 'sales'){
+    loadSales();
+  }
 
-if(v==='invoices')loadInvoices();
+  if(v === 'invoices'){
+    loadInvoices();
+  }
 
-if(v==='payments')loadPayments();
+  if(v === 'payments'){
+    loadPayments();
+  }
 
-if(v==='staff')loadStaff();
+  if(v === 'staff'){
+    loadStaff();
+  }
 
-if(v==='shifts')loadShifts();
+  if(v === 'shifts'){
+    loadShifts();
+  }
 
-if(v==='payroll')loadPayroll();
+  if(v === 'payroll'){
+    loadPayroll();
+  }
 
-if(v==='stock')loadStock();
+  if(v === 'stock'){
+    loadStock();
+  }
 
-if(v==='purchasing')loadSuppliers();
+  if(v === 'purchasing'){
+    loadSuppliers();
+  }
 
-if(v==='menu')loadMenu();
+  if(v === 'menu'){
+    loadMenu();
+  }
 
-if(v==='budgets')loadBudget();
+  if(v === 'budgets'){
+    loadBudget();
+  }
 
-if(v==='audit')loadAudit();
+  if(v === 'audit'){
+    loadAudit();
+  }
 
-if(v==='sites')loadSites();
+  if(v === 'sites'){
+    loadSites();
+  }
+
+  if(v === 'calendar'){
+    loadCalendar();
+  }
+
+  if(v === 'market'){
+    loadMarket();
+  }
+
+  if(v === 'weather'){
+    loadWeather(false);
+  }
+}
+
+
+function calendarMonthKey(){
+
+  return calendarMonth.getFullYear() + '-' +
+    String(calendarMonth.getMonth()+1).padStart(2,'0');
 
 }
 
 
-function openShiftModal(){
+function calendarMonthLabel(){
 
-loadEmployeesForShift();
-
-const d=new Date();
-
-$('shiftDate').value=
-d.toISOString().slice(0,10);
-
-$('shiftStart').value='09:00';
-
-$('shiftEnd').value='17:00';
-
-openModal('shiftModal');
+  return calendarMonth.toLocaleDateString('en-GB',{
+    month:'long',
+    year:'numeric'
+  });
 
 }
 
 
-async function loadEmployeesForShift(){
+function changeCalendarMonth(n){
 
-try{
+  calendarMonth.setMonth(calendarMonth.getMonth()+n);
 
-const d=await api('/api/employees');
-
-$('shiftEmployee').innerHTML=
-d.employees.length
-
-?d.employees
-.map(
-x=>
-`<option value="${x.id}">
-${x.name} — ${x.job_title||x.department}
-</option>`
-)
-.join('')
-
-:'<option value="">No employees yet</option>';
-
-}
-catch(e){
-
-toast(e.message)
-
-}
+  loadCalendar();
 
 }
 
 
-function shiftHours(start,end,breakm){
+function openEventModal(){
 
-const a=start.split(':').map(Number);
+  const d = new Date();
 
-const b=end.split(':').map(Number);
+  $('eventDate').value =
+    d.toISOString().slice(0,10);
 
-let mins=
-(b[0]*60+b[1])-
-(a[0]*60+a[1]);
+  $('eventStart').value = '';
+  $('eventEnd').value = '';
+  $('eventAllDay').checked = false;
 
-if(mins<0)
-mins+=1440;
-
-return Math.max(
-0,
-mins-Number(breakm||0)
-)/60;
+  openModal('eventModal');
 
 }
 
 
-async function loadShifts(){
+function weatherEmoji(code){
 
-try{
+  if(code === 0) return '☀️';
 
-const d=await api('/api/shifts');
+  if([1,2].includes(code)) return '🌤️';
 
-$('shiftRows').innerHTML=
-d.shifts.length
+  if(code === 3) return '☁️';
 
-?d.shifts
-.map(
-x=>{
+  if([45,48].includes(code)) return '🌫️';
 
-const h=
-shiftHours(
-x.start_time,
-x.end_time,
-x.break_minutes
-);
+  if([
+    51,53,55,56,57,
+    61,63,65,66,67,
+    80,81,82
+  ].includes(code)) return '🌧️';
 
-return `
+  if([
+    71,73,75,77,
+    85,86
+  ].includes(code)) return '❄️';
 
-<tr>
+  if([95,96,99].includes(code)) return '⛈️';
 
-<td>${x.shift_date}</td>
-
-<td>
-<b>${x.employee_name}</b>
-</td>
-
-<td>${x.start_time}</td>
-
-<td>${x.end_time}</td>
-
-<td>${x.break_minutes} min</td>
-
-<td>${h.toFixed(2)}</td>
-
-<td>${money(x.pay_rate)}/hr</td>
-
-<td class="money">
-${money(h*x.pay_rate)}
-</td>
-
-<td>
-<span class="pill">
-${x.status}
-</span>
-</td>
-
-</tr>
-
-`
-
-}
-)
-.join('')
-
-:'<tr><td colspan="9" class="small">No shifts have been added yet.</td></tr>';
-
-}
-catch(e){
-
-toast(e.message)
-
-}
-
+  return '🌤️';
 }
 
 
-async function saveShift(e){
+function fmtEventTime(x){
 
-e.preventDefault();
+  if(x.all_day){
+    return 'All day';
+  }
 
-try{
+  if(x.start_time && x.end_time){
+    return x.start_time + '–' + x.end_time;
+  }
 
-const employeeId=
-Number(
-$('shiftEmployee').value
-);
+  if(x.start_time){
+    return x.start_time;
+  }
 
-if(!employeeId)
-throw Error(
-'Add an employee before creating a shift'
-);
-
-await api(
-'/api/shifts',
-{
-method:'POST',
-
-body:JSON.stringify({
-
-employee_id:employeeId,
-
-shift_date:
-$('shiftDate').value,
-
-start_time:
-$('shiftStart').value,
-
-end_time:
-$('shiftEnd').value,
-
-break_minutes:
-Number(
-$('shiftBreak').value||0
-)
-
-})
+  return 'All day';
 }
-);
 
-closeModal('shiftModal');
 
-e.target.reset();
+async function loadCalendar(){
 
-toast('Shift added');
+  try{
 
-loadShifts();
+    const m = calendarMonthKey();
 
-loadFinance();
+    const d = await api('/api/events?month=' + m);
 
-loadDash();
+    $('calendarLabel').textContent =
+      calendarMonthLabel();
+
+    const first = new Date(
+      calendarMonth.getFullYear(),
+      calendarMonth.getMonth(),
+      1
+    );
+
+    const days = new Date(
+      calendarMonth.getFullYear(),
+      calendarMonth.getMonth()+1,
+      0
+    ).getDate();
+
+    const offset =
+      (first.getDay()+6)%7;
+
+    let html = [
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thu',
+      'Fri',
+      'Sat',
+      'Sun'
+    ].map(x=>`
+      <div class="cal-head">${x}</div>
+    `).join('');
+
+    for(let i=0;i<offset;i++){
+      html += '<div class="cal-day"></div>';
+    }
+
+    for(let day=1;day<=days;day++){
+
+      const ds =
+        calendarMonth.getFullYear() +
+        '-' +
+        String(calendarMonth.getMonth()+1).padStart(2,'0') +
+        '-' +
+        String(day).padStart(2,'0');
+
+      const ev =
+        d.events.filter(x=>x.event_date === ds);
+
+      html += `
+        <div class="cal-day">
+          <div class="cal-date">${day}</div>
+          ${
+            ev.map(x=>`
+              <span
+                class="cal-event"
+                title="${x.notes || ''}">
+                ${x.title}
+              </span>
+            `).join('')
+          }
+        </div>
+      `;
+    }
+
+    $('calendarGrid').innerHTML = html;
+
+    const today =
+      new Date().toISOString().slice(0,10);
+
+    const upcoming =
+      d.events
+        .filter(x=>x.event_date >= today)
+        .slice(0,12);
+
+    $('eventList').innerHTML =
+      upcoming.length
+
+      ? upcoming.map(x=>`
+
+        <div
+          style="
+          padding:10px 0;
+          border-bottom:1px solid var(--line);
+          display:flex;
+          justify-content:space-between;
+          gap:10px">
+
+          <div>
+
+            <b>${x.title}</b>
+
+            <div class="small">
+              ${x.event_date}
+              · ${fmtEventTime(x)}
+              · ${x.event_type}
+            </div>
+
+            ${
+              x.notes
+              ? `<div class="small" style="margin-top:3px">
+                   ${x.notes}
+                 </div>`
+              : ''
+            }
+
+          </div>
+
+          <button
+            class="btn danger"
+            onclick="deleteEvent(${x.id})">
+            Delete
+          </button>
+
+        </div>
+
+      `).join('')
+
+      : '<div class="small">No upcoming events in this month.</div>';
+
+  }catch(e){
+
+    toast(e.message);
+
+  }
 
 }
-catch(x){
 
-toast(x.message)
+
+async function saveEvent(e){
+
+  e.preventDefault();
+
+  try{
+
+    await api('/api/events',{
+      method:'POST',
+      body:JSON.stringify({
+
+        title:$('eventTitle').value,
+
+        event_date:$('eventDate').value,
+
+        start_time:$('eventStart').value,
+
+        end_time:$('eventEnd').value,
+
+        event_type:$('eventType').value,
+
+        notes:$('eventNotes').value,
+
+        all_day:$('eventAllDay').checked
+
+      })
+    });
+
+    closeModal('eventModal');
+
+    e.target.reset();
+
+    toast('Event added');
+
+    loadCalendar();
+
+    loadUpcomingEvents();
+
+  }catch(x){
+
+    toast(x.message);
+
+  }
 
 }
+
+
+async function deleteEvent(id){
+
+  if(!confirm('Delete this event?')){
+    return;
+  }
+
+  try{
+
+    await api('/api/events/' + id,{
+      method:'DELETE'
+    });
+
+    toast('Event deleted');
+
+    loadCalendar();
+
+    loadUpcomingEvents();
+
+  }catch(e){
+
+    toast(e.message);
+
+  }
+
+}
+
+
+function renderWeather(target,d){
+
+  if(!d || !d.current){
+
+    $(target).innerHTML =
+      '<div class="small">Weather unavailable.</div>';
+
+    return;
+  }
+
+  const c = d.current;
+
+  const cards =
+    (d.daily || []).map(x=>`
+
+      <div class="weather-day">
+
+        <div class="small">
+          ${new Date(x.date+'T12:00:00')
+            .toLocaleDateString('en-GB',{
+              weekday:'short'
+            })}
+        </div>
+
+        <div class="weather-icon">
+          ${weatherEmoji(x.code)}
+        </div>
+
+        <b>${Math.round(x.high)}°</b>
+
+        <span class="small">
+          / ${Math.round(x.low)}°
+        </span>
+
+        <div
+          class="small"
+          style="margin-top:3px">
+
+          ${x.rain_probability ?? 0}% rain
+
+        </div>
+
+      </div>
+
+    `).join('');
+
+  $(target).innerHTML = `
+
+    <div class="weather-current">
+
+      <div>
+
+        <div class="small">
+          ${d.location || 'Your location'}
+        </div>
+
+        <div class="weather-temp">
+          ${Math.round(c.temperature)}°
+        </div>
+
+        <b>
+          ${weatherEmoji(c.code)}
+          ${c.description}
+        </b>
+
+        <div
+          class="small"
+          style="margin-top:4px">
+
+          Feels like
+          ${Math.round(c.apparent_temperature)}°
+          · Wind
+          ${Math.round(c.wind_speed)}
+          km/h
+
+        </div>
+
+      </div>
+
+      <div class="small">
+        Updated now
+      </div>
+
+    </div>
+
+    <div
+      class="weather-grid"
+      style="margin-top:12px">
+
+      ${cards}
+
+    </div>
+
+  `;
+
+}
+
+
+async function loadWeather(force){
+
+  try{
+
+    let url = '/api/weather';
+
+    if(navigator.geolocation){
+
+      await new Promise(resolve=>{
+
+        navigator.geolocation.getCurrentPosition(
+
+          pos=>{
+
+            url +=
+              '?lat=' +
+              encodeURIComponent(pos.coords.latitude) +
+              '&lon=' +
+              encodeURIComponent(pos.coords.longitude);
+
+            resolve();
+
+          },
+
+          ()=>resolve(),
+
+          {
+            enableHighAccuracy:false,
+            timeout:5000,
+            maximumAge:900000
+          }
+
+        );
+
+      });
+
+    }
+
+    const d = await api(url);
+
+    renderWeather('weatherFull',d);
+
+    renderWeather('dashWeather',d);
+
+  }catch(e){
+
+    if($('weatherFull')){
+      $('weatherFull').innerHTML =
+        '<div class="small">'+e.message+'</div>';
+    }
+
+    if($('dashWeather')){
+      $('dashWeather').innerHTML =
+        '<div class="small">'+e.message+'</div>';
+    }
+
+  }
+
+}
+
+
+async function loadUpcomingEvents(){
+
+  try{
+
+    const m = calendarMonthKey();
+
+    const d =
+      await api('/api/events?month=' + m);
+
+    const today =
+      new Date().toISOString().slice(0,10);
+
+    const ev =
+      d.events
+        .filter(x=>x.event_date >= today)
+        .slice(0,5);
+
+    $('dashEvents').innerHTML =
+      ev.length
+
+      ? ev.map(x=>`
+
+        <div
+          style="
+          padding:8px 0;
+          border-bottom:1px solid var(--line)">
+
+          <b>${x.title}</b>
+
+          <div class="small">
+            ${x.event_date}
+            · ${fmtEventTime(x)}
+            · ${x.event_type}
+          </div>
+
+        </div>
+
+      `).join('')
+
+      : '<div class="small">No upcoming events.</div>';
+
+  }catch(e){
+
+    $('dashEvents').innerHTML =
+      '<div class="small">Unable to load events.</div>';
+
+  }
+
+}
+
+
+async function loadMarket(){
+
+  try{
+
+    const d = await api('/api/market');
+
+    $('marketNotice').textContent =
+      d.configured
+
+      ? `Live benchmark data via ${d.provider}.
+         Prices are market benchmarks, not supplier invoice prices.
+         Last checked ${new Date().toLocaleTimeString('en-GB',{
+           hour:'2-digit',
+           minute:'2-digit'
+         })}.`
+
+      : 'Market data is not configured yet. Add MARKET_API_KEY in Render to enable live commodity prices.';
+
+    if(!d.configured){
+
+      $('marketGrid').innerHTML =
+        (d.instruments || []).map(x=>`
+
+          <div class="market-card">
+
+            <b>${x.name}</b>
+
+            <div class="small">
+              ${x.category}
+            </div>
+
+            <div class="market-price">
+              —
+            </div>
+
+            <div class="market-updated">
+              Awaiting live feed
+            </div>
+
+          </div>
+
+        `).join('');
+
+      return;
+    }
+
+    $('marketGrid').innerHTML =
+      (d.instruments || []).map(x=>`
+
+        <div class="market-card">
+
+          <div class="sectionhead">
+
+            <b>${x.name}</b>
+
+            <span
+              class="pill ${
+                x.status === 'Live'
+                ? 'paid'
+                : 'pending'
+              }">
+
+              ${x.status}
+
+            </span>
+
+          </div>
+
+          <div class="small">
+            ${x.category}
+          </div>
+
+          <div class="market-price">
+
+            ${
+              x.price == null
+              ? '—'
+              : Number(x.price).toLocaleString(
+                  'en-GB',
+                  {maximumFractionDigits:4}
+                )
+            }
+
+          </div>
+
+          <div class="market-updated">
+            ${x.unit || ''}
+          </div>
+
+        </div>
+
+      `).join('');
+
+  }catch(e){
+
+    $('marketNotice').textContent =
+      e.message;
+
+  }
+
+}
+
+
+let budgetMonthDate = new Date();
+
+
+function bp(){
+
+  return budgetMonthDate.getFullYear() +
+    '-' +
+    String(
+      budgetMonthDate.getMonth()+1
+    ).padStart(2,'0');
 
 }
 
 
 function changeBudgetMonth(n){
 
-budgetMonth.setMonth(
-budgetMonth.getMonth()+n
-);
+  budgetMonthDate.setMonth(
+    budgetMonthDate.getMonth()+n
+  );
 
-loadBudget();
-
-}
-
-
-async function loadBudget(){
-
-try{
-
-const m=bp();
-
-const d=
-await api(
-'/api/budget?month='+m
-);
-
-const b=d.budget||{};
-
-$('budgetMonthLabel').textContent=m;
-
-$('budgetActualMonth').textContent=m;
-
-$('budgetRevenue').value=
-b.revenue||0;
-
-$('budgetFood').value=
-b.food_cost||0;
-
-$('budgetDrink').value=
-b.drink_cost||0;
-
-$('budgetLabour').value=
-b.labour||0;
-
-$('budgetOverheads').value=
-b.overheads||0;
-
-$('bRevenue').textContent=
-money(b.revenue);
-
-$('bLabour').textContent=
-money(b.labour);
-
-$('bFood').textContent=
-money(b.food_cost);
-
-$('bOverheads').textContent=
-money(b.overheads);
-
-const actual=
-await api(
-'/api/finance?month='+m
-);
-
-const rows=[
-
-[
-'Revenue',
-Number(b.revenue||0),
-actual.revenue
-],
-
-[
-'Food cost',
-Number(b.food_cost||0),
-actual.cogs
-],
-
-[
-'Labour',
-Number(b.labour||0),
-actual.labour
-],
-
-[
-'Overheads',
-Number(b.overheads||0),
-actual.overheads
-]
-
-];
-
-$('budgetCompare').innerHTML=
-rows
-.map(
-r=>{
-
-const variance=
-r[2]-r[1];
-
-const favourable=
-r[0]==='Revenue'
-?variance>=0
-:variance<=0;
-
-const percent=
-r[1]>0
-?Math.min(
-100,
-(r[2]/r[1])*100
-)
-:0;
-
-return `
-
-<div style="margin-bottom:13px">
-
-<div class="sectionhead">
-
-<b>${r[0]}</b>
-
-<span>
-${money(r[2])} actual /
-${money(r[1])} budget
-</span>
-
-</div>
-
-<div class="bar">
-
-<i style="width:${percent}%"></i>
-
-</div>
-
-<div
-class="small ${favourable?'good':'bad'}"
-style="margin-top:4px">
-
-Variance:
-${variance>=0?'+':''}${money(variance)}
-
-</div>
-
-</div>
-
-`
-
-}
-)
-.join('');
-
-}
-catch(e){
-
-toast(e.message)
-
-}
+  loadBudget();
 
 }
 
 
-async function saveBudget(){
+function openShiftModal(){
 
-try{
+  loadEmployeesForShift();
 
-await api(
-'/api/budget',
-{
-method:'POST',
+  const d = new Date();
 
-body:JSON.stringify({
+  $('shiftDate').value =
+    d.toISOString().slice(0,10);
 
-month:bp(),
+  $('shiftStart').value = '09:00';
 
-revenue:
-Number(
-$('budgetRevenue').value||0
-),
+  $('shiftEnd').value = '17:00';
 
-food_cost:
-Number(
-$('budgetFood').value||0
-),
-
-drink_cost:
-Number(
-$('budgetDrink').value||0
-),
-
-labour:
-Number(
-$('budgetLabour').value||0
-),
-
-overheads:
-Number(
-$('budgetOverheads').value||0
-)
-
-})
-}
-);
-
-toast('Budget saved');
-
-loadBudget();
-
-}
-catch(e){
-
-toast(e.message)
-
-}
+  openModal('shiftModal');
 
 }
 
 
-async function loadAudit(){
+async function loadEmployeesForShift(){
 
-try{
+  try{
 
-const d=
-await api('/api/audit');
+    const d =
+      await api('/api/employees');
 
-$('auditRows').innerHTML=
-d.log.length
+    $('shiftEmployee').innerHTML =
+      d.employees.length
 
-?d.log
-.map(
-x=>`
+      ? d.employees.map(x=>`
 
-<tr>
+        <option value="${x.id}">
+          ${x.name} — ${x.job_title || x.department}
+        </option>
 
-<td>${x.created_at}</td>
+      `).join('')
 
-<td>User ${x.user_id||'—'}</td>
+      : '<option value="">No employees yet</option>';
 
-<td><b>${x.action}</b></td>
+  }catch(e){
 
-<td>${x.entity}</td>
+    toast(e.message);
 
-<td>${x.entity_id||'—'}</td>
-
-<td>${x.detail||'—'}</td>
-
-</tr>
-
-`
-)
-.join('')
-
-:'<tr><td colspan="6" class="small">No audit events yet.</td></tr>';
-
-}
-catch(e){
-
-toast(e.message)
-
-}
+  }
 
 }
 
 
-async function loadDash(){
+function shiftHours(start,end,breakm){
 
-try{
+  const a =
+    start.split(':').map(Number);
 
-let d=
-await api('/api/dashboard');
+  const b =
+    end.split(':').map(Number);
 
-$('dRevenue').textContent=
-money(d.revenue);
+  let mins =
+    (b[0]*60+b[1]) -
+    (a[0]*60+a[1]);
 
-$('dGP').textContent=
-d.gross_margin.toFixed(1)+'%';
+  if(mins < 0){
+    mins += 1440;
+  }
 
-$('dEBITDA').textContent=
-money(d.ebitda);
-
-$('dEBITDAPct').textContent=
-d.ebitda_margin.toFixed(1)+
-'% EBITDA margin';
-
-$('dLabour').textContent=
-money(d.labour);
-
-$('dashFinancial').innerHTML=`
-
-<div class="small">
-Revenue
-</div>
-
-<div class="money">
-${money(d.revenue)}
-</div>
-
-<div class="small" style="margin-top:8px">
-COGS
-</div>
-
-<div class="money">
-${money(d.cogs)}
-</div>
-
-<div class="small" style="margin-top:8px">
-Gross profit
-</div>
-
-<div class="money">
-${money(d.gross_profit)}
-</div>
-
-<div class="small" style="margin-top:8px">
-Labour + overheads
-</div>
-
-<div class="money">
-${money(d.labour+d.overheads)}
-</div>
-
-`;
-
-$('dashAttention').innerHTML=`
-
-<div class="card" style="padding:10px;margin-bottom:7px">
-
-<b>
-${d.outstanding_invoices
-?money(d.outstanding_invoices)
-:'£0'}
-</b>
-
-<div class="small">
-Supplier invoices not yet paid
-</div>
-
-</div>
-
-<div class="card" style="padding:10px;margin-bottom:7px">
-
-<b>
-${d.low_stock}
-</b>
-
-<div class="small">
-Stock items below par
-</div>
-
-</div>
-
-<div class="card" style="padding:10px">
-
-<b>
-${money(d.payroll_due)}
-</b>
-
-<div class="small">
-Payroll runs awaiting completion
-</div>
-
-</div>
-
-`;
+  return Math.max(
+    0,
+    mins - Number(breakm || 0)
+  ) / 60;
 
 }
-catch(e){
 
-toast(e.message)
+
+async function loadShifts(){
+
+  try{
+
+    const d =
+      await api('/api/shifts');
+
+    $('shiftRows').innerHTML =
+      d.shifts.length
+
+      ? d.shifts.map(x=>{
+
+        const h =
+          shiftHours(
+            x.start_time,
+            x.end_time,
+            x.break_minutes
+          );
+
+        return `
+
+          <tr>
+
+            <td>${x.shift_date}</td>
+
+            <td>
+              <b>${x.employee_name}</b>
+            </td>
+
+            <td>${x.start_time}</td>
+
+            <td>${x.end_time}</td>
+
+            <td>${x.break_minutes} min</td>
+
+            <td>${h.toFixed(2)}</td>
+
+            <td>${money(x.pay_rate)}/hr</td>
+
+            <td class="money">
+              ${money(h*x.pay_rate)}
+            </td>
+
+            <td>
+              <span class="pill">
+                ${x.status}
+              </span>
+            </td>
+
+          </tr>
+
+        `;
+
+      }).join('')
+
+      : `
+        <tr>
+          <td colspan="9" class="small">
+            No shifts have been added yet.
+          </td>
+        </tr>
+      `;
+
+  }catch(e){
+
+    toast(e.message);
+
+  }
 
 }
+
+
+async function saveShift(e){
+
+  e.preventDefault();
+
+  try{
+
+    const employeeId =
+      Number($('shiftEmployee').value);
+
+    if(!employeeId){
+      throw Error(
+        'Add an employee before creating a shift'
+      );
+    }
+
+    await api('/api/shifts',{
+      method:'POST',
+
+      body:JSON.stringify({
+
+        employee_id:employeeId,
+
+        shift_date:$('shiftDate').value,
+
+        start_time:$('shiftStart').value,
+
+        end_time:$('shiftEnd').value,
+
+        break_minutes:
+          Number($('shiftBreak').value || 0)
+
+      })
+    });
+
+    closeModal('shiftModal');
+
+    e.target.reset();
+
+    toast('Shift added');
+
+    loadShifts();
+
+    loadFinance();
+
+  }catch(x){
+
+    toast(x.message);
+
+  }
 
 }
 
 
 function changeMonth(n){
 
-month.setMonth(
-month.getMonth()+n
-);
+  month.setMonth(
+    month.getMonth()+n
+  );
 
-loadFinance();
+  loadFinance();
+
+}
+
+
+async function loadBudget(){
+
+  try{
+
+    const m = bp();
+
+    const d =
+      await api('/api/budget?month=' + m);
+
+    const b = d.budget || {};
+
+    $('budgetMonthLabel').textContent = m;
+
+    $('budgetActualMonth').textContent = m;
+
+    $('budgetRevenue').value =
+      b.revenue || 0;
+
+    $('budgetFood').value =
+      b.food_cost || 0;
+
+    $('budgetDrink').value =
+      b.drink_cost || 0;
+
+    $('budgetLabour').value =
+      b.labour || 0;
+
+    $('budgetOverheads').value =
+      b.overheads || 0;
+
+    $('bRevenue').textContent =
+      money(b.revenue);
+
+    $('bLabour').textContent =
+      money(b.labour);
+
+    $('bFood').textContent =
+      money(b.food_cost);
+
+    $('bOverheads').textContent =
+      money(b.overheads);
+
+    const actual =
+      await api('/api/finance?month=' + m);
+
+    const rows = [
+
+      [
+        'Revenue',
+        Number(b.revenue || 0),
+        actual.revenue
+      ],
+
+      [
+        'Food cost',
+        Number(b.food_cost || 0),
+        actual.cogs
+      ],
+
+      [
+        'Labour',
+        Number(b.labour || 0),
+        actual.labour
+      ],
+
+      [
+        'Overheads',
+        Number(b.overheads || 0),
+        actual.overheads
+      ]
+
+    ];
+
+    $('budgetCompare').innerHTML =
+      rows.map(r=>{
+
+        const variance =
+          r[2] - r[1];
+
+        const favourable =
+          r[0] === 'Revenue'
+          ? variance >= 0
+          : variance <= 0;
+
+        return `
+
+          <div style="margin-bottom:13px">
+
+            <div class="sectionhead">
+
+              <b>${r[0]}</b>
+
+              <span>
+                ${money(r[2])}
+                actual /
+                ${money(r[1])}
+                budget
+              </span>
+
+            </div>
+
+            <div class="bar">
+
+              <i style="
+                width:${
+                  r[1] > 0
+                  ? Math.min(
+                      100,
+                      (r[2]/r[1])*100
+                    )
+                  : 0
+                }%
+              "></i>
+
+            </div>
+
+            <div
+              class="small ${
+                favourable
+                ? 'good'
+                : 'bad'
+              }"
+              style="margin-top:4px">
+
+              Variance:
+              ${variance >= 0 ? '+' : ''}
+              ${money(variance)}
+
+            </div>
+
+          </div>
+
+        `;
+
+      }).join('');
+
+  }catch(e){
+
+    toast(e.message);
+
+  }
+
+}
+
+
+async function saveBudget(){
+
+  try{
+
+    await api('/api/budget',{
+      method:'POST',
+
+      body:JSON.stringify({
+
+        month:bp(),
+
+        revenue:
+          Number(
+            $('budgetRevenue').value || 0
+          ),
+
+        food_cost:
+          Number(
+            $('budgetFood').value || 0
+          ),
+
+        drink_cost:
+          Number(
+            $('budgetDrink').value || 0
+          ),
+
+        labour:
+          Number(
+            $('budgetLabour').value || 0
+          ),
+
+        overheads:
+          Number(
+            $('budgetOverheads').value || 0
+          )
+
+      })
+    });
+
+    toast('Budget saved');
+
+    loadBudget();
+
+  }catch(e){
+
+    toast(e.message);
+
+  }
+
+}
+
+
+async function loadAudit(){
+
+  try{
+
+    const d =
+      await api('/api/audit');
+
+    $('auditRows').innerHTML =
+      d.log.length
+
+      ? d.log.map(x=>`
+
+        <tr>
+
+          <td>${x.created_at}</td>
+
+          <td>
+            User ${x.user_id || '—'}
+          </td>
+
+          <td>
+            <b>${x.action}</b>
+          </td>
+
+          <td>${x.entity}</td>
+
+          <td>${x.entity_id || '—'}</td>
+
+          <td>${x.detail || '—'}</td>
+
+        </tr>
+
+      `).join('')
+
+      : `
+        <tr>
+          <td colspan="6" class="small">
+            No audit events yet.
+          </td>
+        </tr>
+      `;
+
+  }catch(e){
+
+    toast(e.message);
+
+  }
+
+}
+
+
+async function loadDash(){
+
+  try{
+
+    let d =
+      await api('/api/dashboard');
+
+    $('dRevenue').textContent =
+      money(d.revenue);
+
+    $('dGP').textContent =
+      d.gross_margin.toFixed(1) + '%';
+
+    $('dEBITDA').textContent =
+      money(d.ebitda);
+
+    $('dEBITDAPct').textContent =
+      d.ebitda_margin.toFixed(1) +
+      '% EBITDA margin';
+
+    $('dLabour').textContent =
+      money(d.labour);
+
+    $('dashFinancial').innerHTML = `
+
+      <div class="small">Revenue</div>
+
+      <div class="money">
+        ${money(d.revenue)}
+      </div>
+
+      <div
+        class="small"
+        style="margin-top:8px">
+        COGS
+      </div>
+
+      <div class="money">
+        ${money(d.cogs)}
+      </div>
+
+      <div
+        class="small"
+        style="margin-top:8px">
+        Gross profit
+      </div>
+
+      <div class="money">
+        ${money(d.gross_profit)}
+      </div>
+
+      <div
+        class="small"
+        style="margin-top:8px">
+        Labour + overheads
+      </div>
+
+      <div class="money">
+        ${money(d.labour+d.overheads)}
+      </div>
+
+    `;
+
+    $('dashAttention').innerHTML = `
+
+      <div
+        class="card"
+        style="padding:10px;margin-bottom:7px">
+
+        <b>
+          ${
+            d.outstanding_invoices
+            ? money(d.outstanding_invoices)
+            : '£0'
+          }
+        </b>
+
+        <div class="small">
+          Supplier invoices not yet paid
+        </div>
+
+      </div>
+
+      <div
+        class="card"
+        style="padding:10px;margin-bottom:7px">
+
+        <b>${d.low_stock}</b>
+
+        <div class="small">
+          Stock items below par
+        </div>
+
+      </div>
+
+      <div
+        class="card"
+        style="padding:10px">
+
+        <b>
+          ${money(d.payroll_due)}
+        </b>
+
+        <div class="small">
+          Payroll runs awaiting completion
+        </div>
+
+      </div>
+
+    `;
+
+    loadMarket();
+
+  }catch(e){
+
+    toast(e.message);
+
+  }
 
 }
 
 
 async function loadFinance(){
 
-try{
+  try{
 
-let d=
-await api(
-'/api/finance?month='+mp()
-);
+    let d =
+      await api('/api/finance?month=' + mp());
 
-$('fRevenue').textContent=
-money(d.revenue);
+    $('fRevenue').textContent =
+      money(d.revenue);
 
-$('fGP').textContent=
-money(d.gross_profit);
+    $('fGP').textContent =
+      money(d.gross_profit);
 
-$('fGPM').textContent=
-d.gross_margin.toFixed(1)+
-'% gross margin';
+    $('fGPM').textContent =
+      d.gross_margin.toFixed(1) +
+      '% gross margin';
 
-$('fLabour').textContent=
-money(d.labour);
+    $('fLabour').textContent =
+      money(d.labour);
 
-$('fEBITDA').textContent=
-money(d.ebitda);
+    $('fEBITDA').textContent =
+      money(d.ebitda);
 
-$('fEBITDAPct').textContent=
-d.ebitda_margin.toFixed(1)+
-'% EBITDA margin';
+    $('fEBITDAPct').textContent =
+      d.ebitda_margin.toFixed(1) +
+      '% EBITDA margin';
 
-$('fMonth').textContent=
-d.month;
+    $('fMonth').textContent =
+      d.month;
 
-$('pnl').innerHTML=[
+    $('pnl').innerHTML = [
 
-['Revenue',d.revenue],
+      ['Revenue',d.revenue],
 
-['Cost of sales',-d.cogs],
+      ['Cost of sales',-d.cogs],
 
-['Gross profit',d.gross_profit],
+      ['Gross profit',d.gross_profit],
 
-['Labour',-d.labour],
+      ['Labour',-d.labour],
 
-['Overheads',-d.overheads],
+      ['Overheads',-d.overheads],
 
-['EBITDA',d.ebitda]
+      ['EBITDA',d.ebitda]
 
-]
-.map(
-x=>`
+    ].map(x=>`
 
-<tr>
+      <tr>
 
-<td>
-<b>${x[0]}</b>
-</td>
+        <td>
+          <b>${x[0]}</b>
+        </td>
 
-<td class="money ${x[1]<0?'bad':''}">
-${money(x[1])}
-</td>
+        <td
+          class="
+            money
+            ${x[1] < 0 ? 'bad' : ''}
+          ">
 
-</tr>
+          ${money(x[1])}
 
-`
-)
-.join('');
+        </td>
 
-$('bridge').innerHTML=`
+      </tr>
 
-<div class="small">
-Revenue
-</div>
+    `).join('');
 
-<h2>
-${money(d.revenue)}
-</h2>
+    $('bridge').innerHTML = `
 
-<div class="small">
-− Cost of sales
-</div>
+      <div class="small">
+        Revenue
+      </div>
 
-<h3>
-${money(d.cogs)}
-</h3>
+      <h2>
+        ${money(d.revenue)}
+      </h2>
 
-<div class="small">
-= Gross profit
-</div>
+      <div class="small">
+        − Cost of sales
+      </div>
 
-<h2>
-${money(d.gross_profit)}
-</h2>
+      <h3>
+        ${money(d.cogs)}
+      </h3>
 
-<div class="small">
-− Labour
-</div>
+      <div class="small">
+        = Gross profit
+      </div>
 
-<h3>
-${money(d.labour)}
-</h3>
+      <h2>
+        ${money(d.gross_profit)}
+      </h2>
 
-<div class="small">
-− Overheads
-</div>
+      <div class="small">
+        − Labour
+      </div>
 
-<h3>
-${money(d.overheads)}
-</h3>
+      <h3>
+        ${money(d.labour)}
+      </h3>
 
-<div class="small">
-= EBITDA
-</div>
+      <div class="small">
+        − Overheads
+      </div>
 
-<h1>
-${money(d.ebitda)}
-</h1>
+      <h3>
+        ${money(d.overheads)}
+      </h3>
 
-`;
+      <div class="small">
+        = EBITDA
+      </div>
 
-}
-catch(e){
+      <h1>
+        ${money(d.ebitda)}
+      </h1>
 
-toast(e.message)
+    `;
 
-}
+  }catch(e){
+
+    toast(e.message);
+
+  }
 
 }
 
 
 async function loadSales(){
 
-try{
+  try{
 
-let d=
-await api('/api/sales');
+    let d =
+      await api('/api/sales');
 
-$('salesRows').innerHTML=
-d.sales
-.map(
-x=>`
+    $('salesRows').innerHTML =
+      d.sales.map(x=>`
 
-<tr>
+        <tr>
 
-<td>${x.sale_date}</td>
+          <td>${x.sale_date}</td>
 
-<td>${x.category}</td>
+          <td>${x.category}</td>
 
-<td>${money(x.net)}</td>
+          <td>${money(x.net)}</td>
 
-<td>${money(x.vat)}</td>
+          <td>${money(x.vat)}</td>
 
-<td class="money">
-${money(x.gross)}
-</td>
+          <td class="money">
+            ${money(x.gross)}
+          </td>
 
-<td>${x.source}</td>
+          <td>${x.source}</td>
 
-</tr>
+        </tr>
 
-`
-)
-.join('');
+      `).join('');
 
-}
-catch(e){
+  }catch(e){
 
-toast(e.message)
+    toast(e.message);
 
-}
+  }
 
 }
 
 
 async function loadInvoices(){
 
-try{
+  try{
 
-let d=
-await api('/api/invoices');
+    let d =
+      await api('/api/invoices');
 
-$('invoiceRows').innerHTML=
-d.invoices
-.map(
-x=>{
+    $('invoiceRows').innerHTML =
+      d.invoices.map(x=>{
 
-let a=
-role==='Owner'||
-role==='Admin'||
-role==='Finance'||
-role==='General Manager';
+        let a =
+          role === 'Owner' ||
+          role === 'Admin' ||
+          role === 'Finance' ||
+          role === 'General Manager';
 
-let b=
-a&&x.status==='Awaiting approval'
+        let b =
+          a && x.status === 'Awaiting approval'
 
-?`
+          ? `
+            <button
+              class="btn"
+              onclick="approveInvoice(${x.id})">
+              Approve
+            </button>
+          `
 
-<button
-class="btn"
-onclick="approveInvoice(${x.id})">
+          : a && x.status === 'Approved'
 
-Approve
+          ? `
+            <button
+              class="btn primary"
+              onclick="payInvoice(${x.id})">
+              Record paid
+            </button>
+          `
 
-</button>
+          : '';
 
-`
+        return `
 
-:a&&x.status==='Approved'
+          <tr>
 
-?`
+            <td>${x.supplier}</td>
 
-<button
-class="btn primary"
-onclick="payInvoice(${x.id})">
+            <td>${x.invoice_number}</td>
 
-Record paid
+            <td>${x.due_date}</td>
 
-</button>
+            <td>${x.category}</td>
 
-`
-:'';
+            <td class="money">
+              ${money(x.gross)}
+            </td>
 
-return `
+            <td>
 
-<tr>
+              <span
+                class="
+                  pill
+                  ${
+                    x.status === 'Paid'
+                    ? 'paid'
+                    : x.status === 'Awaiting approval'
+                    ? 'pending'
+                    : ''
+                  }
+                ">
 
-<td>${x.supplier}</td>
+                ${x.status}
 
-<td>${x.invoice_number}</td>
+              </span>
 
-<td>${x.due_date}</td>
+            </td>
 
-<td>${x.category}</td>
+            <td>${b}</td>
 
-<td class="money">
-${money(x.gross)}
-</td>
+          </tr>
 
-<td>
+        `;
 
-<span
-class="pill ${
-x.status==='Paid'
-?'paid'
-:x.status==='Awaiting approval'
-?'pending'
-:''
-}">
+      }).join('');
 
-${x.status}
+  }catch(e){
 
-</span>
+    toast(e.message);
 
-</td>
-
-<td>
-${b}
-</td>
-
-</tr>
-
-`
-
-}
-)
-.join('');
-
-}
-catch(e){
-
-toast(e.message)
-
-}
+  }
 
 }
 
 
 async function approveInvoice(id){
 
-try{
+  try{
 
-await api(
-'/api/invoices/'+id+'/approve',
-{
-method:'POST'
-}
-);
+    await api(
+      '/api/invoices/' + id + '/approve',
+      {method:'POST'}
+    );
 
-toast(
-'Invoice approved and payment scheduled'
-);
+    toast(
+      'Invoice approved and payment scheduled'
+    );
 
-loadInvoices();
+    loadInvoices();
+    loadPayments();
 
-loadPayments();
+  }catch(e){
 
-}
-catch(e){
+    toast(e.message);
 
-toast(e.message)
-
-}
+  }
 
 }
 
 
 async function payInvoice(id){
 
-if(
-!confirm(
-'Record this invoice as paid?'
-)
-)
-return;
+  if(!confirm(
+    'Record this invoice as paid?'
+  )){
+    return;
+  }
 
-try{
+  try{
 
-await api(
-'/api/invoices/'+id+'/pay',
-{
-method:'POST'
-}
-);
+    await api(
+      '/api/invoices/' + id + '/pay',
+      {method:'POST'}
+    );
 
-toast(
-'Payment recorded'
-);
+    toast('Payment recorded');
 
-loadInvoices();
+    loadInvoices();
+    loadPayments();
+    loadFinance();
 
-loadPayments();
+  }catch(e){
 
-loadFinance();
+    toast(e.message);
 
-loadDash();
-
-}
-catch(e){
-
-toast(e.message)
-
-}
+  }
 
 }
 
 
 async function saveInvoice(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/invoices',
-{
-method:'POST',
+    await api('/api/invoices',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-supplier:
-$('invSupplier').value,
+        supplier:$('invSupplier').value,
 
-invoice_number:
-$('invNumber').value,
+        invoice_number:$('invNumber').value,
 
-invoice_date:
-$('invDate').value,
+        invoice_date:$('invDate').value,
 
-due_date:
-$('invDue').value,
+        due_date:$('invDue').value,
 
-category:
-$('invCategory').value,
+        category:$('invCategory').value,
 
-net:
-Number(
-$('invNet').value
-),
+        net:Number(
+          $('invNet').value
+        ),
 
-vat:
-Number(
-$('invVat').value
-),
+        vat:Number(
+          $('invVat').value
+        ),
 
-notes:
-$('invNotes').value
+        notes:$('invNotes').value
 
-})
-}
-);
+      })
+    });
 
-closeModal('invoiceModal');
+    closeModal('invoiceModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Invoice created'
-);
+    toast('Invoice created');
 
-loadInvoices();
+    loadInvoices();
 
-}
-catch(x){
+  }catch(x){
 
-toast(x.message)
+    toast(x.message);
 
-}
+  }
 
 }
 
 
 async function loadPayments(){
 
-try{
+  try{
 
-let d=
-await api('/api/payments');
+    let d =
+      await api('/api/payments');
 
-$('paymentRows').innerHTML=
-d.payments
-.map(
-x=>`
+    $('paymentRows').innerHTML =
+      d.payments.map(x=>`
 
-<tr>
+        <tr>
 
-<td>${x.payment_type}</td>
+          <td>${x.payment_type}</td>
 
-<td>${x.payee}</td>
+          <td>${x.payee}</td>
 
-<td>${x.reference}</td>
+          <td>${x.reference}</td>
 
-<td class="money">
-${money(x.amount)}
-</td>
+          <td class="money">
+            ${money(x.amount)}
+          </td>
 
-<td>${x.payment_date}</td>
+          <td>${x.payment_date}</td>
 
-<td>
+          <td>
 
-<span
-class="pill ${
-x.status==='Paid'
-?'paid'
-:'pending'
-}">
+            <span
+              class="
+                pill
+                ${
+                  x.status === 'Paid'
+                  ? 'paid'
+                  : 'pending'
+                }
+              ">
 
-${x.status}
+              ${x.status}
 
-</span>
+            </span>
 
-</td>
+          </td>
 
-</tr>
+        </tr>
 
-`
-)
-.join('');
+      `).join('');
 
-}
-catch(e){
+  }catch(e){
 
-toast(e.message)
+    toast(e.message);
 
-}
+  }
 
 }
 
 
 async function saveExpense(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/expenses',
-{
-method:'POST',
+    await api('/api/expenses',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-category:
-$('expenseCategory').value,
+        category:$('expenseCategory').value,
 
-description:
-$('expenseDescription').value,
+        description:$('expenseDescription').value,
 
-supplier:
-$('expenseSupplier').value,
+        supplier:$('expenseSupplier').value,
 
-gross:
-Number(
-$('expenseGross').value
-),
+        gross:Number(
+          $('expenseGross').value
+        ),
 
-vat:
-Number(
-$('expenseVat').value
-),
+        vat:Number(
+          $('expenseVat').value
+        ),
 
-expense_date:
-$('expenseDate').value
+        expense_date:$('expenseDate').value
 
-})
-}
-);
+      })
+    });
 
-closeModal('expenseModal');
+    closeModal('expenseModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Outgoing cost added'
-);
+    toast('Outgoing cost added');
 
-loadFinance();
+    loadFinance();
 
-loadDash();
+  }catch(x){
 
-}
-catch(x){
+    toast(x.message);
 
-toast(x.message)
-
-}
+  }
 
 }
 
 
 async function saveSale(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/sales',
-{
-method:'POST',
+    await api('/api/sales',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-category:
-$('saleCategory').value,
+        category:$('saleCategory').value,
 
-gross:
-Number(
-$('saleGross').value
-),
+        gross:Number(
+          $('saleGross').value
+        ),
 
-vat:
-Number(
-$('saleVat').value
-),
+        vat:Number(
+          $('saleVat').value
+        ),
 
-sale_date:
-$('saleDate').value
+        sale_date:$('saleDate').value
 
-})
-}
-);
+      })
+    });
 
-closeModal('saleModal');
+    closeModal('saleModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Sales recorded'
-);
+    toast('Sales recorded');
 
-loadSales();
+    loadSales();
+    loadFinance();
+    loadDash();
 
-loadFinance();
+  }catch(x){
 
-loadDash();
+    toast(x.message);
 
-}
-catch(x){
-
-toast(x.message)
-
-}
+  }
 
 }
 
 
 async function loadStaff(){
 
-try{
+  try{
 
-let d=
-await api('/api/employees');
+    let d =
+      await api('/api/employees');
 
-$('employeeRows').innerHTML=
-d.employees
-.map(
-x=>`
+    $('employeeRows').innerHTML =
+      d.employees.map(x=>`
 
-<tr>
+        <tr>
 
-<td>
+          <td>
 
-<b>${x.name}</b>
+            <b>${x.name}</b>
 
-<div class="small">
-${x.email}
-</div>
+            <div class="small">
+              ${x.email}
+            </div>
 
-</td>
+          </td>
 
-<td>${x.department}</td>
+          <td>${x.department}</td>
 
-<td>${x.job_title||'—'}</td>
+          <td>${x.job_title || '—'}</td>
 
-<td>${x.pay_type}</td>
+          <td>${x.pay_type}</td>
 
-<td>${money(x.pay_rate)}</td>
+          <td>${money(x.pay_rate)}</td>
 
-<td>${x.holiday_allowance} days</td>
+          <td>
+            ${x.holiday_allowance} days
+          </td>
 
-</tr>
+        </tr>
 
-`
-)
-.join('');
+      `).join('');
 
-}
-catch(e){
+  }catch(e){
 
-toast(e.message)
+    toast(e.message);
 
-}
+  }
 
 }
 
 
 async function saveEmployee(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/employees',
-{
-method:'POST',
+    await api('/api/employees',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-name:
-$('empName').value,
+        name:$('empName').value,
 
-email:
-$('empEmail').value,
+        email:$('empEmail').value,
 
-department:
-$('empDept').value,
+        department:$('empDept').value,
 
-job_title:
-$('empTitle').value,
+        job_title:$('empTitle').value,
 
-pay_type:
-$('empPayType').value,
+        pay_type:$('empPayType').value,
 
-pay_rate:
-Number(
-$('empRate').value
-),
+        pay_rate:Number(
+          $('empRate').value
+        ),
 
-ni_rate:
-Number(
-$('empNI').value
-),
+        ni_rate:Number(
+          $('empNI').value
+        ),
 
-pension_rate:
-Number(
-$('empPension').value
-),
+        pension_rate:Number(
+          $('empPension').value
+        ),
 
-holiday_allowance:
-Number(
-$('empHoliday').value
-)
+        holiday_allowance:Number(
+          $('empHoliday').value
+        )
 
-})
-}
-);
+      })
+    });
 
-closeModal('employeeModal');
+    closeModal('employeeModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Employee added'
-);
+    toast('Employee added');
 
-loadStaff();
+    loadStaff();
 
-}
-catch(x){
+  }catch(x){
 
-toast(x.message)
+    toast(x.message);
 
-}
+  }
 
 }
 
 
 async function loadPayroll(){
 
-try{
+  try{
 
-let d=
-await api('/api/payroll');
+    let d =
+      await api('/api/payroll');
 
-$('payrollRows').innerHTML=
-d.runs
-.map(
-x=>{
+    $('payrollRows').innerHTML =
+      d.runs.map(x=>{
 
-let a=
-role==='Owner'||
-role==='Admin'||
-role==='Finance'||
-role==='General Manager';
+        let a =
+          role === 'Owner' ||
+          role === 'Admin' ||
+          role === 'Finance' ||
+          role === 'General Manager';
 
-let b=
-a&&x.status==='Draft'
+        let b =
+          a && x.status === 'Draft'
 
-?`
+          ? `
+            <button
+              class="btn"
+              onclick="approvePayroll(${x.id})">
+              Approve
+            </button>
+          `
 
-<button
-class="btn"
-onclick="approvePayroll(${x.id})">
+          : a && x.status === 'Approved'
 
-Approve
+          ? `
+            <button
+              class="btn primary"
+              onclick="payPayroll(${x.id})">
+              Record paid
+            </button>
+          `
 
-</button>
+          : '';
 
-`
+        return `
 
-:a&&x.status==='Approved'
+          <tr>
 
-?`
+            <td>
+              ${x.period_start}
+              –
+              ${x.period_end}
+            </td>
 
-<button
-class="btn primary"
-onclick="payPayroll(${x.id})">
+            <td>
+              ${money(x.gross_pay)}
+            </td>
 
-Record paid
+            <td>
+              ${money(x.employer_costs)}
+            </td>
 
-</button>
+            <td>
+              ${money(x.deductions)}
+            </td>
 
-`
-:'';
+            <td class="money">
+              ${money(x.net_pay)}
+            </td>
 
-return `
+            <td>
 
-<tr>
+              <span
+                class="
+                  pill
+                  ${
+                    x.status === 'Paid'
+                    ? 'paid'
+                    : 'pending'
+                  }
+                ">
 
-<td>
-${x.period_start}
-–
-${x.period_end}
-</td>
+                ${x.status}
 
-<td>
-${money(x.gross_pay)}
-</td>
+              </span>
 
-<td>
-${money(x.employer_costs)}
-</td>
+            </td>
 
-<td>
-${money(x.deductions)}
-</td>
+            <td>${b}</td>
 
-<td class="money">
-${money(x.net_pay)}
-</td>
+          </tr>
 
-<td>
+        `;
 
-<span
-class="pill ${
-x.status==='Paid'
-?'paid'
-:'pending'
-}">
+      }).join('');
 
-${x.status}
+  }catch(e){
 
-</span>
+    toast(e.message);
 
-</td>
-
-<td>
-${b}
-</td>
-
-</tr>
-
-`
-
-}
-)
-.join('');
-
-}
-catch(e){
-
-toast(e.message)
-
-}
+  }
 
 }
 
 
 async function savePayroll(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/payroll',
-{
-method:'POST',
+    await api('/api/payroll',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-period_start:
-$('payStart').value,
+        period_start:$('payStart').value,
 
-period_end:
-$('payEnd').value,
+        period_end:$('payEnd').value,
 
-gross_pay:
-Number(
-$('payGross').value
-),
+        gross_pay:Number(
+          $('payGross').value
+        ),
 
-employer_costs:
-Number(
-$('payEmployer').value
-),
+        employer_costs:Number(
+          $('payEmployer').value
+        ),
 
-deductions:
-Number(
-$('payDeduct').value
-)
+        deductions:Number(
+          $('payDeduct').value
+        )
 
-})
-}
-);
+      })
+    });
 
-closeModal('payrollModal');
+    closeModal('payrollModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Payroll run created'
-);
+    toast('Payroll run created');
 
-loadPayroll();
+    loadPayroll();
 
-}
-catch(x){
+  }catch(x){
 
-toast(x.message)
+    toast(x.message);
 
-}
+  }
 
 }
 
 
 async function approvePayroll(id){
 
-try{
+  try{
 
-await api(
-'/api/payroll/'+id+'/approve',
-{
-method:'POST'
-}
-);
+    await api(
+      '/api/payroll/' + id + '/approve',
+      {method:'POST'}
+    );
 
-toast(
-'Payroll approved and payment scheduled'
-);
+    toast(
+      'Payroll approved and payment scheduled'
+    );
 
-loadPayroll();
+    loadPayroll();
+    loadPayments();
 
-loadPayments();
+  }catch(e){
 
-}
-catch(e){
+    toast(e.message);
 
-toast(e.message)
-
-}
+  }
 
 }
 
 
 async function payPayroll(id){
 
-if(
-!confirm(
-'Record this payroll as paid?'
-)
-)
-return;
+  if(!confirm(
+    'Record this payroll as paid?'
+  )){
+    return;
+  }
 
-try{
+  try{
 
-await api(
-'/api/payroll/'+id+'/pay',
-{
-method:'POST'
-}
-);
+    await api(
+      '/api/payroll/' + id + '/pay',
+      {method:'POST'}
+    );
 
-toast(
-'Staff payment recorded'
-);
+    toast(
+      'Staff payment recorded'
+    );
 
-loadPayroll();
+    loadPayroll();
+    loadPayments();
+    loadFinance();
 
-loadPayments();
+  }catch(e){
 
-loadFinance();
+    toast(e.message);
 
-loadDash();
-
-}
-catch(e){
-
-toast(e.message)
-
-}
+  }
 
 }
 
 
 async function loadStock(){
 
-try{
+  try{
 
-let d=
-await api('/api/stock');
+    let d =
+      await api('/api/stock');
 
-$('stockRows').innerHTML=
-d.stock
-.map(
-x=>{
+    $('stockRows').innerHTML =
+      d.stock.map(x=>{
 
-let low=
-x.on_hand<x.par_level;
+        let low =
+          x.on_hand < x.par_level;
 
-return `
+        return `
 
-<tr>
+          <tr>
 
-<td>
+            <td>
 
-<b>${x.name}</b>
+              <b>${x.name}</b>
 
-<div class="small">
-${x.supplier||''}
-</div>
+              <div class="small">
+                ${x.supplier || ''}
+              </div>
 
-</td>
+            </td>
 
-<td>${x.category}</td>
+            <td>${x.category}</td>
 
-<td>
-${x.on_hand}
-${x.unit}
-</td>
+            <td>
+              ${x.on_hand}
+              ${x.unit}
+            </td>
 
-<td>
-${x.par_level}
-</td>
+            <td>
+              ${x.par_level}
+            </td>
 
-<td>
-${money(x.unit_cost)}
-</td>
+            <td>
+              ${money(x.unit_cost)}
+            </td>
 
-<td>
+            <td>
 
-<span
-class="pill ${low?'bad':''}">
+              <span
+                class="
+                  pill
+                  ${low ? 'bad' : ''}
+                ">
 
-${low?'Below par':'OK'}
+                ${low ? 'Below par' : 'OK'}
 
-</span>
+              </span>
 
-</td>
+            </td>
 
-</tr>
+          </tr>
 
-`
+        `;
 
-}
-)
-.join('');
+      }).join('');
 
-}
-catch(e){
+  }catch(e){
 
-toast(e.message)
+    toast(e.message);
 
-}
+  }
 
 }
 
 
 async function saveStock(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/stock',
-{
-method:'POST',
+    await api('/api/stock',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-name:
-$('stockName').value,
+        name:$('stockName').value,
 
-category:
-$('stockCategory').value,
+        category:$('stockCategory').value,
 
-unit:
-$('stockUnit').value,
+        unit:$('stockUnit').value,
 
-on_hand:
-Number(
-$('stockOn').value
-),
+        on_hand:Number(
+          $('stockOn').value
+        ),
 
-par_level:
-Number(
-$('stockPar').value
-),
+        par_level:Number(
+          $('stockPar').value
+        ),
 
-unit_cost:
-Number(
-$('stockCost').value
-),
+        unit_cost:Number(
+          $('stockCost').value
+        ),
 
-supplier:
-$('stockSupplier').value
+        supplier:$('stockSupplier').value
 
-})
-}
-);
+      })
+    });
 
-closeModal('stockModal');
+    closeModal('stockModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Stock item added'
-);
+    toast('Stock item added');
 
-loadStock();
+    loadStock();
 
-}
-catch(x){
+  }catch(x){
 
-toast(x.message)
+    toast(x.message);
 
-}
+  }
 
 }
 
 
 async function loadSuppliers(){
 
-try{
+  try{
 
-let d=
-await api('/api/suppliers');
+    let d =
+      await api('/api/suppliers');
 
-$('supplierRows').innerHTML=
-d.suppliers
-.map(
-x=>`
+    $('supplierRows').innerHTML =
+      d.suppliers.map(x=>`
 
-<tr>
+        <tr>
 
-<td>
-<b>${x.name}</b>
-</td>
+          <td>
+            <b>${x.name}</b>
+          </td>
 
-<td>
-${x.contact}
-</td>
+          <td>${x.contact}</td>
 
-<td>
-${x.email}
-</td>
+          <td>${x.email}</td>
 
-<td>
-${x.payment_terms} days
-</td>
+          <td>
+            ${x.payment_terms} days
+          </td>
 
-</tr>
+        </tr>
 
-`
-)
-.join('');
+      `).join('');
 
-}
-catch(e){
+  }catch(e){
 
-toast(e.message)
+    toast(e.message);
 
-}
+  }
 
 }
 
 
 async function saveSupplier(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/suppliers',
-{
-method:'POST',
+    await api('/api/suppliers',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-name:
-$('supName').value,
+        name:$('supName').value,
 
-contact:
-$('supContact').value,
+        contact:$('supContact').value,
 
-email:
-$('supEmail').value,
+        email:$('supEmail').value,
 
-phone:
-$('supPhone').value,
+        phone:$('supPhone').value,
 
-payment_terms:
-Number(
-$('supTerms').value
-)
+        payment_terms:Number(
+          $('supTerms').value
+        )
 
-})
-}
-);
+      })
+    });
 
-closeModal('supplierModal');
+    closeModal('supplierModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Supplier added'
-);
+    toast('Supplier added');
 
-loadSuppliers();
+    loadSuppliers();
 
-}
-catch(x){
+  }catch(x){
 
-toast(x.message)
+    toast(x.message);
 
-}
+  }
 
 }
 
 
 async function loadMenu(){
 
-try{
+  try{
 
-let d=
-await api('/api/menu');
+    let d =
+      await api('/api/menu');
 
-$('menuRows').innerHTML=
-d.menu
-.map(
-x=>{
+    $('menuRows').innerHTML =
+      d.menu.map(x=>{
 
-let m=
-x.selling_price
-?
-(
-(
-x.selling_price-
-x.recipe_cost
-)/
-x.selling_price*
-100
-)
-:0;
+        let m =
+          x.selling_price
+          ? (
+              (
+                x.selling_price -
+                x.recipe_cost
+              )
+              /
+              x.selling_price
+              *
+              100
+            )
+          : 0;
 
-return `
+        return `
 
-<div
-class="card"
-style="margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
+          <div
+            class="card"
+            style="
+              margin-bottom:7px;
+              display:flex;
+              justify-content:space-between;
+              align-items:center">
 
-<div>
+            <div>
 
-<b>
-${x.name}
-</b>
+              <b>${x.name}</b>
 
-<div class="small">
+              <div class="small">
 
-${x.category}
+                ${x.category}
+                · Sell
+                ${money(x.selling_price)}
+                · Recipe cost
+                ${money(x.recipe_cost)}
 
-· Sell
-${money(x.selling_price)}
+              </div>
 
-· Recipe cost
-${money(x.recipe_cost)}
+            </div>
 
-</div>
+            <span class="pill">
+              ${m.toFixed(1)}% GP
+            </span>
 
-</div>
+          </div>
 
-<span class="pill">
-${m.toFixed(1)}% GP
-</span>
+        `;
 
-</div>
+      }).join('');
 
-`
+  }catch(e){
 
-}
-)
-.join('');
+    toast(e.message);
 
-}
-catch(e){
-
-toast(e.message)
-
-}
+  }
 
 }
 
 
 async function saveMenu(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/menu',
-{
-method:'POST',
+    await api('/api/menu',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-name:
-$('menuName').value,
+        name:$('menuName').value,
 
-category:
-$('menuCategory').value,
+        category:$('menuCategory').value,
 
-selling_price:
-Number(
-$('menuPrice').value
-),
+        selling_price:Number(
+          $('menuPrice').value
+        ),
 
-recipe_cost:
-Number(
-$('menuCost').value
-)
+        recipe_cost:Number(
+          $('menuCost').value
+        )
 
-})
-}
-);
+      })
+    });
 
-closeModal('menuModal');
+    closeModal('menuModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Menu item added'
-);
+    toast('Menu item added');
 
-loadMenu();
+    loadMenu();
 
-}
-catch(x){
+  }catch(x){
 
-toast(x.message)
+    toast(x.message);
 
-}
+  }
 
 }
 
 
 async function loadSites(){
 
-try{
+  try{
 
-let d=
-await api('/api/sites');
+    let d =
+      await api('/api/sites');
 
-$('siteRows').innerHTML=
-d.sites
-.map(
-x=>`
+    $('siteRows').innerHTML =
+      d.sites.map(x=>`
 
-<div
-class="card"
-style="margin-bottom:7px">
+        <div
+          class="card"
+          style="margin-bottom:7px">
 
-<b>
-${x.name}
-</b>
+          <b>${x.name}</b>
 
-<div class="small">
-${x.address||'No address entered'}
-</div>
+          <div class="small">
+            ${x.address || 'No address entered'}
+          </div>
 
-</div>
+        </div>
 
-`
-)
-.join('');
+      `).join('');
 
-}
-catch(e){
+  }catch(e){
 
-toast(e.message)
+    toast(e.message);
 
-}
+  }
 
 }
 
 
 async function saveSite(e){
 
-e.preventDefault();
+  e.preventDefault();
 
-try{
+  try{
 
-await api(
-'/api/site',
-{
-method:'POST',
+    await api('/api/site',{
+      method:'POST',
 
-body:JSON.stringify({
+      body:JSON.stringify({
 
-name:
-$('siteName').value,
+        name:$('siteName').value,
 
-address:
-$('siteAddress').value
+        address:$('siteAddress').value
 
-})
-}
-);
+      })
+    });
 
-closeModal('siteModal');
+    closeModal('siteModal');
 
-e.target.reset();
+    e.target.reset();
 
-toast(
-'Site created'
-);
+    toast('Site created');
 
-loadSites();
+    loadSites();
 
-}
-catch(x){
+  }catch(x){
 
-toast(x.message)
+    toast(x.message);
+
+  }
 
 }
 
-}
 
+/* INITIAL LOAD */
 
 loadDash();
+loadWeather(false);
+loadUpcomingEvents();
+loadMarket();
 
 </script>
 
