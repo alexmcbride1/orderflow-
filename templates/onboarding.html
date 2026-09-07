@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Create your OrderFlow business</title>
+
+<style>
+body{
+    margin:0;
+    background:#f4f7f5;
+    color:#17221e;
+    font-family:system-ui,-apple-system,sans-serif;
+    min-height:100vh;
+    display:grid;
+    place-items:center
+}
+
+.box{
+    width:min(600px,calc(100% - 28px));
+    background:#fff;
+    border:1px solid #dfe8e2;
+    border-radius:22px;
+    padding:28px;
+    box-shadow:0 20px 70px #17382d12
+}
+
+.logo{
+    font-size:27px;
+    font-weight:900
+}
+
+.logo span{
+    color:#2c755b
+}
+
+.muted{
+    color:#718079;
+    font-size:12px
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:20px
+}
+
+label{
+    font-size:11px;
+    font-weight:800
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    border:1px solid #dfe8e2;
+    border-radius:11px;
+    font-size:14px;
+    box-sizing:border-box
+}
+
+.full{
+    grid-column:1/-1
+}
+
+button{
+    grid-column:1/-1;
+    padding:13px;
+    border:0;
+    border-radius:11px;
+    background:#1d5a47;
+    color:white;
+    font-weight:800
+}
+
+.error{
+    margin-top:14px;
+    padding:10px;
+    border-radius:10px;
+    background:#f7e6e3;
+    color:#9b4038;
+    font-size:12px
+}
+
+@media(max-width:600px){
+    .grid{
+        grid-template-columns:1fr
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<div class="logo">
+ORDER<span>FLOW</span>
+</div>
+
+<div class="muted">
+Set up your hospitality business
+</div>
+
+{% if error %}
+<div class="error">{{error}}</div>
+{% endif %}
+
+<form class="grid" method="post">
+
+<div class="full">
+<label>Business name</label>
+<input
+    name="business_name"
+    placeholder="Your business or company"
+    required
+>
+</div>
+
+<div>
+<label>Business type</label>
+
+<select name="business_type">
+<option>Pub</option>
+<option>Restaurant</option>
+<option>Hotel</option>
+<option>Bar</option>
+<option>Café</option>
+<option>Hospitality Group</option>
+</select>
+
+</div>
+
+<div>
+<label>First site / venue</label>
+
+<input
+    name="site_name"
+    placeholder="Main site"
+    required
+>
+
+</div>
+
+<div class="full">
+
+<label>Address</label>
+
+<input
+    name="address"
+    placeholder="Venue address"
+>
+
+</div>
+
+<div>
+
+<label>Your name</label>
+
+<input
+    name="owner_name"
+    required
+>
+
+</div>
+
+<div>
+
+<label>Email</label>
+
+<input
+    type="email"
+    name="email"
+    required
+>
+
+</div>
+
+<div>
+
+<label>Password</label>
+
+<input
+    type="password"
+    name="password"
+    minlength="8"
+    required
+>
+
+</div>
+
+<button>
+Create OrderFlow business
+</button>
+
+</form>
+
+</div>
+
+</body>
+</html>
