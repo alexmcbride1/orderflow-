@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-
 <title>OrderFlow</title>
 
 <style>
@@ -111,7 +110,9 @@ margin:auto
 
 .view.active{display:block}
 
-.head{margin-bottom:18px}
+.head{
+margin-bottom:18px
+}
 
 .eyebrow{
 font-size:10px;
@@ -176,9 +177,7 @@ color:var(--muted)
 }
 
 .good{color:#2d765b}
-
 .bad{color:var(--red)}
-
 .warn{color:var(--amber)}
 
 .section{
@@ -415,7 +414,6 @@ grid-template-columns:1fr
 }
 
 }
-
 </style>
 </head>
 
@@ -444,9 +442,7 @@ ORDER<span>FLOW</span>
 ⌂ Dashboard
 </button>
 
-<div class="navgroup">
-Operations
-</div>
+<div class="navgroup">Operations</div>
 
 <button class="navbtn" data-view="sales">
 ▣ Sales
@@ -464,9 +460,7 @@ Operations
 ☷ Menu & Costing
 </button>
 
-<div class="navgroup">
-People
-</div>
+<div class="navgroup">People</div>
 
 <button class="navbtn" data-view="staff">
 ♙ Staff
@@ -480,9 +474,7 @@ People
 £ Payroll
 </button>
 
-<div class="navgroup">
-Finance
-</div>
+<div class="navgroup">Finance</div>
 
 <button class="navbtn" data-view="finance">
 £ Finance & EBITDA
@@ -496,9 +488,7 @@ Finance
 ↗ Payments
 </button>
 
-<div class="navgroup">
-Management
-</div>
+<div class="navgroup">Management</div>
 
 <button class="navbtn" data-view="budgets">
 ◫ Budgets
@@ -1372,12 +1362,7 @@ Monthly budget
 Revenue (£)
 </label>
 
-<input
-id="budgetRevenue"
-type="number"
-step=".01"
-min="0"
->
+<input id="budgetRevenue" type="number" step=".01" min="0">
 
 </div>
 
@@ -1387,12 +1372,7 @@ min="0"
 Food cost (£)
 </label>
 
-<input
-id="budgetFood"
-type="number"
-step=".01"
-min="0"
->
+<input id="budgetFood" type="number" step=".01" min="0">
 
 </div>
 
@@ -1406,12 +1386,7 @@ min="0"
 Drink cost (£)
 </label>
 
-<input
-id="budgetDrink"
-type="number"
-step=".01"
-min="0"
->
+<input id="budgetDrink" type="number" step=".01" min="0">
 
 </div>
 
@@ -1421,12 +1396,7 @@ min="0"
 Labour (£)
 </label>
 
-<input
-id="budgetLabour"
-type="number"
-step=".01"
-min="0"
->
+<input id="budgetLabour" type="number" step=".01" min="0">
 
 </div>
 
@@ -1436,17 +1406,11 @@ min="0"
 Overheads (£)
 </label>
 
-<input
-id="budgetOverheads"
-type="number"
-step=".01"
-min="0"
->
+<input id="budgetOverheads" type="number" step=".01" min="0">
 
 </form>
 
 </div>
-
 
 <div class="card">
 
@@ -1456,9 +1420,7 @@ min="0"
 Budget vs Actual
 </h2>
 
-<span
-class="small"
-id="budgetActualMonth">
+<span class="small" id="budgetActualMonth">
 </span>
 
 </div>
@@ -1574,17 +1536,11 @@ Settings
 Current site
 </b>
 
-<div
-class="small"
-style="margin-top:4px">
-
+<div class="small" style="margin-top:4px">
 {{site.name}}
-
 </div>
 
-<div
-class="notice"
-style="margin-top:14px">
+<div class="notice" style="margin-top:14px">
 
 Use the Sites section to add locations.
 All operational and financial records are separated by organisation and site.
@@ -1642,9 +1598,7 @@ More
 OrderFlow
 </b>
 
-<button
-class="close"
-onclick="closeModal('moreModal')">
+<button class="close" onclick="closeModal('moreModal')">
 ×
 </button>
 
@@ -1652,75 +1606,51 @@ onclick="closeModal('moreModal')">
 
 <div class="actions">
 
-<button
-class="btn"
-onclick="nav('sales');closeModal('moreModal')">
+<button class="btn" onclick="nav('sales');closeModal('moreModal')">
 Sales
 </button>
 
-<button
-class="btn"
-onclick="nav('stock');closeModal('moreModal')">
+<button class="btn" onclick="nav('stock');closeModal('moreModal')">
 Stock
 </button>
 
-<button
-class="btn"
-onclick="nav('purchasing');closeModal('moreModal')">
+<button class="btn" onclick="nav('purchasing');closeModal('moreModal')">
 Purchasing
 </button>
 
-<button
-class="btn"
-onclick="nav('menu');closeModal('moreModal')">
+<button class="btn" onclick="nav('menu');closeModal('moreModal')">
 Menu
 </button>
 
-<button
-class="btn"
-onclick="nav('staff');closeModal('moreModal')">
+<button class="btn" onclick="nav('staff');closeModal('moreModal')">
 Staff
 </button>
 
-<button
-class="btn"
-onclick="nav('shifts');closeModal('moreModal')">
+<button class="btn" onclick="nav('shifts');closeModal('moreModal')">
 Shifts & Rota
 </button>
 
-<button
-class="btn"
-onclick="nav('payroll');closeModal('moreModal')">
+<button class="btn" onclick="nav('payroll');closeModal('moreModal')">
 Payroll
 </button>
 
-<button
-class="btn"
-onclick="nav('budgets');closeModal('moreModal')">
+<button class="btn" onclick="nav('budgets');closeModal('moreModal')">
 Budgets
 </button>
 
-<button
-class="btn"
-onclick="nav('audit');closeModal('moreModal')">
+<button class="btn" onclick="nav('audit');closeModal('moreModal')">
 Audit Log
 </button>
 
-<button
-class="btn"
-onclick="nav('sites');closeModal('moreModal')">
+<button class="btn" onclick="nav('sites');closeModal('moreModal')">
 Sites
 </button>
 
-<button
-class="btn"
-onclick="nav('settings');closeModal('moreModal')">
+<button class="btn" onclick="nav('settings');closeModal('moreModal')">
 Settings
 </button>
 
-<form
-method="post"
-action="/logout">
+<form method="post" action="/logout">
 
 <button class="btn danger">
 Sign out
@@ -1745,17 +1675,13 @@ Sign out
 Add outgoing cost
 </b>
 
-<button
-class="close"
-onclick="closeModal('expenseModal')">
+<button class="close" onclick="closeModal('expenseModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="saveExpense(event)">
+<form class="form" onsubmit="saveExpense(event)">
 
 <label>
 Category
@@ -1784,18 +1710,13 @@ Category
 Description
 </label>
 
-<input
-id="expenseDescription"
-required
->
+<input id="expenseDescription" required>
 
 <label>
 Supplier
 </label>
 
-<input
-id="expenseSupplier"
->
+<input id="expenseSupplier">
 
 <div class="formgrid">
 
@@ -1805,12 +1726,7 @@ id="expenseSupplier"
 Gross (£)
 </label>
 
-<input
-id="expenseGross"
-type="number"
-step=".01"
-required
->
+<input id="expenseGross" type="number" step=".01" required>
 
 </div>
 
@@ -1820,12 +1736,7 @@ required
 VAT (£)
 </label>
 
-<input
-id="expenseVat"
-type="number"
-step=".01"
-value="0"
->
+<input id="expenseVat" type="number" step=".01" value="0">
 
 </div>
 
@@ -1835,10 +1746,7 @@ value="0"
 Date
 </label>
 
-<input
-id="expenseDate"
-type="date"
->
+<input id="expenseDate" type="date">
 
 <button class="btn primary">
 Save outgoing
@@ -1861,17 +1769,13 @@ Save outgoing
 Record sales
 </b>
 
-<button
-class="close"
-onclick="closeModal('saleModal')">
+<button class="close" onclick="closeModal('saleModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="saveSale(event)">
+<form class="form" onsubmit="saveSale(event)">
 
 <label>
 Category
@@ -1889,32 +1793,19 @@ Category
 Gross sales (£)
 </label>
 
-<input
-id="saleGross"
-type="number"
-step=".01"
-required
->
+<input id="saleGross" type="number" step=".01" required>
 
 <label>
 VAT (£)
 </label>
 
-<input
-id="saleVat"
-type="number"
-step=".01"
-value="0"
->
+<input id="saleVat" type="number" step=".01" value="0">
 
 <label>
 Date
 </label>
 
-<input
-id="saleDate"
-type="date"
->
+<input id="saleDate" type="date">
 
 <button class="btn primary">
 Record sales
@@ -1937,17 +1828,13 @@ Record sales
 Supplier invoice
 </b>
 
-<button
-class="close"
-onclick="closeModal('invoiceModal')">
+<button class="close" onclick="closeModal('invoiceModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="saveInvoice(event)">
+<form class="form" onsubmit="saveInvoice(event)">
 
 <div class="formgrid">
 
@@ -1957,10 +1844,7 @@ onsubmit="saveInvoice(event)">
 Supplier
 </label>
 
-<input
-id="invSupplier"
-required
->
+<input id="invSupplier" required>
 
 </div>
 
@@ -1970,10 +1854,7 @@ required
 Invoice number
 </label>
 
-<input
-id="invNumber"
-required
->
+<input id="invNumber" required>
 
 </div>
 
@@ -1987,10 +1868,7 @@ required
 Invoice date
 </label>
 
-<input
-id="invDate"
-type="date"
->
+<input id="invDate" type="date">
 
 </div>
 
@@ -2000,10 +1878,7 @@ type="date"
 Due date
 </label>
 
-<input
-id="invDue"
-type="date"
->
+<input id="invDue" type="date">
 
 </div>
 
@@ -2033,12 +1908,7 @@ Category
 Net (£)
 </label>
 
-<input
-id="invNet"
-type="number"
-step=".01"
-required
->
+<input id="invNet" type="number" step=".01" required>
 
 </div>
 
@@ -2048,12 +1918,7 @@ required
 VAT (£)
 </label>
 
-<input
-id="invVat"
-type="number"
-step=".01"
-value="0"
->
+<input id="invVat" type="number" step=".01" value="0">
 
 </div>
 
@@ -2063,9 +1928,7 @@ value="0"
 Notes
 </label>
 
-<input
-id="invNotes"
->
+<input id="invNotes">
 
 <button class="btn primary">
 Create invoice
@@ -2088,35 +1951,25 @@ Create invoice
 Add employee
 </b>
 
-<button
-class="close"
-onclick="closeModal('employeeModal')">
+<button class="close" onclick="closeModal('employeeModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="saveEmployee(event)">
+<form class="form" onsubmit="saveEmployee(event)">
 
 <label>
 Name
 </label>
 
-<input
-id="empName"
-required
->
+<input id="empName" required>
 
 <label>
 Email
 </label>
 
-<input
-id="empEmail"
-type="email"
->
+<input id="empEmail" type="email">
 
 <div class="formgrid">
 
@@ -2142,9 +1995,7 @@ Department
 Job title
 </label>
 
-<input
-id="empTitle"
->
+<input id="empTitle">
 
 </div>
 
@@ -2173,12 +2024,7 @@ Pay type
 Pay rate (£)
 </label>
 
-<input
-id="empRate"
-type="number"
-step=".01"
-required
->
+<input id="empRate" type="number" step=".01" required>
 
 </div>
 
@@ -2192,12 +2038,7 @@ required
 Employer NI %
 </label>
 
-<input
-id="empNI"
-type="number"
-step=".01"
-value="0"
->
+<input id="empNI" type="number" step=".01" value="0">
 
 </div>
 
@@ -2207,12 +2048,7 @@ value="0"
 Pension %
 </label>
 
-<input
-id="empPension"
-type="number"
-step=".01"
-value="0"
->
+<input id="empPension" type="number" step=".01" value="0">
 
 </div>
 
@@ -2222,110 +2058,10 @@ value="0"
 Holiday allowance (days)
 </label>
 
-<input
-id="empHoliday"
-type="number"
-step=".5"
-value="28"
->
+<input id="empHoliday" type="number" step=".5" value="28">
 
 <button class="btn primary">
 Save employee
-</button>
-
-</form>
-
-</div>
-
-</div>
-
-
-<div class="modal" id="shiftModal">
-
-<div class="sheet">
-
-<div class="sectionhead">
-
-<b>
-Add shift
-</b>
-
-<button
-class="close"
-onclick="closeModal('shiftModal')">
-×
-</button>
-
-</div>
-
-<form
-class="form"
-onsubmit="saveShift(event)">
-
-<label>
-Employee
-</label>
-
-<select
-id="shiftEmployee"
-required>
-</select>
-
-<label>
-Date
-</label>
-
-<input
-id="shiftDate"
-type="date"
-required
->
-
-<div class="formgrid">
-
-<div>
-
-<label>
-Start
-</label>
-
-<input
-id="shiftStart"
-type="time"
-required
->
-
-</div>
-
-<div>
-
-<label>
-Finish
-</label>
-
-<input
-id="shiftEnd"
-type="time"
-required
->
-
-</div>
-
-</div>
-
-<label>
-Break (minutes)
-</label>
-
-<input
-id="shiftBreak"
-type="number"
-min="0"
-value="0"
->
-
-<button class="btn primary">
-Save shift
 </button>
 
 </form>
@@ -2345,17 +2081,13 @@ Save shift
 Payroll run
 </b>
 
-<button
-class="close"
-onclick="closeModal('payrollModal')">
+<button class="close" onclick="closeModal('payrollModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="savePayroll(event)">
+<form class="form" onsubmit="savePayroll(event)">
 
 <div class="formgrid">
 
@@ -2365,11 +2097,7 @@ onsubmit="savePayroll(event)">
 Period start
 </label>
 
-<input
-id="payStart"
-type="date"
-required
->
+<input id="payStart" type="date" required>
 
 </div>
 
@@ -2379,11 +2107,7 @@ required
 Period end
 </label>
 
-<input
-id="payEnd"
-type="date"
-required
->
+<input id="payEnd" type="date" required>
 
 </div>
 
@@ -2397,12 +2121,7 @@ required
 Gross pay (£)
 </label>
 
-<input
-id="payGross"
-type="number"
-step=".01"
-required
->
+<input id="payGross" type="number" step=".01" required>
 
 </div>
 
@@ -2412,12 +2131,7 @@ required
 Employer costs (£)
 </label>
 
-<input
-id="payEmployer"
-type="number"
-step=".01"
-value="0"
->
+<input id="payEmployer" type="number" step=".01" value="0">
 
 </div>
 
@@ -2427,12 +2141,7 @@ value="0"
 Deductions (£)
 </label>
 
-<input
-id="payDeduct"
-type="number"
-step=".01"
-value="0"
->
+<input id="payDeduct" type="number" step=".01" value="0">
 
 <button class="btn primary">
 Create payroll run
@@ -2455,26 +2164,19 @@ Create payroll run
 Add stock item
 </b>
 
-<button
-class="close"
-onclick="closeModal('stockModal')">
+<button class="close" onclick="closeModal('stockModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="saveStock(event)">
+<form class="form" onsubmit="saveStock(event)">
 
 <label>
 Item
 </label>
 
-<input
-id="stockName"
-required
->
+<input id="stockName" required>
 
 <div class="formgrid">
 
@@ -2484,10 +2186,7 @@ required
 Category
 </label>
 
-<input
-id="stockCategory"
-value="Food"
->
+<input id="stockCategory" value="Food">
 
 </div>
 
@@ -2497,10 +2196,7 @@ value="Food"
 Unit
 </label>
 
-<input
-id="stockUnit"
-value="kg"
->
+<input id="stockUnit" value="kg">
 
 </div>
 
@@ -2514,12 +2210,7 @@ value="kg"
 On hand
 </label>
 
-<input
-id="stockOn"
-type="number"
-step=".01"
-value="0"
->
+<input id="stockOn" type="number" step=".01" value="0">
 
 </div>
 
@@ -2529,12 +2220,7 @@ value="0"
 Par level
 </label>
 
-<input
-id="stockPar"
-type="number"
-step=".01"
-value="0"
->
+<input id="stockPar" type="number" step=".01" value="0">
 
 </div>
 
@@ -2548,12 +2234,7 @@ value="0"
 Unit cost (£)
 </label>
 
-<input
-id="stockCost"
-type="number"
-step=".01"
-value="0"
->
+<input id="stockCost" type="number" step=".01" value="0">
 
 </div>
 
@@ -2563,9 +2244,7 @@ value="0"
 Supplier
 </label>
 
-<input
-id="stockSupplier"
->
+<input id="stockSupplier">
 
 </div>
 
@@ -2592,61 +2271,43 @@ Save stock item
 Add supplier
 </b>
 
-<button
-class="close"
-onclick="closeModal('supplierModal')">
+<button class="close" onclick="closeModal('supplierModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="saveSupplier(event)">
+<form class="form" onsubmit="saveSupplier(event)">
 
 <label>
 Name
 </label>
 
-<input
-id="supName"
-required
->
+<input id="supName" required>
 
 <label>
 Contact
 </label>
 
-<input
-id="supContact"
->
+<input id="supContact">
 
 <label>
 Email
 </label>
 
-<input
-id="supEmail"
-type="email"
->
+<input id="supEmail" type="email">
 
 <label>
 Phone
 </label>
 
-<input
-id="supPhone"
->
+<input id="supPhone">
 
 <label>
 Payment terms (days)
 </label>
 
-<input
-id="supTerms"
-type="number"
-value="30"
->
+<input id="supTerms" type="number" value="30">
 
 <button class="btn primary">
 Save supplier
@@ -2669,35 +2330,25 @@ Save supplier
 Add menu item
 </b>
 
-<button
-class="close"
-onclick="closeModal('menuModal')">
+<button class="close" onclick="closeModal('menuModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="saveMenu(event)">
+<form class="form" onsubmit="saveMenu(event)">
 
 <label>
 Name
 </label>
 
-<input
-id="menuName"
-required
->
+<input id="menuName" required>
 
 <label>
 Category
 </label>
 
-<input
-id="menuCategory"
-value="Main"
->
+<input id="menuCategory" value="Main">
 
 <div class="formgrid">
 
@@ -2707,12 +2358,7 @@ value="Main"
 Selling price (£)
 </label>
 
-<input
-id="menuPrice"
-type="number"
-step=".01"
-required
->
+<input id="menuPrice" type="number" step=".01" required>
 
 </div>
 
@@ -2722,12 +2368,7 @@ required
 Recipe cost (£)
 </label>
 
-<input
-id="menuCost"
-type="number"
-step=".01"
-value="0"
->
+<input id="menuCost" type="number" step=".01" value="0">
 
 </div>
 
@@ -2754,34 +2395,25 @@ Save menu item
 Add site
 </b>
 
-<button
-class="close"
-onclick="closeModal('siteModal')">
+<button class="close" onclick="closeModal('siteModal')">
 ×
 </button>
 
 </div>
 
-<form
-class="form"
-onsubmit="saveSite(event)">
+<form class="form" onsubmit="saveSite(event)">
 
 <label>
 Site name
 </label>
 
-<input
-id="siteName"
-required
->
+<input id="siteName" required>
 
 <label>
 Address
 </label>
 
-<input
-id="siteAddress"
->
+<input id="siteAddress">
 
 <button class="btn primary">
 Create site
@@ -2794,10 +2426,79 @@ Create site
 </div>
 
 
-<div
-id="toast"
-style="position:fixed;bottom:84px;left:15px;right:15px;max-width:500px;margin:auto;background:#10251d;color:#fff;padding:11px;border-radius:10px;text-align:center;display:none;z-index:80;font-size:11px">
+<div class="modal" id="shiftModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>
+Add shift
+</b>
+
+<button class="close" onclick="closeModal('shiftModal')">
+×
+</button>
+
 </div>
+
+<form class="form" onsubmit="saveShift(event)">
+
+<label>
+Employee
+</label>
+
+<select id="shiftEmployee" required>
+</select>
+
+<label>
+Date
+</label>
+
+<input id="shiftDate" type="date" required>
+
+<div class="formgrid">
+
+<div>
+
+<label>
+Start
+</label>
+
+<input id="shiftStart" type="time" required>
+
+</div>
+
+<div>
+
+<label>
+Finish
+</label>
+
+<input id="shiftEnd" type="time" required>
+
+</div>
+
+</div>
+
+<label>
+Break (minutes)
+</label>
+
+<input id="shiftBreak" type="number" min="0" value="0">
+
+<button class="btn primary">
+Save shift
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+
+<div id="toast"></div>
 
 
 <script>
@@ -2950,47 +2651,33 @@ x=>x.addEventListener(
 
 function load(v){
 
-if(v==='dashboard')
-loadDash();
+if(v==='dashboard')loadDash();
 
-if(v==='finance')
-loadFinance();
+if(v==='finance')loadFinance();
 
-if(v==='sales')
-loadSales();
+if(v==='sales')loadSales();
 
-if(v==='invoices')
-loadInvoices();
+if(v==='invoices')loadInvoices();
 
-if(v==='payments')
-loadPayments();
+if(v==='payments')loadPayments();
 
-if(v==='staff')
-loadStaff();
+if(v==='staff')loadStaff();
 
-if(v==='shifts')
-loadShifts();
+if(v==='shifts')loadShifts();
 
-if(v==='payroll')
-loadPayroll();
+if(v==='payroll')loadPayroll();
 
-if(v==='stock')
-loadStock();
+if(v==='stock')loadStock();
 
-if(v==='purchasing')
-loadSuppliers();
+if(v==='purchasing')loadSuppliers();
 
-if(v==='menu')
-loadMenu();
+if(v==='menu')loadMenu();
 
-if(v==='budgets')
-loadBudget();
+if(v==='budgets')loadBudget();
 
-if(v==='audit')
-loadAudit();
+if(v==='audit')loadAudit();
 
-if(v==='sites')
-loadSites();
+if(v==='sites')loadSites();
 
 }
 
@@ -3007,8 +2694,6 @@ d.toISOString().slice(0,10);
 $('shiftStart').value='09:00';
 
 $('shiftEnd').value='17:00';
-
-$('shiftBreak').value='0';
 
 openModal('shiftModal');
 
@@ -3090,46 +2775,30 @@ return `
 
 <tr>
 
-<td>
-${x.shift_date}
-</td>
+<td>${x.shift_date}</td>
 
 <td>
-<b>
-${x.employee_name}
-</b>
+<b>${x.employee_name}</b>
 </td>
 
-<td>
-${x.start_time}
-</td>
+<td>${x.start_time}</td>
 
-<td>
-${x.end_time}
-</td>
+<td>${x.end_time}</td>
 
-<td>
-${x.break_minutes} min
-</td>
+<td>${x.break_minutes} min</td>
 
-<td>
-${h.toFixed(2)}
-</td>
+<td>${h.toFixed(2)}</td>
 
-<td>
-${money(x.pay_rate)}/hr
-</td>
+<td>${money(x.pay_rate)}/hr</td>
 
 <td class="money">
 ${money(h*x.pay_rate)}
 </td>
 
 <td>
-
 <span class="pill">
 ${x.status}
 </span>
-
 </td>
 
 </tr>
@@ -3272,12 +2941,10 @@ money(b.food_cost);
 $('bOverheads').textContent=
 money(b.overheads);
 
-
 const actual=
 await api(
 '/api/finance?month='+m
 );
-
 
 const rows=[
 
@@ -3307,7 +2974,6 @@ actual.overheads
 
 ];
 
-
 $('budgetCompare').innerHTML=
 rows
 .map(
@@ -3335,15 +3001,11 @@ return `
 
 <div class="sectionhead">
 
-<b>
-${r[0]}
-</b>
+<b>${r[0]}</b>
 
 <span>
-${money(r[2])}
-actual /
-${money(r[1])}
-budget
+${money(r[2])} actual /
+${money(r[1])} budget
 </span>
 
 </div>
@@ -3453,31 +3115,17 @@ x=>`
 
 <tr>
 
-<td>
-${x.created_at}
-</td>
+<td>${x.created_at}</td>
 
-<td>
-User ${x.user_id||'—'}
-</td>
+<td>User ${x.user_id||'—'}</td>
 
-<td>
-<b>
-${x.action}
-</b>
-</td>
+<td><b>${x.action}</b></td>
 
-<td>
-${x.entity}
-</td>
+<td>${x.entity}</td>
 
-<td>
-${x.entity_id||'—'}
-</td>
+<td>${x.entity_id||'—'}</td>
 
-<td>
-${x.detail||'—'}
-</td>
+<td>${x.detail||'—'}</td>
 
 </tr>
 
@@ -3520,7 +3168,6 @@ d.ebitda_margin.toFixed(1)+
 $('dLabour').textContent=
 money(d.labour);
 
-
 $('dashFinancial').innerHTML=`
 
 <div class="small">
@@ -3531,36 +3178,24 @@ Revenue
 ${money(d.revenue)}
 </div>
 
-<div
-class="small"
-style="margin-top:8px">
-
+<div class="small" style="margin-top:8px">
 COGS
-
 </div>
 
 <div class="money">
 ${money(d.cogs)}
 </div>
 
-<div
-class="small"
-style="margin-top:8px">
-
+<div class="small" style="margin-top:8px">
 Gross profit
-
 </div>
 
 <div class="money">
 ${money(d.gross_profit)}
 </div>
 
-<div
-class="small"
-style="margin-top:8px">
-
+<div class="small" style="margin-top:8px">
 Labour + overheads
-
 </div>
 
 <div class="money">
@@ -3569,64 +3204,47 @@ ${money(d.labour+d.overheads)}
 
 `;
 
-
 $('dashAttention').innerHTML=`
 
-<div
-class="card"
-style="padding:10px;margin-bottom:7px">
+<div class="card" style="padding:10px;margin-bottom:7px">
 
 <b>
-
 ${d.outstanding_invoices
 ?money(d.outstanding_invoices)
 :'£0'}
-
 </b>
 
 <div class="small">
-
 Supplier invoices not yet paid
-
 </div>
 
 </div>
 
-
-<div
-class="card"
-style="padding:10px;margin-bottom:7px">
+<div class="card" style="padding:10px;margin-bottom:7px">
 
 <b>
 ${d.low_stock}
 </b>
 
 <div class="small">
-
 Stock items below par
-
 </div>
 
 </div>
 
-
-<div
-class="card"
-style="padding:10px">
+<div class="card" style="padding:10px">
 
 <b>
 ${money(d.payroll_due)}
 </b>
 
 <div class="small">
-
 Payroll runs awaiting completion
-
 </div>
 
 </div>
 
-`
+`;
 
 }
 catch(e){
@@ -3681,38 +3299,19 @@ d.ebitda_margin.toFixed(1)+
 $('fMonth').textContent=
 d.month;
 
-
 $('pnl').innerHTML=[
 
-[
-'Revenue',
-d.revenue
-],
+['Revenue',d.revenue],
 
-[
-'Cost of sales',
--d.cogs
-],
+['Cost of sales',-d.cogs],
 
-[
-'Gross profit',
-d.gross_profit
-],
+['Gross profit',d.gross_profit],
 
-[
-'Labour',
--d.labour
-],
+['Labour',-d.labour],
 
-[
-'Overheads',
--d.overheads
-],
+['Overheads',-d.overheads],
 
-[
-'EBITDA',
-d.ebitda
-]
+['EBITDA',d.ebitda]
 
 ]
 .map(
@@ -3721,16 +3320,11 @@ x=>`
 <tr>
 
 <td>
-<b>
-${x[0]}
-</b>
+<b>${x[0]}</b>
 </td>
 
-<td
-class="money ${x[1]<0?'bad':''}">
-
+<td class="money ${x[1]<0?'bad':''}">
 ${money(x[1])}
-
 </td>
 
 </tr>
@@ -3738,7 +3332,6 @@ ${money(x[1])}
 `
 )
 .join('');
-
 
 $('bridge').innerHTML=`
 
@@ -3790,7 +3383,7 @@ ${money(d.overheads)}
 ${money(d.ebitda)}
 </h1>
 
-`
+`;
 
 }
 catch(e){
@@ -3816,29 +3409,19 @@ x=>`
 
 <tr>
 
-<td>
-${x.sale_date}
-</td>
+<td>${x.sale_date}</td>
 
-<td>
-${x.category}
-</td>
+<td>${x.category}</td>
 
-<td>
-${money(x.net)}
-</td>
+<td>${money(x.net)}</td>
 
-<td>
-${money(x.vat)}
-</td>
+<td>${money(x.vat)}</td>
 
 <td class="money">
 ${money(x.gross)}
 </td>
 
-<td>
-${x.source}
-</td>
+<td>${x.source}</td>
 
 </tr>
 
@@ -3904,26 +3487,17 @@ Record paid
 `
 :'';
 
-
 return `
 
 <tr>
 
-<td>
-${x.supplier}
-</td>
+<td>${x.supplier}</td>
 
-<td>
-${x.invoice_number}
-</td>
+<td>${x.invoice_number}</td>
 
-<td>
-${x.due_date}
-</td>
+<td>${x.due_date}</td>
 
-<td>
-${x.category}
-</td>
+<td>${x.category}</td>
 
 <td class="money">
 ${money(x.gross)}
@@ -4116,25 +3690,17 @@ x=>`
 
 <tr>
 
-<td>
-${x.payment_type}
-</td>
+<td>${x.payment_type}</td>
 
-<td>
-${x.payee}
-</td>
+<td>${x.payee}</td>
 
-<td>
-${x.reference}
-</td>
+<td>${x.reference}</td>
 
 <td class="money">
 ${money(x.amount)}
 </td>
 
-<td>
-${x.payment_date}
-</td>
+<td>${x.payment_date}</td>
 
 <td>
 
@@ -4301,9 +3867,7 @@ x=>`
 
 <td>
 
-<b>
-${x.name}
-</b>
+<b>${x.name}</b>
 
 <div class="small">
 ${x.email}
@@ -4311,25 +3875,15 @@ ${x.email}
 
 </td>
 
-<td>
-${x.department}
-</td>
+<td>${x.department}</td>
 
-<td>
-${x.job_title||'—'}
-</td>
+<td>${x.job_title||'—'}</td>
 
-<td>
-${x.pay_type}
-</td>
+<td>${x.pay_type}</td>
 
-<td>
-${money(x.pay_rate)}
-</td>
+<td>${money(x.pay_rate)}</td>
 
-<td>
-${x.holiday_allowance} days
-</td>
+<td>${x.holiday_allowance} days</td>
 
 </tr>
 
@@ -4466,7 +4020,6 @@ Record paid
 
 `
 :'';
-
 
 return `
 
@@ -4679,9 +4232,7 @@ return `
 
 <td>
 
-<b>
-${x.name}
-</b>
+<b>${x.name}</b>
 
 <div class="small">
 ${x.supplier||''}
@@ -4689,9 +4240,7 @@ ${x.supplier||''}
 
 </td>
 
-<td>
-${x.category}
-</td>
+<td>${x.category}</td>
 
 <td>
 ${x.on_hand}
@@ -4814,9 +4363,7 @@ x=>`
 <tr>
 
 <td>
-<b>
-${x.name}
-</b>
+<b>${x.name}</b>
 </td>
 
 <td>
@@ -4953,9 +4500,7 @@ ${money(x.recipe_cost)}
 </div>
 
 <span class="pill">
-
 ${m.toFixed(1)}% GP
-
 </span>
 
 </div>
@@ -5050,9 +4595,7 @@ ${x.name}
 </b>
 
 <div class="small">
-
 ${x.address||'No address entered'}
-
 </div>
 
 </div>
