@@ -29,7 +29,9 @@ def q(sql, args=(), one=False):
     c = conn()
     rows = c.execute(sql, args).fetchall()
     c.close()
-    return rows[0] if rows else None if one else rows
+    if one:
+        return rows[0] if rows else None
+    return rows
 
 
 def execute(sql, args=()):
