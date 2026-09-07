@@ -181,7 +181,9 @@ color:var(--muted)
 
 .warn{color:var(--amber)}
 
-.section{margin-top:12px}
+.section{
+margin-top:12px
+}
 
 .sectionhead{
 display:flex;
@@ -211,7 +213,9 @@ color:#fff;
 border-color:var(--green)
 }
 
-.btn.danger{color:var(--red)}
+.btn.danger{
+color:var(--red)
+}
 
 .actions{
 display:flex;
@@ -219,7 +223,9 @@ gap:7px;
 flex-wrap:wrap
 }
 
-.table{overflow:auto}
+.table{
+overflow:auto
+}
 
 .table table{
 width:100%;
@@ -241,7 +247,9 @@ padding:10px 8px;
 border-bottom:1px solid #edf1ef
 }
 
-.money{font-weight:850}
+.money{
+font-weight:850
+}
 
 .pill{
 display:inline-flex;
@@ -263,7 +271,9 @@ background:#e5f1eb;
 color:#286c53
 }
 
-.pill.bad{background:#f7e5e3}
+.pill.bad{
+background:#f7e5e3
+}
 
 .form{
 display:grid;
@@ -322,7 +332,9 @@ z-index:50;
 padding:15px
 }
 
-.modal.open{display:flex}
+.modal.open{
+display:flex
+}
 
 .sheet{
 background:#fff;
@@ -341,29 +353,28 @@ width:32px;
 height:32px
 }
 
-.bottom{display:none}
-
-.site-select{
-background:#17382d;
-color:#fff;
-border:1px solid #2d604f;
-padding:7px;
-border-radius:8px;
-font-size:10px
+.bottom{
+display:none
 }
 
 @media(max-width:850px){
 
-.layout{display:block}
+.layout{
+display:block
+}
 
-.layout aside{display:none}
+.layout aside{
+display:none
+}
 
 .grid4,
 .grid3{
 grid-template-columns:1fr 1fr
 }
 
-.two{grid-template-columns:1fr}
+.two{
+grid-template-columns:1fr
+}
 
 .bottom{
 display:grid;
@@ -387,17 +398,24 @@ font-weight:800;
 color:var(--muted)
 }
 
-.bottom button.active{color:var(--green)}
+.bottom button.active{
+color:var(--green)
+}
 
 main{
 padding:18px 13px 85px
 }
 
-.top{padding:0 12px}
+.top{
+padding:0 12px
+}
 
-.formgrid{grid-template-columns:1fr}
+.formgrid{
+grid-template-columns:1fr
+}
 
 }
+
 </style>
 </head>
 
@@ -426,7 +444,9 @@ ORDER<span>FLOW</span>
 ⌂ Dashboard
 </button>
 
-<div class="navgroup">Operations</div>
+<div class="navgroup">
+Operations
+</div>
 
 <button class="navbtn" data-view="sales">
 ▣ Sales
@@ -444,17 +464,25 @@ ORDER<span>FLOW</span>
 ☷ Menu & Costing
 </button>
 
-<div class="navgroup">People</div>
+<div class="navgroup">
+People
+</div>
 
 <button class="navbtn" data-view="staff">
 ♙ Staff
+</button>
+
+<button class="navbtn" data-view="shifts">
+▦ Shifts & Rota
 </button>
 
 <button class="navbtn" data-view="payroll">
 £ Payroll
 </button>
 
-<div class="navgroup">Finance</div>
+<div class="navgroup">
+Finance
+</div>
 
 <button class="navbtn" data-view="finance">
 £ Finance & EBITDA
@@ -468,7 +496,17 @@ ORDER<span>FLOW</span>
 ↗ Payments
 </button>
 
-<div class="navgroup">Management</div>
+<div class="navgroup">
+Management
+</div>
+
+<button class="navbtn" data-view="budgets">
+◫ Budgets
+</button>
+
+<button class="navbtn" data-view="audit">
+◉ Audit Log
+</button>
 
 <button class="navbtn" data-view="sites">
 ⌂ Sites
@@ -511,24 +549,54 @@ Good day, {{user.name.split()[0]}}.
 <div class="grid4">
 
 <div class="card kpi">
-<div class="label">Revenue this month</div>
-<div class="value" id="dRevenue">—</div>
+
+<div class="label">
+Revenue this month
+</div>
+
+<div class="value" id="dRevenue">
+—
+</div>
+
 </div>
 
 <div class="card kpi">
-<div class="label">Gross margin</div>
-<div class="value" id="dGP">—</div>
+
+<div class="label">
+Gross margin
+</div>
+
+<div class="value" id="dGP">
+—
+</div>
+
 </div>
 
 <div class="card kpi">
-<div class="label">EBITDA</div>
-<div class="value" id="dEBITDA">—</div>
-<div class="good" id="dEBITDAPct"></div>
+
+<div class="label">
+EBITDA
+</div>
+
+<div class="value" id="dEBITDA">
+—
+</div>
+
+<div class="good" id="dEBITDAPct">
+</div>
+
 </div>
 
 <div class="card kpi">
-<div class="label">Labour</div>
-<div class="value" id="dLabour">—</div>
+
+<div class="label">
+Labour
+</div>
+
+<div class="value" id="dLabour">
+—
+</div>
+
 </div>
 
 </div>
@@ -538,21 +606,34 @@ Good day, {{user.name.split()[0]}}.
 <div class="card">
 
 <div class="sectionhead">
-<h2>Financial position</h2>
-<span class="small">Current month</span>
+
+<h2>
+Financial position
+</h2>
+
+<span class="small">
+Current month
+</span>
+
 </div>
 
-<div id="dashFinancial"></div>
+<div id="dashFinancial">
+</div>
 
 </div>
 
 <div class="card">
 
 <div class="sectionhead">
-<h2>Attention</h2>
+
+<h2>
+Attention
+</h2>
+
 </div>
 
-<div id="dashAttention"></div>
+<div id="dashAttention">
+</div>
 
 </div>
 
@@ -560,13 +641,18 @@ Good day, {{user.name.split()[0]}}.
 
 </section>
 
+
 <section id="finance" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Finance</div>
+<div class="eyebrow">
+Finance
+</div>
 
-<h1>Finance & EBITDA</h1>
+<h1>
+Finance & EBITDA
+</h1>
 
 <p>
 Management P&L built from the data entered into OrderFlow.
@@ -597,25 +683,57 @@ Month →
 <div class="section grid4">
 
 <div class="card kpi">
-<div class="label">Revenue</div>
-<div class="value" id="fRevenue">—</div>
+
+<div class="label">
+Revenue
+</div>
+
+<div class="value" id="fRevenue">
+—
+</div>
+
 </div>
 
 <div class="card kpi">
-<div class="label">Gross profit</div>
-<div class="value" id="fGP">—</div>
-<div id="fGPM"></div>
+
+<div class="label">
+Gross profit
+</div>
+
+<div class="value" id="fGP">
+—
+</div>
+
+<div id="fGPM">
+</div>
+
 </div>
 
 <div class="card kpi">
-<div class="label">Labour</div>
-<div class="value" id="fLabour">—</div>
+
+<div class="label">
+Labour
+</div>
+
+<div class="value" id="fLabour">
+—
+</div>
+
 </div>
 
 <div class="card kpi">
-<div class="label">EBITDA</div>
-<div class="value" id="fEBITDA">—</div>
-<div id="fEBITDAPct"></div>
+
+<div class="label">
+EBITDA
+</div>
+
+<div class="value" id="fEBITDA">
+—
+</div>
+
+<div id="fEBITDAPct">
+</div>
+
 </div>
 
 </div>
@@ -625,8 +743,14 @@ Month →
 <div class="card">
 
 <div class="sectionhead">
-<h2>Management P&L</h2>
-<span id="fMonth"></span>
+
+<h2>
+Management P&L
+</h2>
+
+<span id="fMonth">
+</span>
+
 </div>
 
 <div class="table">
@@ -642,7 +766,8 @@ Month →
 
 </thead>
 
-<tbody id="pnl"></tbody>
+<tbody id="pnl">
+</tbody>
 
 </table>
 
@@ -653,10 +778,15 @@ Month →
 <div class="card">
 
 <div class="sectionhead">
-<h2>EBITDA bridge</h2>
+
+<h2>
+EBITDA bridge
+</h2>
+
 </div>
 
-<div id="bridge"></div>
+<div id="bridge">
+</div>
 
 </div>
 
@@ -664,13 +794,18 @@ Month →
 
 </section>
 
+
 <section id="sales" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Revenue</div>
+<div class="eyebrow">
+Revenue
+</div>
 
-<h1>Sales</h1>
+<h1>
+Sales
+</h1>
 
 <p>
 Enter or import sales. POS integration can be connected here later.
@@ -701,7 +836,8 @@ Enter or import sales. POS integration can be connected here later.
 
 </thead>
 
-<tbody id="salesRows"></tbody>
+<tbody id="salesRows">
+</tbody>
 
 </table>
 
@@ -711,13 +847,18 @@ Enter or import sales. POS integration can be connected here later.
 
 </section>
 
+
 <section id="invoices" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Accounts payable</div>
+<div class="eyebrow">
+Accounts payable
+</div>
 
-<h1>Supplier invoices</h1>
+<h1>
+Supplier invoices
+</h1>
 
 <p>
 Capture → approve → schedule → record payment.
@@ -749,7 +890,8 @@ Capture → approve → schedule → record payment.
 
 </thead>
 
-<tbody id="invoiceRows"></tbody>
+<tbody id="invoiceRows">
+</tbody>
 
 </table>
 
@@ -759,13 +901,18 @@ Capture → approve → schedule → record payment.
 
 </section>
 
+
 <section id="payments" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Money out</div>
+<div class="eyebrow">
+Money out
+</div>
 
-<h1>Payments</h1>
+<h1>
+Payments
+</h1>
 
 <p>
 Supplier and staff payment instructions with approval history.
@@ -792,7 +939,8 @@ Supplier and staff payment instructions with approval history.
 
 </thead>
 
-<tbody id="paymentRows"></tbody>
+<tbody id="paymentRows">
+</tbody>
 
 </table>
 
@@ -809,13 +957,18 @@ It does not move real money until a regulated bank/payment provider is connected
 
 </section>
 
+
 <section id="staff" class="view">
 
 <div class="head">
 
-<div class="eyebrow">People</div>
+<div class="eyebrow">
+People
+</div>
 
-<h1>Staff</h1>
+<h1>
+Staff
+</h1>
 
 <p>
 Employees, pay rates and holiday settings.
@@ -846,7 +999,8 @@ Employees, pay rates and holiday settings.
 
 </thead>
 
-<tbody id="employeeRows"></tbody>
+<tbody id="employeeRows">
+</tbody>
 
 </table>
 
@@ -856,13 +1010,82 @@ Employees, pay rates and holiday settings.
 
 </section>
 
+
+<section id="shifts" class="view">
+
+<div class="head">
+
+<div class="eyebrow">
+People planning
+</div>
+
+<h1>
+Shifts & Rota
+</h1>
+
+<p>
+Plan staff hours, breaks and labour cost before payroll.
+</p>
+
+</div>
+
+<div class="actions">
+
+<button class="btn primary" onclick="openShiftModal()">
++ Add shift
+</button>
+
+<button class="btn" onclick="loadShifts()">
+Refresh
+</button>
+
+</div>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Date</th>
+<th>Employee</th>
+<th>Start</th>
+<th>Finish</th>
+<th>Break</th>
+<th>Hours</th>
+<th>Rate</th>
+<th>Est. cost</th>
+<th>Status</th>
+</tr>
+
+</thead>
+
+<tbody id="shiftRows">
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
 <section id="payroll" class="view">
 
 <div class="head">
 
-<div class="eyebrow">People costs</div>
+<div class="eyebrow">
+People costs
+</div>
 
-<h1>Payroll</h1>
+<h1>
+Payroll
+</h1>
 
 <p>
 Prepare, approve and record staff payment runs.
@@ -894,7 +1117,8 @@ Prepare, approve and record staff payment runs.
 
 </thead>
 
-<tbody id="payrollRows"></tbody>
+<tbody id="payrollRows">
+</tbody>
 
 </table>
 
@@ -904,13 +1128,18 @@ Prepare, approve and record staff payment runs.
 
 </section>
 
+
 <section id="stock" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Inventory</div>
+<div class="eyebrow">
+Inventory
+</div>
 
-<h1>Stock</h1>
+<h1>
+Stock
+</h1>
 
 <p>
 Actual stock levels, cost and movement.
@@ -941,7 +1170,8 @@ Actual stock levels, cost and movement.
 
 </thead>
 
-<tbody id="stockRows"></tbody>
+<tbody id="stockRows">
+</tbody>
 
 </table>
 
@@ -951,13 +1181,18 @@ Actual stock levels, cost and movement.
 
 </section>
 
+
 <section id="purchasing" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Supply chain</div>
+<div class="eyebrow">
+Supply chain
+</div>
 
-<h1>Purchasing</h1>
+<h1>
+Purchasing
+</h1>
 
 <p>
 Manage supplier relationships and purchasing data.
@@ -986,7 +1221,8 @@ Manage supplier relationships and purchasing data.
 
 </thead>
 
-<tbody id="supplierRows"></tbody>
+<tbody id="supplierRows">
+</tbody>
 
 </table>
 
@@ -996,13 +1232,18 @@ Manage supplier relationships and purchasing data.
 
 </section>
 
+
 <section id="menu" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Commercial</div>
+<div class="eyebrow">
+Commercial
+</div>
 
-<h1>Menu & costing</h1>
+<h1>
+Menu & Costing
+</h1>
 
 <p>
 See selling price, recipe cost and gross margin.
@@ -1014,17 +1255,284 @@ See selling price, recipe cost and gross margin.
 + Menu item
 </button>
 
-<div class="section" id="menuRows"></div>
+<div class="section" id="menuRows">
+</div>
 
 </section>
+
+
+<section id="budgets" class="view">
+
+<div class="head">
+
+<div class="eyebrow">
+Planning
+</div>
+
+<h1>
+Budgets
+</h1>
+
+<p>
+Set monthly revenue, cost and labour targets, then compare them with actual performance.
+</p>
+
+</div>
+
+<div class="actions">
+
+<button class="btn" onclick="changeBudgetMonth(-1)">
+← Month
+</button>
+
+<button class="btn" onclick="changeBudgetMonth(1)">
+Month →
+</button>
+
+<button class="btn primary" onclick="saveBudget()">
+Save budget
+</button>
+
+</div>
+
+<div class="section grid4">
+
+<div class="card kpi">
+
+<div class="label">
+Budget revenue
+</div>
+
+<div class="value" id="bRevenue">
+£0
+</div>
+
+</div>
+
+<div class="card kpi">
+
+<div class="label">
+Budget labour
+</div>
+
+<div class="value" id="bLabour">
+£0
+</div>
+
+</div>
+
+<div class="card kpi">
+
+<div class="label">
+Budget food cost
+</div>
+
+<div class="value" id="bFood">
+£0
+</div>
+
+</div>
+
+<div class="card kpi">
+
+<div class="label">
+Budget overheads
+</div>
+
+<div class="value" id="bOverheads">
+£0
+</div>
+
+</div>
+
+</div>
+
+<div class="section two">
+
+<div class="card">
+
+<div class="sectionhead">
+
+<h2>
+Monthly budget
+</h2>
+
+<span id="budgetMonthLabel" class="small">
+</span>
+
+</div>
+
+<form class="form">
+
+<div class="formgrid">
+
+<div>
+
+<label>
+Revenue (£)
+</label>
+
+<input
+id="budgetRevenue"
+type="number"
+step=".01"
+min="0"
+>
+
+</div>
+
+<div>
+
+<label>
+Food cost (£)
+</label>
+
+<input
+id="budgetFood"
+type="number"
+step=".01"
+min="0"
+>
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+
+<label>
+Drink cost (£)
+</label>
+
+<input
+id="budgetDrink"
+type="number"
+step=".01"
+min="0"
+>
+
+</div>
+
+<div>
+
+<label>
+Labour (£)
+</label>
+
+<input
+id="budgetLabour"
+type="number"
+step=".01"
+min="0"
+>
+
+</div>
+
+</div>
+
+<label>
+Overheads (£)
+</label>
+
+<input
+id="budgetOverheads"
+type="number"
+step=".01"
+min="0"
+>
+
+</form>
+
+</div>
+
+
+<div class="card">
+
+<div class="sectionhead">
+
+<h2>
+Budget vs Actual
+</h2>
+
+<span
+class="small"
+id="budgetActualMonth">
+</span>
+
+</div>
+
+<div id="budgetCompare">
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="audit" class="view">
+
+<div class="head">
+
+<div class="eyebrow">
+Governance
+</div>
+
+<h1>
+Audit Log
+</h1>
+
+<p>
+A record of important actions taken inside this organisation.
+</p>
+
+</div>
+
+<div class="section card">
+
+<div class="table">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Time</th>
+<th>User</th>
+<th>Action</th>
+<th>Entity</th>
+<th>ID</th>
+<th>Detail</th>
+</tr>
+
+</thead>
+
+<tbody id="auditRows">
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
 
 <section id="sites" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Multi-site</div>
+<div class="eyebrow">
+Multi-site
+</div>
 
-<h1>Sites</h1>
+<h1>
+Sites
+</h1>
 
 <p>
 Run one venue or a whole hospitality group from the same account.
@@ -1036,17 +1544,23 @@ Run one venue or a whole hospitality group from the same account.
 + Add site
 </button>
 
-<div class="section" id="siteRows"></div>
+<div class="section" id="siteRows">
+</div>
 
 </section>
+
 
 <section id="settings" class="view">
 
 <div class="head">
 
-<div class="eyebrow">Settings</div>
+<div class="eyebrow">
+Settings
+</div>
 
-<h1>{{organisation.name}}</h1>
+<h1>
+{{organisation.name}}
+</h1>
 
 <p>
 {{organisation.business_type}} · {{organisation.currency}}
@@ -1056,13 +1570,21 @@ Run one venue or a whole hospitality group from the same account.
 
 <div class="card">
 
-<b>Current site</b>
+<b>
+Current site
+</b>
 
-<div class="small" style="margin-top:4px">
+<div
+class="small"
+style="margin-top:4px">
+
 {{site.name}}
+
 </div>
 
-<div class="notice" style="margin-top:14px">
+<div
+class="notice"
+style="margin-top:14px">
 
 Use the Sites section to add locations.
 All operational and financial records are separated by organisation and site.
@@ -1074,33 +1596,41 @@ All operational and financial records are separated by organisation and site.
 </section>
 
 </main>
+
 </div>
+
 
 <nav class="bottom">
 
 <button data-view="dashboard">
-⌂<br>Home
+⌂<br>
+Home
 </button>
 
 <button data-view="finance">
-£<br>Finance
+£<br>
+Finance
 </button>
 
 <button data-view="invoices">
-▤<br>Invoices
+▤<br>
+Invoices
 </button>
 
 <button data-view="payments">
-↗<br>Payments
+↗<br>
+Payments
 </button>
 
 <button data-view="more">
-•••<br>More
+•••<br>
+More
 </button>
 
 </nav>
 
 </div>
+
 
 <div class="modal" id="moreModal">
 
@@ -1108,9 +1638,13 @@ All operational and financial records are separated by organisation and site.
 
 <div class="sectionhead">
 
-<b>OrderFlow</b>
+<b>
+OrderFlow
+</b>
 
-<button class="close" onclick="closeModal('moreModal')">
+<button
+class="close"
+onclick="closeModal('moreModal')">
 ×
 </button>
 
@@ -1118,39 +1652,75 @@ All operational and financial records are separated by organisation and site.
 
 <div class="actions">
 
-<button class="btn" onclick="nav('sales');closeModal('moreModal')">
+<button
+class="btn"
+onclick="nav('sales');closeModal('moreModal')">
 Sales
 </button>
 
-<button class="btn" onclick="nav('stock');closeModal('moreModal')">
+<button
+class="btn"
+onclick="nav('stock');closeModal('moreModal')">
 Stock
 </button>
 
-<button class="btn" onclick="nav('purchasing');closeModal('moreModal')">
+<button
+class="btn"
+onclick="nav('purchasing');closeModal('moreModal')">
 Purchasing
 </button>
 
-<button class="btn" onclick="nav('menu');closeModal('moreModal')">
+<button
+class="btn"
+onclick="nav('menu');closeModal('moreModal')">
 Menu
 </button>
 
-<button class="btn" onclick="nav('staff');closeModal('moreModal')">
+<button
+class="btn"
+onclick="nav('staff');closeModal('moreModal')">
 Staff
 </button>
 
-<button class="btn" onclick="nav('payroll');closeModal('moreModal')">
+<button
+class="btn"
+onclick="nav('shifts');closeModal('moreModal')">
+Shifts & Rota
+</button>
+
+<button
+class="btn"
+onclick="nav('payroll');closeModal('moreModal')">
 Payroll
 </button>
 
-<button class="btn" onclick="nav('sites');closeModal('moreModal')">
+<button
+class="btn"
+onclick="nav('budgets');closeModal('moreModal')">
+Budgets
+</button>
+
+<button
+class="btn"
+onclick="nav('audit');closeModal('moreModal')">
+Audit Log
+</button>
+
+<button
+class="btn"
+onclick="nav('sites');closeModal('moreModal')">
 Sites
 </button>
 
-<button class="btn" onclick="nav('settings');closeModal('moreModal')">
+<button
+class="btn"
+onclick="nav('settings');closeModal('moreModal')">
 Settings
 </button>
 
-<form method="post" action="/logout">
+<form
+method="post"
+action="/logout">
 
 <button class="btn danger">
 Sign out
@@ -1164,25 +1734,35 @@ Sign out
 
 </div>
 
+
 <div class="modal" id="expenseModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Add outgoing cost</b>
+<b>
+Add outgoing cost
+</b>
 
-<button class="close" onclick="closeModal('expenseModal')">
+<button
+class="close"
+onclick="closeModal('expenseModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="saveExpense(event)">
+<form
+class="form"
+onsubmit="saveExpense(event)">
 
-<label>Category</label>
+<label>
+Category
+</label>
 
 <select id="expenseCategory">
+
 <option>Rent</option>
 <option>Business rates</option>
 <option>Utilities</option>
@@ -1197,39 +1777,68 @@ Sign out
 <option>Licences</option>
 <option>Bank charges</option>
 <option>Other</option>
+
 </select>
 
-<label>Description</label>
+<label>
+Description
+</label>
 
-<input id="expenseDescription" required>
+<input
+id="expenseDescription"
+required
+>
 
-<label>Supplier</label>
+<label>
+Supplier
+</label>
 
-<input id="expenseSupplier">
+<input
+id="expenseSupplier"
+>
 
 <div class="formgrid">
 
 <div>
 
-<label>Gross (£)</label>
+<label>
+Gross (£)
+</label>
 
-<input id="expenseGross" type="number" step=".01" required>
+<input
+id="expenseGross"
+type="number"
+step=".01"
+required
+>
 
 </div>
 
 <div>
 
-<label>VAT (£)</label>
+<label>
+VAT (£)
+</label>
 
-<input id="expenseVat" type="number" step=".01" value="0">
+<input
+id="expenseVat"
+type="number"
+step=".01"
+value="0"
+>
 
 </div>
 
 </div>
 
-<label>Date</label>
+<label>
+Date
+</label>
 
-<input id="expenseDate" type="date">
+<input
+id="expenseDate"
+type="date"
+>
 
 <button class="btn primary">
 Save outgoing
@@ -1241,41 +1850,71 @@ Save outgoing
 
 </div>
 
+
 <div class="modal" id="saleModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Record sales</b>
+<b>
+Record sales
+</b>
 
-<button class="close" onclick="closeModal('saleModal')">
+<button
+class="close"
+onclick="closeModal('saleModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="saveSale(event)">
+<form
+class="form"
+onsubmit="saveSale(event)">
 
-<label>Category</label>
+<label>
+Category
+</label>
 
 <select id="saleCategory">
+
 <option>Food</option>
 <option>Drink</option>
 <option>Other</option>
+
 </select>
 
-<label>Gross sales (£)</label>
+<label>
+Gross sales (£)
+</label>
 
-<input id="saleGross" type="number" step=".01" required>
+<input
+id="saleGross"
+type="number"
+step=".01"
+required
+>
 
-<label>VAT (£)</label>
+<label>
+VAT (£)
+</label>
 
-<input id="saleVat" type="number" step=".01" value="0">
+<input
+id="saleVat"
+type="number"
+step=".01"
+value="0"
+>
 
-<label>Date</label>
+<label>
+Date
+</label>
 
-<input id="saleDate" type="date">
+<input
+id="saleDate"
+type="date"
+>
 
 <button class="btn primary">
 Record sales
@@ -1287,37 +1926,54 @@ Record sales
 
 </div>
 
+
 <div class="modal" id="invoiceModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Supplier invoice</b>
+<b>
+Supplier invoice
+</b>
 
-<button class="close" onclick="closeModal('invoiceModal')">
+<button
+class="close"
+onclick="closeModal('invoiceModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="saveInvoice(event)">
+<form
+class="form"
+onsubmit="saveInvoice(event)">
 
 <div class="formgrid">
 
 <div>
 
-<label>Supplier</label>
+<label>
+Supplier
+</label>
 
-<input id="invSupplier" required>
+<input
+id="invSupplier"
+required
+>
 
 </div>
 
 <div>
 
-<label>Invoice number</label>
+<label>
+Invoice number
+</label>
 
-<input id="invNumber" required>
+<input
+id="invNumber"
+required
+>
 
 </div>
 
@@ -1327,23 +1983,35 @@ Record sales
 
 <div>
 
-<label>Invoice date</label>
+<label>
+Invoice date
+</label>
 
-<input id="invDate" type="date">
+<input
+id="invDate"
+type="date"
+>
 
 </div>
 
 <div>
 
-<label>Due date</label>
+<label>
+Due date
+</label>
 
-<input id="invDue" type="date">
+<input
+id="invDue"
+type="date"
+>
 
 </div>
 
 </div>
 
-<label>Category</label>
+<label>
+Category
+</label>
 
 <select id="invCategory">
 
@@ -1361,25 +2029,43 @@ Record sales
 
 <div>
 
-<label>Net (£)</label>
+<label>
+Net (£)
+</label>
 
-<input id="invNet" type="number" step=".01" required>
+<input
+id="invNet"
+type="number"
+step=".01"
+required
+>
 
 </div>
 
 <div>
 
-<label>VAT (£)</label>
+<label>
+VAT (£)
+</label>
 
-<input id="invVat" type="number" step=".01" value="0">
+<input
+id="invVat"
+type="number"
+step=".01"
+value="0"
+>
 
 </div>
 
 </div>
 
-<label>Notes</label>
+<label>
+Notes
+</label>
 
-<input id="invNotes">
+<input
+id="invNotes"
+>
 
 <button class="btn primary">
 Create invoice
@@ -1391,49 +2077,74 @@ Create invoice
 
 </div>
 
+
 <div class="modal" id="employeeModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Add employee</b>
+<b>
+Add employee
+</b>
 
-<button class="close" onclick="closeModal('employeeModal')">
+<button
+class="close"
+onclick="closeModal('employeeModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="saveEmployee(event)">
+<form
+class="form"
+onsubmit="saveEmployee(event)">
 
-<label>Name</label>
+<label>
+Name
+</label>
 
-<input id="empName" required>
+<input
+id="empName"
+required
+>
 
-<label>Email</label>
+<label>
+Email
+</label>
 
-<input id="empEmail" type="email">
+<input
+id="empEmail"
+type="email"
+>
 
 <div class="formgrid">
 
 <div>
 
-<label>Department</label>
+<label>
+Department
+</label>
 
 <select id="empDept">
+
 <option>FOH</option>
 <option>BOH</option>
 <option>Management</option>
+
 </select>
 
 </div>
 
 <div>
 
-<label>Job title</label>
+<label>
+Job title
+</label>
 
-<input id="empTitle">
+<input
+id="empTitle"
+>
 
 </div>
 
@@ -1443,20 +2154,31 @@ Create invoice
 
 <div>
 
-<label>Pay type</label>
+<label>
+Pay type
+</label>
 
 <select id="empPayType">
+
 <option>Hourly</option>
 <option>Salary</option>
+
 </select>
 
 </div>
 
 <div>
 
-<label>Pay rate (£)</label>
+<label>
+Pay rate (£)
+</label>
 
-<input id="empRate" type="number" step=".01" required>
+<input
+id="empRate"
+type="number"
+step=".01"
+required
+>
 
 </div>
 
@@ -1466,25 +2188,46 @@ Create invoice
 
 <div>
 
-<label>Employer NI %</label>
+<label>
+Employer NI %
+</label>
 
-<input id="empNI" type="number" step=".01" value="0">
+<input
+id="empNI"
+type="number"
+step=".01"
+value="0"
+>
 
 </div>
 
 <div>
 
-<label>Pension %</label>
+<label>
+Pension %
+</label>
 
-<input id="empPension" type="number" step=".01" value="0">
+<input
+id="empPension"
+type="number"
+step=".01"
+value="0"
+>
 
 </div>
 
 </div>
 
-<label>Holiday allowance (days)</label>
+<label>
+Holiday allowance (days)
+</label>
 
-<input id="empHoliday" type="number" step=".5" value="28">
+<input
+id="empHoliday"
+type="number"
+step=".5"
+value="28"
+>
 
 <button class="btn primary">
 Save employee
@@ -1496,37 +2239,151 @@ Save employee
 
 </div>
 
+
+<div class="modal" id="shiftModal">
+
+<div class="sheet">
+
+<div class="sectionhead">
+
+<b>
+Add shift
+</b>
+
+<button
+class="close"
+onclick="closeModal('shiftModal')">
+×
+</button>
+
+</div>
+
+<form
+class="form"
+onsubmit="saveShift(event)">
+
+<label>
+Employee
+</label>
+
+<select
+id="shiftEmployee"
+required>
+</select>
+
+<label>
+Date
+</label>
+
+<input
+id="shiftDate"
+type="date"
+required
+>
+
+<div class="formgrid">
+
+<div>
+
+<label>
+Start
+</label>
+
+<input
+id="shiftStart"
+type="time"
+required
+>
+
+</div>
+
+<div>
+
+<label>
+Finish
+</label>
+
+<input
+id="shiftEnd"
+type="time"
+required
+>
+
+</div>
+
+</div>
+
+<label>
+Break (minutes)
+</label>
+
+<input
+id="shiftBreak"
+type="number"
+min="0"
+value="0"
+>
+
+<button class="btn primary">
+Save shift
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+
 <div class="modal" id="payrollModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Payroll run</b>
+<b>
+Payroll run
+</b>
 
-<button class="close" onclick="closeModal('payrollModal')">
+<button
+class="close"
+onclick="closeModal('payrollModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="savePayroll(event)">
+<form
+class="form"
+onsubmit="savePayroll(event)">
 
 <div class="formgrid">
 
 <div>
 
-<label>Period start</label>
+<label>
+Period start
+</label>
 
-<input id="payStart" type="date" required>
+<input
+id="payStart"
+type="date"
+required
+>
 
 </div>
 
 <div>
 
-<label>Period end</label>
+<label>
+Period end
+</label>
 
-<input id="payEnd" type="date" required>
+<input
+id="payEnd"
+type="date"
+required
+>
 
 </div>
 
@@ -1536,25 +2393,46 @@ Save employee
 
 <div>
 
-<label>Gross pay (£)</label>
+<label>
+Gross pay (£)
+</label>
 
-<input id="payGross" type="number" step=".01" required>
+<input
+id="payGross"
+type="number"
+step=".01"
+required
+>
 
 </div>
 
 <div>
 
-<label>Employer costs (£)</label>
+<label>
+Employer costs (£)
+</label>
 
-<input id="payEmployer" type="number" step=".01" value="0">
+<input
+id="payEmployer"
+type="number"
+step=".01"
+value="0"
+>
 
 </div>
 
 </div>
 
-<label>Deductions (£)</label>
+<label>
+Deductions (£)
+</label>
 
-<input id="payDeduct" type="number" step=".01" value="0">
+<input
+id="payDeduct"
+type="number"
+step=".01"
+value="0"
+>
 
 <button class="btn primary">
 Create payroll run
@@ -1566,61 +2444,63 @@ Create payroll run
 
 </div>
 
+
 <div class="modal" id="stockModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Add stock item</b>
+<b>
+Add stock item
+</b>
 
-<button class="close" onclick="closeModal('stockModal')">
+<button
+class="close"
+onclick="closeModal('stockModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="saveStock(event)">
+<form
+class="form"
+onsubmit="saveStock(event)">
 
-<label>Item</label>
+<label>
+Item
+</label>
 
-<input id="stockName" required>
-
-<div class="formgrid">
-
-<div>
-
-<label>Category</label>
-
-<input id="stockCategory" value="Food">
-
-</div>
-
-<div>
-
-<label>Unit</label>
-
-<input id="stockUnit" value="kg">
-
-</div>
-
-</div>
+<input
+id="stockName"
+required
+>
 
 <div class="formgrid">
 
 <div>
 
-<label>On hand</label>
+<label>
+Category
+</label>
 
-<input id="stockOn" type="number" step=".01" value="0">
+<input
+id="stockCategory"
+value="Food"
+>
 
 </div>
 
 <div>
 
-<label>Par level</label>
+<label>
+Unit
+</label>
 
-<input id="stockPar" type="number" step=".01" value="0">
+<input
+id="stockUnit"
+value="kg"
+>
 
 </div>
 
@@ -1630,17 +2510,62 @@ Create payroll run
 
 <div>
 
-<label>Unit cost (£)</label>
+<label>
+On hand
+</label>
 
-<input id="stockCost" type="number" step=".01" value="0">
+<input
+id="stockOn"
+type="number"
+step=".01"
+value="0"
+>
 
 </div>
 
 <div>
 
-<label>Supplier</label>
+<label>
+Par level
+</label>
 
-<input id="stockSupplier">
+<input
+id="stockPar"
+type="number"
+step=".01"
+value="0"
+>
+
+</div>
+
+</div>
+
+<div class="formgrid">
+
+<div>
+
+<label>
+Unit cost (£)
+</label>
+
+<input
+id="stockCost"
+type="number"
+step=".01"
+value="0"
+>
+
+</div>
+
+<div>
+
+<label>
+Supplier
+</label>
+
+<input
+id="stockSupplier"
+>
 
 </div>
 
@@ -1656,41 +2581,72 @@ Save stock item
 
 </div>
 
+
 <div class="modal" id="supplierModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Add supplier</b>
+<b>
+Add supplier
+</b>
 
-<button class="close" onclick="closeModal('supplierModal')">
+<button
+class="close"
+onclick="closeModal('supplierModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="saveSupplier(event)">
+<form
+class="form"
+onsubmit="saveSupplier(event)">
 
-<label>Name</label>
+<label>
+Name
+</label>
 
-<input id="supName" required>
+<input
+id="supName"
+required
+>
 
-<label>Contact</label>
+<label>
+Contact
+</label>
 
-<input id="supContact">
+<input
+id="supContact"
+>
 
-<label>Email</label>
+<label>
+Email
+</label>
 
-<input id="supEmail" type="email">
+<input
+id="supEmail"
+type="email"
+>
 
-<label>Phone</label>
+<label>
+Phone
+</label>
 
-<input id="supPhone">
+<input
+id="supPhone"
+>
 
-<label>Payment terms (days)</label>
+<label>
+Payment terms (days)
+</label>
 
-<input id="supTerms" type="number" value="30">
+<input
+id="supTerms"
+type="number"
+value="30"
+>
 
 <button class="btn primary">
 Save supplier
@@ -1702,45 +2658,76 @@ Save supplier
 
 </div>
 
+
 <div class="modal" id="menuModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Add menu item</b>
+<b>
+Add menu item
+</b>
 
-<button class="close" onclick="closeModal('menuModal')">
+<button
+class="close"
+onclick="closeModal('menuModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="saveMenu(event)">
+<form
+class="form"
+onsubmit="saveMenu(event)">
 
-<label>Name</label>
+<label>
+Name
+</label>
 
-<input id="menuName" required>
+<input
+id="menuName"
+required
+>
 
-<label>Category</label>
+<label>
+Category
+</label>
 
-<input id="menuCategory" value="Main">
+<input
+id="menuCategory"
+value="Main"
+>
 
 <div class="formgrid">
 
 <div>
 
-<label>Selling price (£)</label>
+<label>
+Selling price (£)
+</label>
 
-<input id="menuPrice" type="number" step=".01" required>
+<input
+id="menuPrice"
+type="number"
+step=".01"
+required
+>
 
 </div>
 
 <div>
 
-<label>Recipe cost (£)</label>
+<label>
+Recipe cost (£)
+</label>
 
-<input id="menuCost" type="number" step=".01" value="0">
+<input
+id="menuCost"
+type="number"
+step=".01"
+value="0"
+>
 
 </div>
 
@@ -1756,29 +2743,45 @@ Save menu item
 
 </div>
 
+
 <div class="modal" id="siteModal">
 
 <div class="sheet">
 
 <div class="sectionhead">
 
-<b>Add site</b>
+<b>
+Add site
+</b>
 
-<button class="close" onclick="closeModal('siteModal')">
+<button
+class="close"
+onclick="closeModal('siteModal')">
 ×
 </button>
 
 </div>
 
-<form class="form" onsubmit="saveSite(event)">
+<form
+class="form"
+onsubmit="saveSite(event)">
 
-<label>Site name</label>
+<label>
+Site name
+</label>
 
-<input id="siteName" required>
+<input
+id="siteName"
+required
+>
 
-<label>Address</label>
+<label>
+Address
+</label>
 
-<input id="siteAddress">
+<input
+id="siteAddress"
+>
 
 <button class="btn primary">
 Create site
@@ -1790,163 +2793,774 @@ Create site
 
 </div>
 
-<div id="toast"
+
+<div
+id="toast"
 style="position:fixed;bottom:84px;left:15px;right:15px;max-width:500px;margin:auto;background:#10251d;color:#fff;padding:11px;border-radius:10px;text-align:center;display:none;z-index:80;font-size:11px">
 </div>
+
 
 <script>
 
 let month=new Date();
 
+let budgetMonth=new Date();
+
 const role={{user.role|tojson}};
 
 const $=id=>document.getElementById(id);
 
+
 function money(n){
-return '£'+Number(n||0).toLocaleString('en-GB',{
+
+return '£'+Number(n||0).toLocaleString(
+'en-GB',
+{
 minimumFractionDigits:0,
 maximumFractionDigits:2
-})
 }
+)
+
+}
+
 
 function mp(){
-return month.getFullYear()+'-'+String(month.getMonth()+1).padStart(2,'0')
+
+return month.getFullYear()+
+'-'+
+String(month.getMonth()+1).padStart(2,'0')
+
 }
+
+
+function bp(){
+
+return budgetMonth.getFullYear()+
+'-'+
+String(budgetMonth.getMonth()+1).padStart(2,'0')
+
+}
+
 
 function toast(x){
+
 $('toast').textContent=x;
+
 $('toast').style.display='block';
-setTimeout(()=>$('toast').style.display='none',2500)
+
+setTimeout(
+()=>$('toast').style.display='none',
+2500
+)
+
 }
 
+
 async function api(url,opt={}){
-let r=await fetch(url,{
+
+let r=await fetch(
+url,
+{
 ...opt,
 headers:{
 'Content-Type':'application/json',
 ...(opt.headers||{})
 }
-});
+}
+);
 
 let d=await r.json();
 
-if(!r.ok)throw Error(d.error||'Request failed');
+if(!r.ok)
+throw Error(d.error||'Request failed');
 
 return d
+
 }
+
 
 function openModal(id){
+
 $(id).classList.add('open')
+
 }
 
+
 function closeModal(id){
+
 $(id).classList.remove('open')
+
 }
+
 
 function nav(v){
 
-document.querySelectorAll('.view')
+document
+.querySelectorAll('.view')
 .forEach(x=>x.classList.remove('active'));
 
 $(v).classList.add('active');
 
-document.querySelectorAll('.navbtn')
-.forEach(x=>x.classList.toggle(
+document
+.querySelectorAll('.navbtn')
+.forEach(
+x=>x.classList.toggle(
 'active',
 x.dataset.view===v
-));
+)
+);
 
-document.querySelectorAll('.bottom button')
-.forEach(x=>x.classList.toggle(
+document
+.querySelectorAll('.bottom button')
+.forEach(
+x=>x.classList.toggle(
 'active',
 x.dataset.view===v
-));
+)
+);
 
 load(v);
 
 window.scrollTo(0,0)
+
 }
 
-document.querySelectorAll('.navbtn')
-.forEach(x=>x.addEventListener(
+
+document
+.querySelectorAll('.navbtn')
+.forEach(
+x=>x.addEventListener(
 'click',
 ()=>nav(x.dataset.view)
-));
+)
+);
 
-document.querySelectorAll('.bottom button')
-.forEach(x=>x.addEventListener(
+
+document
+.querySelectorAll('.bottom button')
+.forEach(
+x=>x.addEventListener(
 'click',
 ()=>x.dataset.view==='more'
 ?openModal('moreModal')
 :nav(x.dataset.view)
-));
+)
+);
+
 
 function load(v){
 
-if(v==='dashboard')loadDash();
+if(v==='dashboard')
+loadDash();
 
-if(v==='finance')loadFinance();
+if(v==='finance')
+loadFinance();
 
-if(v==='sales')loadSales();
+if(v==='sales')
+loadSales();
 
-if(v==='invoices')loadInvoices();
+if(v==='invoices')
+loadInvoices();
 
-if(v==='payments')loadPayments();
+if(v==='payments')
+loadPayments();
 
-if(v==='staff')loadStaff();
+if(v==='staff')
+loadStaff();
 
-if(v==='payroll')loadPayroll();
+if(v==='shifts')
+loadShifts();
 
-if(v==='stock')loadStock();
+if(v==='payroll')
+loadPayroll();
 
-if(v==='purchasing')loadSuppliers();
+if(v==='stock')
+loadStock();
 
-if(v==='menu')loadMenu();
+if(v==='purchasing')
+loadSuppliers();
 
-if(v==='sites')loadSites();
+if(v==='menu')
+loadMenu();
+
+if(v==='budgets')
+loadBudget();
+
+if(v==='audit')
+loadAudit();
+
+if(v==='sites')
+loadSites();
 
 }
+
+
+function openShiftModal(){
+
+loadEmployeesForShift();
+
+const d=new Date();
+
+$('shiftDate').value=
+d.toISOString().slice(0,10);
+
+$('shiftStart').value='09:00';
+
+$('shiftEnd').value='17:00';
+
+$('shiftBreak').value='0';
+
+openModal('shiftModal');
+
+}
+
+
+async function loadEmployeesForShift(){
+
+try{
+
+const d=await api('/api/employees');
+
+$('shiftEmployee').innerHTML=
+d.employees.length
+
+?d.employees
+.map(
+x=>
+`<option value="${x.id}">
+${x.name} — ${x.job_title||x.department}
+</option>`
+)
+.join('')
+
+:'<option value="">No employees yet</option>';
+
+}
+catch(e){
+
+toast(e.message)
+
+}
+
+}
+
+
+function shiftHours(start,end,breakm){
+
+const a=start.split(':').map(Number);
+
+const b=end.split(':').map(Number);
+
+let mins=
+(b[0]*60+b[1])-
+(a[0]*60+a[1]);
+
+if(mins<0)
+mins+=1440;
+
+return Math.max(
+0,
+mins-Number(breakm||0)
+)/60;
+
+}
+
+
+async function loadShifts(){
+
+try{
+
+const d=await api('/api/shifts');
+
+$('shiftRows').innerHTML=
+d.shifts.length
+
+?d.shifts
+.map(
+x=>{
+
+const h=
+shiftHours(
+x.start_time,
+x.end_time,
+x.break_minutes
+);
+
+return `
+
+<tr>
+
+<td>
+${x.shift_date}
+</td>
+
+<td>
+<b>
+${x.employee_name}
+</b>
+</td>
+
+<td>
+${x.start_time}
+</td>
+
+<td>
+${x.end_time}
+</td>
+
+<td>
+${x.break_minutes} min
+</td>
+
+<td>
+${h.toFixed(2)}
+</td>
+
+<td>
+${money(x.pay_rate)}/hr
+</td>
+
+<td class="money">
+${money(h*x.pay_rate)}
+</td>
+
+<td>
+
+<span class="pill">
+${x.status}
+</span>
+
+</td>
+
+</tr>
+
+`
+
+}
+)
+.join('')
+
+:'<tr><td colspan="9" class="small">No shifts have been added yet.</td></tr>';
+
+}
+catch(e){
+
+toast(e.message)
+
+}
+
+}
+
+
+async function saveShift(e){
+
+e.preventDefault();
+
+try{
+
+const employeeId=
+Number(
+$('shiftEmployee').value
+);
+
+if(!employeeId)
+throw Error(
+'Add an employee before creating a shift'
+);
+
+await api(
+'/api/shifts',
+{
+method:'POST',
+
+body:JSON.stringify({
+
+employee_id:employeeId,
+
+shift_date:
+$('shiftDate').value,
+
+start_time:
+$('shiftStart').value,
+
+end_time:
+$('shiftEnd').value,
+
+break_minutes:
+Number(
+$('shiftBreak').value||0
+)
+
+})
+}
+);
+
+closeModal('shiftModal');
+
+e.target.reset();
+
+toast('Shift added');
+
+loadShifts();
+
+loadFinance();
+
+loadDash();
+
+}
+catch(x){
+
+toast(x.message)
+
+}
+
+}
+
+
+function changeBudgetMonth(n){
+
+budgetMonth.setMonth(
+budgetMonth.getMonth()+n
+);
+
+loadBudget();
+
+}
+
+
+async function loadBudget(){
+
+try{
+
+const m=bp();
+
+const d=
+await api(
+'/api/budget?month='+m
+);
+
+const b=d.budget||{};
+
+$('budgetMonthLabel').textContent=m;
+
+$('budgetActualMonth').textContent=m;
+
+$('budgetRevenue').value=
+b.revenue||0;
+
+$('budgetFood').value=
+b.food_cost||0;
+
+$('budgetDrink').value=
+b.drink_cost||0;
+
+$('budgetLabour').value=
+b.labour||0;
+
+$('budgetOverheads').value=
+b.overheads||0;
+
+$('bRevenue').textContent=
+money(b.revenue);
+
+$('bLabour').textContent=
+money(b.labour);
+
+$('bFood').textContent=
+money(b.food_cost);
+
+$('bOverheads').textContent=
+money(b.overheads);
+
+
+const actual=
+await api(
+'/api/finance?month='+m
+);
+
+
+const rows=[
+
+[
+'Revenue',
+Number(b.revenue||0),
+actual.revenue
+],
+
+[
+'Food cost',
+Number(b.food_cost||0),
+actual.cogs
+],
+
+[
+'Labour',
+Number(b.labour||0),
+actual.labour
+],
+
+[
+'Overheads',
+Number(b.overheads||0),
+actual.overheads
+]
+
+];
+
+
+$('budgetCompare').innerHTML=
+rows
+.map(
+r=>{
+
+const variance=
+r[2]-r[1];
+
+const favourable=
+r[0]==='Revenue'
+?variance>=0
+:variance<=0;
+
+const percent=
+r[1]>0
+?Math.min(
+100,
+(r[2]/r[1])*100
+)
+:0;
+
+return `
+
+<div style="margin-bottom:13px">
+
+<div class="sectionhead">
+
+<b>
+${r[0]}
+</b>
+
+<span>
+${money(r[2])}
+actual /
+${money(r[1])}
+budget
+</span>
+
+</div>
+
+<div class="bar">
+
+<i style="width:${percent}%"></i>
+
+</div>
+
+<div
+class="small ${favourable?'good':'bad'}"
+style="margin-top:4px">
+
+Variance:
+${variance>=0?'+':''}${money(variance)}
+
+</div>
+
+</div>
+
+`
+
+}
+)
+.join('');
+
+}
+catch(e){
+
+toast(e.message)
+
+}
+
+}
+
+
+async function saveBudget(){
+
+try{
+
+await api(
+'/api/budget',
+{
+method:'POST',
+
+body:JSON.stringify({
+
+month:bp(),
+
+revenue:
+Number(
+$('budgetRevenue').value||0
+),
+
+food_cost:
+Number(
+$('budgetFood').value||0
+),
+
+drink_cost:
+Number(
+$('budgetDrink').value||0
+),
+
+labour:
+Number(
+$('budgetLabour').value||0
+),
+
+overheads:
+Number(
+$('budgetOverheads').value||0
+)
+
+})
+}
+);
+
+toast('Budget saved');
+
+loadBudget();
+
+}
+catch(e){
+
+toast(e.message)
+
+}
+
+}
+
+
+async function loadAudit(){
+
+try{
+
+const d=
+await api('/api/audit');
+
+$('auditRows').innerHTML=
+d.log.length
+
+?d.log
+.map(
+x=>`
+
+<tr>
+
+<td>
+${x.created_at}
+</td>
+
+<td>
+User ${x.user_id||'—'}
+</td>
+
+<td>
+<b>
+${x.action}
+</b>
+</td>
+
+<td>
+${x.entity}
+</td>
+
+<td>
+${x.entity_id||'—'}
+</td>
+
+<td>
+${x.detail||'—'}
+</td>
+
+</tr>
+
+`
+)
+.join('')
+
+:'<tr><td colspan="6" class="small">No audit events yet.</td></tr>';
+
+}
+catch(e){
+
+toast(e.message)
+
+}
+
+}
+
 
 async function loadDash(){
 
 try{
 
-let d=await api('/api/dashboard');
+let d=
+await api('/api/dashboard');
 
-$('dRevenue').textContent=money(d.revenue);
+$('dRevenue').textContent=
+money(d.revenue);
 
-$('dGP').textContent=d.gross_margin.toFixed(1)+'%';
+$('dGP').textContent=
+d.gross_margin.toFixed(1)+'%';
 
-$('dEBITDA').textContent=money(d.ebitda);
+$('dEBITDA').textContent=
+money(d.ebitda);
 
 $('dEBITDAPct').textContent=
-d.ebitda_margin.toFixed(1)+'% EBITDA margin';
+d.ebitda_margin.toFixed(1)+
+'% EBITDA margin';
 
-$('dLabour').textContent=money(d.labour);
+$('dLabour').textContent=
+money(d.labour);
+
 
 $('dashFinancial').innerHTML=`
 
-<div class="small">Revenue</div>
-<div class="money">${money(d.revenue)}</div>
+<div class="small">
+Revenue
+</div>
 
-<div class="small" style="margin-top:8px">
+<div class="money">
+${money(d.revenue)}
+</div>
+
+<div
+class="small"
+style="margin-top:8px">
+
 COGS
+
 </div>
 
 <div class="money">
 ${money(d.cogs)}
 </div>
 
-<div class="small" style="margin-top:8px">
+<div
+class="small"
+style="margin-top:8px">
+
 Gross profit
+
 </div>
 
 <div class="money">
 ${money(d.gross_profit)}
 </div>
 
-<div class="small" style="margin-top:8px">
+<div
+class="small"
+style="margin-top:8px">
+
 Labour + overheads
+
 </div>
 
 <div class="money">
@@ -1955,109 +3569,176 @@ ${money(d.labour+d.overheads)}
 
 `;
 
+
 $('dashAttention').innerHTML=`
 
-<div class="card" style="padding:10px;margin-bottom:7px">
+<div
+class="card"
+style="padding:10px;margin-bottom:7px">
 
 <b>
+
 ${d.outstanding_invoices
 ?money(d.outstanding_invoices)
 :'£0'}
+
 </b>
 
 <div class="small">
+
 Supplier invoices not yet paid
-</div>
 
 </div>
 
-<div class="card" style="padding:10px;margin-bottom:7px">
+</div>
 
-<b>${d.low_stock}</b>
+
+<div
+class="card"
+style="padding:10px;margin-bottom:7px">
+
+<b>
+${d.low_stock}
+</b>
 
 <div class="small">
+
 Stock items below par
-</div>
 
 </div>
 
-<div class="card" style="padding:10px">
+</div>
 
-<b>${money(d.payroll_due)}</b>
+
+<div
+class="card"
+style="padding:10px">
+
+<b>
+${money(d.payroll_due)}
+</b>
 
 <div class="small">
+
 Payroll runs awaiting completion
+
 </div>
 
 </div>
 
 `
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 function changeMonth(n){
 
-month.setMonth(month.getMonth()+n);
+month.setMonth(
+month.getMonth()+n
+);
 
-loadFinance()
+loadFinance();
 
 }
+
 
 async function loadFinance(){
 
 try{
 
-let d=await api('/api/finance?month='+mp());
+let d=
+await api(
+'/api/finance?month='+mp()
+);
 
-$('fRevenue').textContent=money(d.revenue);
+$('fRevenue').textContent=
+money(d.revenue);
 
-$('fGP').textContent=money(d.gross_profit);
+$('fGP').textContent=
+money(d.gross_profit);
 
 $('fGPM').textContent=
-d.gross_margin.toFixed(1)+'% gross margin';
+d.gross_margin.toFixed(1)+
+'% gross margin';
 
-$('fLabour').textContent=money(d.labour);
+$('fLabour').textContent=
+money(d.labour);
 
-$('fEBITDA').textContent=money(d.ebitda);
+$('fEBITDA').textContent=
+money(d.ebitda);
 
 $('fEBITDAPct').textContent=
-d.ebitda_margin.toFixed(1)+'% EBITDA margin';
+d.ebitda_margin.toFixed(1)+
+'% EBITDA margin';
 
-$('fMonth').textContent=d.month;
+$('fMonth').textContent=
+d.month;
+
 
 $('pnl').innerHTML=[
 
-['Revenue',d.revenue],
+[
+'Revenue',
+d.revenue
+],
 
-['Cost of sales',-d.cogs],
+[
+'Cost of sales',
+-d.cogs
+],
 
-['Gross profit',d.gross_profit],
+[
+'Gross profit',
+d.gross_profit
+],
 
-['Labour',-d.labour],
+[
+'Labour',
+-d.labour
+],
 
-['Overheads',-d.overheads],
+[
+'Overheads',
+-d.overheads
+],
 
-['EBITDA',d.ebitda]
+[
+'EBITDA',
+d.ebitda
+]
 
-].map(x=>`
+]
+.map(
+x=>`
 
 <tr>
 
 <td>
-<b>${x[0]}</b>
+<b>
+${x[0]}
+</b>
 </td>
 
-<td class="money ${x[1]<0?'bad':''}">
+<td
+class="money ${x[1]<0?'bad':''}">
+
 ${money(x[1])}
+
 </td>
 
 </tr>
 
-`).join('');
+`
+)
+.join('');
+
 
 $('bridge').innerHTML=`
 
@@ -2111,51 +3792,81 @@ ${money(d.ebitda)}
 
 `
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function loadSales(){
 
 try{
 
-let d=await api('/api/sales');
+let d=
+await api('/api/sales');
 
-$('salesRows').innerHTML=d.sales.map(x=>`
+$('salesRows').innerHTML=
+d.sales
+.map(
+x=>`
 
 <tr>
 
-<td>${x.sale_date}</td>
+<td>
+${x.sale_date}
+</td>
 
-<td>${x.category}</td>
+<td>
+${x.category}
+</td>
 
-<td>${money(x.net)}</td>
+<td>
+${money(x.net)}
+</td>
 
-<td>${money(x.vat)}</td>
+<td>
+${money(x.vat)}
+</td>
 
-<td class="money">${money(x.gross)}</td>
+<td class="money">
+${money(x.gross)}
+</td>
 
-<td>${x.source}</td>
+<td>
+${x.source}
+</td>
 
 </tr>
 
-`).join('');
+`
+)
+.join('');
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function loadInvoices(){
 
 try{
 
-let d=await api('/api/invoices');
+let d=
+await api('/api/invoices');
 
-$('invoiceRows').innerHTML=d.invoices.map(x=>{
+$('invoiceRows').innerHTML=
+d.invoices
+.map(
+x=>{
 
 let a=
 role==='Owner'||
@@ -2165,22 +3876,54 @@ role==='General Manager';
 
 let b=
 a&&x.status==='Awaiting approval'
-?`<button class="btn" onclick="approveInvoice(${x.id})">Approve</button>`
+
+?`
+
+<button
+class="btn"
+onclick="approveInvoice(${x.id})">
+
+Approve
+
+</button>
+
+`
+
 :a&&x.status==='Approved'
-?`<button class="btn primary" onclick="payInvoice(${x.id})">Record paid</button>`
+
+?`
+
+<button
+class="btn primary"
+onclick="payInvoice(${x.id})">
+
+Record paid
+
+</button>
+
+`
 :'';
+
 
 return `
 
 <tr>
 
-<td>${x.supplier}</td>
+<td>
+${x.supplier}
+</td>
 
-<td>${x.invoice_number}</td>
+<td>
+${x.invoice_number}
+</td>
 
-<td>${x.due_date}</td>
+<td>
+${x.due_date}
+</td>
 
-<td>${x.category}</td>
+<td>
+${x.category}
+</td>
 
 <td class="money">
 ${money(x.gross)}
@@ -2188,7 +3931,8 @@ ${money(x.gross)}
 
 <td>
 
-<span class="pill ${
+<span
+class="pill ${
 x.status==='Paid'
 ?'paid'
 :x.status==='Awaiting approval'
@@ -2202,52 +3946,78 @@ ${x.status}
 
 </td>
 
-<td>${b}</td>
+<td>
+${b}
+</td>
 
 </tr>
 
 `
 
-}).join('');
+}
+)
+.join('');
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function approveInvoice(id){
 
 try{
 
-await api('/api/invoices/'+id+'/approve',{
+await api(
+'/api/invoices/'+id+'/approve',
+{
 method:'POST'
-});
+}
+);
 
-toast('Invoice approved and payment scheduled');
+toast(
+'Invoice approved and payment scheduled'
+);
 
 loadInvoices();
 
 loadPayments();
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function payInvoice(id){
 
-if(!confirm('Record this invoice as paid?'))
+if(
+!confirm(
+'Record this invoice as paid?'
+)
+)
 return;
 
 try{
 
-await api('/api/invoices/'+id+'/pay',{
+await api(
+'/api/invoices/'+id+'/pay',
+{
 method:'POST'
-});
+}
+);
 
-toast('Payment recorded');
+toast(
+'Payment recorded'
+);
 
 loadInvoices();
 
@@ -2255,11 +4025,17 @@ loadPayments();
 
 loadFinance();
 
-}catch(e){
+loadDash();
+
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function saveInvoice(e){
 
@@ -2267,70 +4043,103 @@ e.preventDefault();
 
 try{
 
-await api('/api/invoices',{
+await api(
+'/api/invoices',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-supplier:invSupplier.value,
+supplier:
+$('invSupplier').value,
 
-invoice_number:invNumber.value,
+invoice_number:
+$('invNumber').value,
 
-invoice_date:invDate.value,
+invoice_date:
+$('invDate').value,
 
-due_date:invDue.value,
+due_date:
+$('invDue').value,
 
-category:invCategory.value,
+category:
+$('invCategory').value,
 
-net:Number(invNet.value),
+net:
+Number(
+$('invNet').value
+),
 
-vat:Number(invVat.value),
+vat:
+Number(
+$('invVat').value
+),
 
-notes:invNotes.value
+notes:
+$('invNotes').value
 
 })
-
-});
+}
+);
 
 closeModal('invoiceModal');
 
 e.target.reset();
 
-toast('Invoice created');
+toast(
+'Invoice created'
+);
 
 loadInvoices();
 
-}catch(x){
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 async function loadPayments(){
 
 try{
 
-let d=await api('/api/payments');
+let d=
+await api('/api/payments');
 
-$('paymentRows').innerHTML=d.payments.map(x=>`
+$('paymentRows').innerHTML=
+d.payments
+.map(
+x=>`
 
 <tr>
 
-<td>${x.payment_type}</td>
+<td>
+${x.payment_type}
+</td>
 
-<td>${x.payee}</td>
+<td>
+${x.payee}
+</td>
 
-<td>${x.reference}</td>
+<td>
+${x.reference}
+</td>
 
 <td class="money">
 ${money(x.amount)}
 </td>
 
-<td>${x.payment_date}</td>
+<td>
+${x.payment_date}
+</td>
 
 <td>
 
-<span class="pill ${
+<span
+class="pill ${
 x.status==='Paid'
 ?'paid'
 :'pending'
@@ -2344,13 +4153,19 @@ ${x.status}
 
 </tr>
 
-`).join('');
+`
+)
+.join('');
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function saveExpense(e){
 
@@ -2358,40 +4173,60 @@ e.preventDefault();
 
 try{
 
-await api('/api/expenses',{
+await api(
+'/api/expenses',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-category:expenseCategory.value,
+category:
+$('expenseCategory').value,
 
-description:expenseDescription.value,
+description:
+$('expenseDescription').value,
 
-supplier:expenseSupplier.value,
+supplier:
+$('expenseSupplier').value,
 
-gross:Number(expenseGross.value),
+gross:
+Number(
+$('expenseGross').value
+),
 
-vat:Number(expenseVat.value),
+vat:
+Number(
+$('expenseVat').value
+),
 
-expense_date:expenseDate.value
+expense_date:
+$('expenseDate').value
 
 })
-
-});
+}
+);
 
 closeModal('expenseModal');
 
 e.target.reset();
 
-toast('Outgoing cost added');
+toast(
+'Outgoing cost added'
+);
 
 loadFinance();
 
-}catch(x){
+loadDash();
+
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 async function saveSale(e){
 
@@ -2399,28 +4234,40 @@ e.preventDefault();
 
 try{
 
-await api('/api/sales',{
+await api(
+'/api/sales',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-category:saleCategory.value,
+category:
+$('saleCategory').value,
 
-gross:Number(saleGross.value),
+gross:
+Number(
+$('saleGross').value
+),
 
-vat:Number(saleVat.value),
+vat:
+Number(
+$('saleVat').value
+),
 
-sale_date:saleDate.value
+sale_date:
+$('saleDate').value
 
 })
-
-});
+}
+);
 
 closeModal('saleModal');
 
 e.target.reset();
 
-toast('Sales recorded');
+toast(
+'Sales recorded'
+);
 
 loadSales();
 
@@ -2428,25 +4275,35 @@ loadFinance();
 
 loadDash();
 
-}catch(x){
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 async function loadStaff(){
 
 try{
 
-let d=await api('/api/employees');
+let d=
+await api('/api/employees');
 
-$('employeeRows').innerHTML=d.employees.map(x=>`
+$('employeeRows').innerHTML=
+d.employees
+.map(
+x=>`
 
 <tr>
 
 <td>
 
-<b>${x.name}</b>
+<b>
+${x.name}
+</b>
 
 <div class="small">
 ${x.email}
@@ -2454,25 +4311,41 @@ ${x.email}
 
 </td>
 
-<td>${x.department}</td>
+<td>
+${x.department}
+</td>
 
-<td>${x.job_title||'—'}</td>
+<td>
+${x.job_title||'—'}
+</td>
 
-<td>${x.pay_type}</td>
+<td>
+${x.pay_type}
+</td>
 
-<td>${money(x.pay_rate)}</td>
+<td>
+${money(x.pay_rate)}
+</td>
 
-<td>${x.holiday_allowance} days</td>
+<td>
+${x.holiday_allowance} days
+</td>
 
 </tr>
 
-`).join('');
+`
+)
+.join('');
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function saveEmployee(e){
 
@@ -2480,54 +4353,83 @@ e.preventDefault();
 
 try{
 
-await api('/api/employees',{
+await api(
+'/api/employees',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-name:empName.value,
+name:
+$('empName').value,
 
-email:empEmail.value,
+email:
+$('empEmail').value,
 
-department:empDept.value,
+department:
+$('empDept').value,
 
-job_title:empTitle.value,
+job_title:
+$('empTitle').value,
 
-pay_type:empPayType.value,
+pay_type:
+$('empPayType').value,
 
-pay_rate:Number(empRate.value),
+pay_rate:
+Number(
+$('empRate').value
+),
 
-ni_rate:Number(empNI.value),
+ni_rate:
+Number(
+$('empNI').value
+),
 
-pension_rate:Number(empPension.value),
+pension_rate:
+Number(
+$('empPension').value
+),
 
-holiday_allowance:Number(empHoliday.value)
+holiday_allowance:
+Number(
+$('empHoliday').value
+)
 
 })
-
-});
+}
+);
 
 closeModal('employeeModal');
 
 e.target.reset();
 
-toast('Employee added');
+toast(
+'Employee added'
+);
 
 loadStaff();
 
-}catch(x){
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 async function loadPayroll(){
 
 try{
 
-let d=await api('/api/payroll');
+let d=
+await api('/api/payroll');
 
-$('payrollRows').innerHTML=d.runs.map(x=>{
+$('payrollRows').innerHTML=
+d.runs
+.map(
+x=>{
 
 let a=
 role==='Owner'||
@@ -2537,17 +4439,43 @@ role==='General Manager';
 
 let b=
 a&&x.status==='Draft'
-?`<button class="btn" onclick="approvePayroll(${x.id})">Approve</button>`
+
+?`
+
+<button
+class="btn"
+onclick="approvePayroll(${x.id})">
+
+Approve
+
+</button>
+
+`
+
 :a&&x.status==='Approved'
-?`<button class="btn primary" onclick="payPayroll(${x.id})">Record paid</button>`
+
+?`
+
+<button
+class="btn primary"
+onclick="payPayroll(${x.id})">
+
+Record paid
+
+</button>
+
+`
 :'';
+
 
 return `
 
 <tr>
 
 <td>
-${x.period_start} – ${x.period_end}
+${x.period_start}
+–
+${x.period_end}
 </td>
 
 <td>
@@ -2568,7 +4496,8 @@ ${money(x.net_pay)}
 
 <td>
 
-<span class="pill ${
+<span
+class="pill ${
 x.status==='Paid'
 ?'paid'
 :'pending'
@@ -2580,19 +4509,27 @@ ${x.status}
 
 </td>
 
-<td>${b}</td>
+<td>
+${b}
+</td>
 
 </tr>
 
 `
 
-}).join('');
+}
+)
+.join('');
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function savePayroll(e){
 
@@ -2600,71 +4537,108 @@ e.preventDefault();
 
 try{
 
-await api('/api/payroll',{
+await api(
+'/api/payroll',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-period_start:payStart.value,
+period_start:
+$('payStart').value,
 
-period_end:payEnd.value,
+period_end:
+$('payEnd').value,
 
-gross_pay:Number(payGross.value),
+gross_pay:
+Number(
+$('payGross').value
+),
 
-employer_costs:Number(payEmployer.value),
+employer_costs:
+Number(
+$('payEmployer').value
+),
 
-deductions:Number(payDeduct.value)
+deductions:
+Number(
+$('payDeduct').value
+)
 
 })
-
-});
+}
+);
 
 closeModal('payrollModal');
 
 e.target.reset();
 
-toast('Payroll run created');
+toast(
+'Payroll run created'
+);
 
 loadPayroll();
 
-}catch(x){
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 async function approvePayroll(id){
 
 try{
 
-await api('/api/payroll/'+id+'/approve',{
+await api(
+'/api/payroll/'+id+'/approve',
+{
 method:'POST'
-});
+}
+);
 
-toast('Payroll approved and payment scheduled');
+toast(
+'Payroll approved and payment scheduled'
+);
 
 loadPayroll();
 
 loadPayments();
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function payPayroll(id){
 
-if(!confirm('Record this payroll as paid?'))
+if(
+!confirm(
+'Record this payroll as paid?'
+)
+)
 return;
 
 try{
 
-await api('/api/payroll/'+id+'/pay',{
+await api(
+'/api/payroll/'+id+'/pay',
+{
 method:'POST'
-});
+}
+);
 
-toast('Staff payment recorded');
+toast(
+'Staff payment recorded'
+);
 
 loadPayroll();
 
@@ -2672,21 +4646,32 @@ loadPayments();
 
 loadFinance();
 
-}catch(e){
+loadDash();
+
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function loadStock(){
 
 try{
 
-let d=await api('/api/stock');
+let d=
+await api('/api/stock');
 
-$('stockRows').innerHTML=d.stock.map(x=>{
+$('stockRows').innerHTML=
+d.stock
+.map(
+x=>{
 
-let low=x.on_hand<x.par_level;
+let low=
+x.on_hand<x.par_level;
 
 return `
 
@@ -2694,7 +4679,9 @@ return `
 
 <td>
 
-<b>${x.name}</b>
+<b>
+${x.name}
+</b>
 
 <div class="small">
 ${x.supplier||''}
@@ -2702,17 +4689,27 @@ ${x.supplier||''}
 
 </td>
 
-<td>${x.category}</td>
+<td>
+${x.category}
+</td>
 
-<td>${x.on_hand} ${x.unit}</td>
+<td>
+${x.on_hand}
+${x.unit}
+</td>
 
-<td>${x.par_level}</td>
+<td>
+${x.par_level}
+</td>
 
-<td>${money(x.unit_cost)}</td>
+<td>
+${money(x.unit_cost)}
+</td>
 
 <td>
 
-<span class="pill ${low?'bad':''}">
+<span
+class="pill ${low?'bad':''}">
 
 ${low?'Below par':'OK'}
 
@@ -2724,13 +4721,19 @@ ${low?'Below par':'OK'}
 
 `
 
-}).join('');
+}
+)
+.join('');
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function saveStock(e){
 
@@ -2738,72 +4741,111 @@ e.preventDefault();
 
 try{
 
-await api('/api/stock',{
+await api(
+'/api/stock',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-name:stockName.value,
+name:
+$('stockName').value,
 
-category:stockCategory.value,
+category:
+$('stockCategory').value,
 
-unit:stockUnit.value,
+unit:
+$('stockUnit').value,
 
-on_hand:Number(stockOn.value),
+on_hand:
+Number(
+$('stockOn').value
+),
 
-par_level:Number(stockPar.value),
+par_level:
+Number(
+$('stockPar').value
+),
 
-unit_cost:Number(stockCost.value),
+unit_cost:
+Number(
+$('stockCost').value
+),
 
-supplier:stockSupplier.value
+supplier:
+$('stockSupplier').value
 
 })
-
-});
+}
+);
 
 closeModal('stockModal');
 
 e.target.reset();
 
-toast('Stock item added');
+toast(
+'Stock item added'
+);
 
 loadStock();
 
-}catch(x){
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 async function loadSuppliers(){
 
 try{
 
-let d=await api('/api/suppliers');
+let d=
+await api('/api/suppliers');
 
-$('supplierRows').innerHTML=d.suppliers.map(x=>`
+$('supplierRows').innerHTML=
+d.suppliers
+.map(
+x=>`
 
 <tr>
 
 <td>
-<b>${x.name}</b>
+<b>
+${x.name}
+</b>
 </td>
 
-<td>${x.contact}</td>
+<td>
+${x.contact}
+</td>
 
-<td>${x.email}</td>
+<td>
+${x.email}
+</td>
 
-<td>${x.payment_terms} days</td>
+<td>
+${x.payment_terms} days
+</td>
 
 </tr>
 
-`).join('');
+`
+)
+.join('');
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function saveSupplier(e){
 
@@ -2811,85 +4853,128 @@ e.preventDefault();
 
 try{
 
-await api('/api/suppliers',{
+await api(
+'/api/suppliers',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-name:supName.value,
+name:
+$('supName').value,
 
-contact:supContact.value,
+contact:
+$('supContact').value,
 
-email:supEmail.value,
+email:
+$('supEmail').value,
 
-phone:supPhone.value,
+phone:
+$('supPhone').value,
 
-payment_terms:Number(supTerms.value)
+payment_terms:
+Number(
+$('supTerms').value
+)
 
 })
-
-});
+}
+);
 
 closeModal('supplierModal');
 
 e.target.reset();
 
-toast('Supplier added');
+toast(
+'Supplier added'
+);
 
 loadSuppliers();
 
-}catch(x){
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 async function loadMenu(){
 
 try{
 
-let d=await api('/api/menu');
+let d=
+await api('/api/menu');
 
-$('menuRows').innerHTML=d.menu.map(x=>{
+$('menuRows').innerHTML=
+d.menu
+.map(
+x=>{
 
-let m=x.selling_price
-?((x.selling_price-x.recipe_cost)/x.selling_price*100)
+let m=
+x.selling_price
+?
+(
+(
+x.selling_price-
+x.recipe_cost
+)/
+x.selling_price*
+100
+)
 :0;
 
 return `
 
-<div class="card"
+<div
+class="card"
 style="margin-bottom:7px;display:flex;justify-content:space-between;align-items:center">
 
 <div>
 
-<b>${x.name}</b>
+<b>
+${x.name}
+</b>
 
 <div class="small">
 
 ${x.category}
-· Sell ${money(x.selling_price)}
-· Recipe cost ${money(x.recipe_cost)}
+
+· Sell
+${money(x.selling_price)}
+
+· Recipe cost
+${money(x.recipe_cost)}
 
 </div>
 
 </div>
 
 <span class="pill">
+
 ${m.toFixed(1)}% GP
+
 </span>
 
 </div>
 
 `
 
-}).join('');
+}
+)
+.join('');
 
-}catch(e){
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function saveMenu(e){
 
@@ -2897,62 +4982,94 @@ e.preventDefault();
 
 try{
 
-await api('/api/menu',{
+await api(
+'/api/menu',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-name:menuName.value,
+name:
+$('menuName').value,
 
-category:menuCategory.value,
+category:
+$('menuCategory').value,
 
-selling_price:Number(menuPrice.value),
+selling_price:
+Number(
+$('menuPrice').value
+),
 
-recipe_cost:Number(menuCost.value)
+recipe_cost:
+Number(
+$('menuCost').value
+)
 
 })
-
-});
+}
+);
 
 closeModal('menuModal');
 
 e.target.reset();
 
-toast('Menu item added');
+toast(
+'Menu item added'
+);
 
 loadMenu();
 
-}catch(x){
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 async function loadSites(){
 
 try{
 
-let d=await api('/api/sites');
+let d=
+await api('/api/sites');
 
-$('siteRows').innerHTML=d.sites.map(x=>`
+$('siteRows').innerHTML=
+d.sites
+.map(
+x=>`
 
-<div class="card" style="margin-bottom:7px">
+<div
+class="card"
+style="margin-bottom:7px">
 
-<b>${x.name}</b>
+<b>
+${x.name}
+</b>
 
 <div class="small">
+
 ${x.address||'No address entered'}
-</div>
 
 </div>
 
-`).join('');
+</div>
 
-}catch(e){
+`
+)
+.join('');
+
+}
+catch(e){
+
 toast(e.message)
+
 }
 
 }
+
 
 async function saveSite(e){
 
@@ -2960,32 +5077,42 @@ e.preventDefault();
 
 try{
 
-await api('/api/site',{
+await api(
+'/api/site',
+{
 method:'POST',
 
 body:JSON.stringify({
 
-name:siteName.value,
+name:
+$('siteName').value,
 
-address:siteAddress.value
+address:
+$('siteAddress').value
 
 })
-
-});
+}
+);
 
 closeModal('siteModal');
 
 e.target.reset();
 
-toast('Site created');
+toast(
+'Site created'
+);
 
 loadSites();
 
-}catch(x){
+}
+catch(x){
+
 toast(x.message)
+
 }
 
 }
+
 
 loadDash();
 
