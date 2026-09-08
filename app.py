@@ -534,6 +534,87 @@ CREATE TABLE IF NOT EXISTS company_events(
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE SET NULL
 );
+
+CREATE TABLE IF NOT EXISTS eho_daily_checks(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    check_date TEXT NOT NULL,
+    check_type TEXT NOT NULL,
+    answers_json TEXT NOT NULL DEFAULT '{}',
+    problems TEXT DEFAULT '',
+    corrective_action TEXT DEFAULT '',
+    signed_by BIGINT NOT NULL,
+    signed_name TEXT NOT NULL,
+    completed_at TEXT NOT NULL,
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE,
+    FOREIGN KEY(signed_by) REFERENCES users(id)
+);
+CREATE TABLE IF NOT EXISTS eho_temperature_checks(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    check_date TEXT NOT NULL,
+    check_time TEXT NOT NULL,
+    check_type TEXT NOT NULL,
+    item TEXT NOT NULL,
+    temperature DOUBLE PRECISION NOT NULL,
+    target_min DOUBLE PRECISION,
+    target_max DOUBLE PRECISION,
+    result TEXT NOT NULL DEFAULT 'OK',
+    method TEXT DEFAULT '',
+    corrective_action TEXT DEFAULT '',
+    recorded_by BIGINT NOT NULL,
+    recorded_name TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE,
+    FOREIGN KEY(recorded_by) REFERENCES users(id)
+);
+CREATE TABLE IF NOT EXISTS eho_records(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    category TEXT NOT NULL,
+    record_date TEXT NOT NULL,
+    title TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Complete',
+    details TEXT DEFAULT '',
+    corrective_action TEXT DEFAULT '',
+    due_date TEXT DEFAULT '',
+    reference TEXT DEFAULT '',
+    metadata_json TEXT NOT NULL DEFAULT '{}',
+    created_by BIGINT NOT NULL,
+    created_name TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    verified_by BIGINT,
+    verified_at TEXT DEFAULT '',
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE,
+    FOREIGN KEY(created_by) REFERENCES users(id),
+    FOREIGN KEY(verified_by) REFERENCES users(id)
+);
+CREATE TABLE IF NOT EXISTS eho_four_week_reviews(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    review_date TEXT NOT NULL,
+    period_start TEXT NOT NULL,
+    period_end TEXT NOT NULL,
+    persistent_problems TEXT DEFAULT '',
+    changes_made TEXT DEFAULT '',
+    safe_methods_current INTEGER NOT NULL DEFAULT 1,
+    allergen_info_current INTEGER NOT NULL DEFAULT 1,
+    training_current INTEGER NOT NULL DEFAULT 1,
+    signed_by BIGINT NOT NULL,
+    signed_name TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE,
+    FOREIGN KEY(signed_by) REFERENCES users(id)
+);
+
 CREATE TABLE IF NOT EXISTS audit_log(
     id BIGSERIAL PRIMARY KEY,
     organisation_id BIGINT,
@@ -2063,6 +2144,281 @@ def audit_log():
         (u["organisation_id"],),
     )
     return jsonify(log=[dict(x) for x in result])
+
+
+
+
+# -----------------------------------------------------------------------------
+# EHO / FOOD-SAFETY COMPLIANCE (ENGLAND - SFBB/HACCP SUPPORT)
+# -----------------------------------------------------------------------------
+OPENING_CHECKS = [
+    "Fridges, chilled display equipment and freezers are working properly",
+    "Other equipment needed for safe food preparation is working properly",
+    "Staff are fit for work and wearing clean work clothes",
+    "Food preparation areas, equipment and utensils are clean and disinfected",
+    "Areas are free from evidence of pest activity",
+    "Handwashing and cleaning materials are available",
+    "Hot running water is available at sinks and hand wash basins",
+    "Probe thermometer is working and cleaning/disinfection materials are available",
+    "Allergen information is accurate for all food currently on sale",
+    "Required cleaning has been completed according to the cleaning schedule",
+]
+CLOSING_CHECKS = [
+    "Food is covered, labelled and stored correctly",
+    "Food on its Use By date that has not been safely used or frozen has been disposed of",
+    "Cleaning equipment has been cleaned or disposed of as appropriate",
+    "Waste has been removed and bins relined",
+    "Food preparation areas, equipment and utensils are clean and disinfected",
+    "Washing up has been completed",
+    "Floors are swept and clean",
+    "Required Prove It / food-safety checks have been recorded",
+    "Required cleaning has been completed according to the cleaning schedule",
+]
+EHO_CATEGORIES = (
+    "Cleaning", "Pest control", "Delivery", "Allergen", "Training", "Probe calibration",
+    "Maintenance", "HACCP/SFBB", "EHO inspection", "Document", "Waste", "Fit to work", "Other"
+)
+ALLERGENS_14 = [
+    "Celery", "Cereals containing gluten", "Crustaceans", "Eggs", "Fish", "Lupin", "Milk",
+    "Molluscs", "Mustard", "Nuts", "Peanuts", "Sesame", "Soya", "Sulphur dioxide and sulphites"
+]
+TEMP_PRESETS = {
+    "Chilled storage": {"max": 8.0, "note": "Legal maximum for foods subject to chill holding requirements in England; OrderFlow recommends operating fridges at 5Â°C or below."},
+    "Freezer": {"max": -18.0, "note": "FSA recommended operating target for frozen food; set your documented safe method if different."},
+    "Hot holding": {"min": 63.0, "note": "Legal hot-holding minimum in England, subject to applicable exemptions/time controls."},
+    "Cooking": {"min": 70.0, "note": "Default OrderFlow verification target only. Record the time/temperature combination required by your documented safe method."},
+    "Reheating": {"min": 70.0, "note": "Default OrderFlow verification target only. Food must be reheated thoroughly; use the limit in your documented safe method."},
+    "Delivery chilled": {"max": 8.0, "note": "Use supplier/product requirements where stricter; foods subject to chill holding requirements must remain at 8Â°C or below."},
+    "Cooling": {"note": "No single universal statutory endpoint is imposed here; record the method and target in your HACCP/SFBB safe method."},
+    "Other": {"note": "Use the limits defined in your site food-safety management system."},
+}
+
+
+def _eho_scope():
+    u, s = user(), current_site()
+    return u, s
+
+
+def _json_load(value, fallback=None):
+    try:
+        return json.loads(value or "{}")
+    except Exception:
+        return {} if fallback is None else fallback
+
+
+@app.get("/api/eho/overview")
+@login_required
+def eho_overview():
+    u, site = _eho_scope()
+    today = date.today().isoformat()
+    opening = q("SELECT * FROM eho_daily_checks WHERE organisation_id=? AND site_id=? AND check_date=? AND check_type='Opening' ORDER BY id DESC LIMIT 1", (u["organisation_id"], site["id"], today), True)
+    closing = q("SELECT * FROM eho_daily_checks WHERE organisation_id=? AND site_id=? AND check_date=? AND check_type='Closing' ORDER BY id DESC LIMIT 1", (u["organisation_id"], site["id"], today), True)
+    temp_today = q("SELECT COUNT(*) AS n FROM eho_temperature_checks WHERE organisation_id=? AND site_id=? AND check_date=?", (u["organisation_id"], site["id"], today), True)["n"]
+    breaches = q("SELECT COUNT(*) AS n FROM eho_temperature_checks WHERE organisation_id=? AND site_id=? AND check_date=? AND result='Action required'", (u["organisation_id"], site["id"], today), True)["n"]
+    open_actions = q("SELECT COUNT(*) AS n FROM eho_records WHERE organisation_id=? AND site_id=? AND status IN ('Action required','Open','Overdue')", (u["organisation_id"], site["id"]), True)["n"]
+    last_review = q("SELECT * FROM eho_four_week_reviews WHERE organisation_id=? AND site_id=? ORDER BY review_date DESC,id DESC LIMIT 1", (u["organisation_id"], site["id"]), True)
+    review_due = True
+    if last_review:
+        d = _parse_iso_date(last_review.get("review_date"))
+        review_due = not d or date.today() >= d + timedelta(days=28)
+    completed = int(bool(opening)) + int(bool(closing))
+    daily_percent = int(round(completed / 2 * 100))
+    recent = q("SELECT * FROM eho_records WHERE organisation_id=? AND site_id=? ORDER BY record_date DESC,id DESC LIMIT 12", (u["organisation_id"], site["id"]))
+    return jsonify(
+        date=today,
+        opening_complete=bool(opening), closing_complete=bool(closing), daily_percent=daily_percent,
+        temperature_checks=int(temp_today or 0), temperature_breaches=int(breaches or 0), open_actions=int(open_actions or 0),
+        four_week_review_due=review_due, last_review=dict(last_review) if last_review else None,
+        opening_items=OPENING_CHECKS, closing_items=CLOSING_CHECKS, allergens=ALLERGENS_14,
+        temperature_presets=TEMP_PRESETS, categories=EHO_CATEGORIES,
+        recent=[({**dict(x), "details": "Restricted manager record", "corrective_action": ""} if x.get("category") == "Fit to work" and u["role"] not in ("Owner","Admin","General Manager","Manager") else dict(x)) for x in recent],
+    )
+
+
+@app.post("/api/eho/daily-check")
+@login_required
+def save_eho_daily_check():
+    u, site = _eho_scope()
+    d = request.get_json() or {}
+    check_type = str(d.get("check_type") or "").strip().title()
+    if check_type not in ("Opening", "Closing"):
+        return jsonify(error="Check type must be Opening or Closing"), 400
+    expected = OPENING_CHECKS if check_type == "Opening" else CLOSING_CHECKS
+    answers = d.get("answers") or {}
+    if not isinstance(answers, dict):
+        return jsonify(error="Invalid checklist answers"), 400
+    missing = [item for item in expected if item not in answers]
+    if missing:
+        return jsonify(error="Every checklist item must be answered"), 400
+    failed = [item for item in expected if answers.get(item) is not True]
+    problems = str(d.get("problems") or "").strip()
+    corrective = str(d.get("corrective_action") or "").strip()
+    if failed and (not problems or not corrective):
+        return jsonify(error="For any failed check, record the problem and corrective action before signing"), 400
+    row_id = execute(
+        """INSERT INTO eho_daily_checks(organisation_id,site_id,check_date,check_type,answers_json,problems,corrective_action,signed_by,signed_name,completed_at)
+           VALUES(?,?,?,?,?,?,?,?,?,?)""",
+        (u["organisation_id"], site["id"], date.today().isoformat(), check_type, json.dumps(answers), problems, corrective, u["id"], u["name"], now()),
+    )
+    if failed:
+        execute(
+            """INSERT INTO eho_records(organisation_id,site_id,category,record_date,title,status,details,corrective_action,created_by,created_name,created_at)
+               VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
+            (u["organisation_id"], site["id"], "HACCP/SFBB", date.today().isoformat(), f"{check_type} check exception", "Action required", "; ".join(failed) + (f" | {problems}" if problems else ""), corrective, u["id"], u["name"], now()),
+        )
+    audit("Completed", "eho_daily_check", row_id, f"{check_type} checks signed by {u['name']}")
+    return jsonify(ok=True, id=row_id, failed=failed)
+
+
+@app.get("/api/eho/daily-checks")
+@login_required
+def get_eho_daily_checks():
+    u, site = _eho_scope()
+    start = request.args.get("start") or (date.today() - timedelta(days=28)).isoformat()
+    end = request.args.get("end") or date.today().isoformat()
+    rows = q("SELECT * FROM eho_daily_checks WHERE organisation_id=? AND site_id=? AND check_date BETWEEN ? AND ? ORDER BY check_date DESC,id DESC", (u["organisation_id"], site["id"], start, end))
+    out=[]
+    for r in rows:
+        x=dict(r); x["answers"]=_json_load(x.pop("answers_json", "{}")); out.append(x)
+    return jsonify(checks=out)
+
+
+@app.post("/api/eho/temperature")
+@login_required
+def save_eho_temperature():
+    u, site = _eho_scope()
+    d=request.get_json() or {}
+    check_type=str(d.get("check_type") or "Other").strip()
+    item=str(d.get("item") or "").strip()
+    if not item:
+        return jsonify(error="Enter the fridge, food, delivery or equipment checked"),400
+    try:
+        temp=float(d.get("temperature"))
+        target_min=None if d.get("target_min") in (None,"") else float(d.get("target_min"))
+        target_max=None if d.get("target_max") in (None,"") else float(d.get("target_max"))
+    except Exception:
+        return jsonify(error="Enter a valid temperature and limits"),400
+    preset=TEMP_PRESETS.get(check_type,{})
+    if target_min is None and preset.get("min") is not None: target_min=float(preset["min"])
+    if target_max is None and preset.get("max") is not None: target_max=float(preset["max"])
+    result="OK"
+    if (target_min is not None and temp < target_min) or (target_max is not None and temp > target_max): result="Action required"
+    corrective=str(d.get("corrective_action") or "").strip()
+    if result=="Action required" and not corrective:
+        return jsonify(error="Temperature is outside the recorded limit. Enter the corrective action taken."),400
+    check_date=str(d.get("check_date") or date.today().isoformat())
+    check_time=str(d.get("check_time") or datetime.now().strftime("%H:%M"))
+    row_id=execute("""INSERT INTO eho_temperature_checks(organisation_id,site_id,check_date,check_time,check_type,item,temperature,target_min,target_max,result,method,corrective_action,recorded_by,recorded_name,created_at)
+                      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (u["organisation_id"],site["id"],check_date,check_time,check_type,item,temp,target_min,target_max,result,str(d.get("method") or "").strip(),corrective,u["id"],u["name"],now()))
+    if result=="Action required":
+        execute("""INSERT INTO eho_records(organisation_id,site_id,category,record_date,title,status,details,corrective_action,created_by,created_name,created_at)
+                   VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
+            (u["organisation_id"],site["id"],"HACCP/SFBB",check_date,f"Temperature exception: {item}","Action required",f"{check_type}: {temp}Â°C",corrective,u["id"],u["name"],now()))
+    audit("Recorded", "eho_temperature", row_id, f"{check_type} Â· {item} Â· {temp}Â°C Â· {result}")
+    return jsonify(ok=True,id=row_id,result=result)
+
+
+@app.get("/api/eho/temperatures")
+@login_required
+def get_eho_temperatures():
+    u,site=_eho_scope(); start=request.args.get("start") or (date.today()-timedelta(days=28)).isoformat(); end=request.args.get("end") or date.today().isoformat()
+    rows=q("SELECT * FROM eho_temperature_checks WHERE organisation_id=? AND site_id=? AND check_date BETWEEN ? AND ? ORDER BY check_date DESC,check_time DESC,id DESC",(u["organisation_id"],site["id"],start,end))
+    return jsonify(temperatures=[dict(x) for x in rows])
+
+
+@app.post("/api/eho/record")
+@login_required
+def save_eho_record():
+    u,site=_eho_scope(); d=request.get_json() or {}
+    category=str(d.get("category") or "Other").strip()
+    if category not in EHO_CATEGORIES: return jsonify(error="Invalid compliance category"),400
+    title=str(d.get("title") or "").strip()
+    if not title: return jsonify(error="Enter a record title"),400
+    status=str(d.get("status") or "Complete").strip()
+    details=str(d.get("details") or "").strip(); corrective=str(d.get("corrective_action") or "").strip()
+    if status in ("Action required","Open","Overdue") and not corrective:
+        return jsonify(error="Open/action-required records need a corrective action or next step"),400
+    metadata=d.get("metadata") or {}
+    if not isinstance(metadata,dict): metadata={}
+    row_id=execute("""INSERT INTO eho_records(organisation_id,site_id,category,record_date,title,status,details,corrective_action,due_date,reference,metadata_json,created_by,created_name,created_at)
+                      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (u["organisation_id"],site["id"],category,str(d.get("record_date") or date.today().isoformat()),title,status,details,corrective,str(d.get("due_date") or ""),str(d.get("reference") or ""),json.dumps(metadata),u["id"],u["name"],now()))
+    audit("Recorded", "eho_record", row_id, f"{category}: {title} ({status})")
+    return jsonify(ok=True,id=row_id)
+
+
+@app.get("/api/eho/records")
+@login_required
+def get_eho_records():
+    u,site=_eho_scope(); start=request.args.get("start") or (date.today()-timedelta(days=90)).isoformat(); end=request.args.get("end") or date.today().isoformat(); category=(request.args.get("category") or "").strip()
+    args=[u["organisation_id"],site["id"],start,end]; sql="SELECT * FROM eho_records WHERE organisation_id=? AND site_id=? AND record_date BETWEEN ? AND ?"
+    if category: sql+=" AND category=?"; args.append(category)
+    sql+=" ORDER BY record_date DESC,id DESC"
+    rows=q(sql,tuple(args)); out=[]
+    for r in rows:
+        x=dict(r); x["metadata"]=_json_load(x.pop("metadata_json","{}"))
+        if x.get("category") == "Fit to work" and u["role"] not in ("Owner","Admin","General Manager","Manager"):
+            x["details"] = "Restricted manager record"; x["corrective_action"] = ""; x["reference"] = ""
+        out.append(x)
+    return jsonify(records=out)
+
+
+@app.post("/api/eho/record/<int:record_id>/resolve")
+@login_required
+@manager_required
+def resolve_eho_record(record_id):
+    u,site=_eho_scope(); d=request.get_json() or {}
+    row=q("SELECT * FROM eho_records WHERE id=? AND organisation_id=? AND site_id=?",(record_id,u["organisation_id"],site["id"]),True)
+    if not row:return jsonify(error="Compliance record not found"),404
+    resolution=str(d.get("resolution") or "").strip()
+    if not resolution:return jsonify(error="Record how the issue was resolved"),400
+    # Preserve the original record and append the resolution to the action field.
+    action=(str(row.get("corrective_action") or "").strip()+" | RESOLVED: "+resolution).strip(" |")
+    execute("UPDATE eho_records SET status='Complete',corrective_action=?,verified_by=?,verified_at=? WHERE id=?",(action,u["id"],now(),record_id))
+    audit("Resolved", "eho_record", record_id, resolution)
+    return jsonify(ok=True)
+
+
+@app.post("/api/eho/record/<int:record_id>/verify")
+@login_required
+@manager_required
+def verify_eho_record(record_id):
+    u,site=_eho_scope(); row=q("SELECT * FROM eho_records WHERE id=? AND organisation_id=? AND site_id=?",(record_id,u["organisation_id"],site["id"]),True)
+    if not row:return jsonify(error="Compliance record not found"),404
+    execute("UPDATE eho_records SET verified_by=?,verified_at=? WHERE id=?",(u["id"],now(),record_id))
+    audit("Verified", "eho_record", record_id, f"Verified by {u['name']}")
+    return jsonify(ok=True)
+
+
+@app.post("/api/eho/four-week-review")
+@login_required
+@manager_required
+def save_four_week_review():
+    u,site=_eho_scope(); d=request.get_json() or {}; end=_parse_iso_date(d.get("period_end")) or date.today(); start=_parse_iso_date(d.get("period_start")) or (end-timedelta(days=27))
+    row_id=execute("""INSERT INTO eho_four_week_reviews(organisation_id,site_id,review_date,period_start,period_end,persistent_problems,changes_made,safe_methods_current,allergen_info_current,training_current,signed_by,signed_name,created_at)
+                      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (u["organisation_id"],site["id"],date.today().isoformat(),start.isoformat(),end.isoformat(),str(d.get("persistent_problems") or ""),str(d.get("changes_made") or ""),1 if d.get("safe_methods_current",True) else 0,1 if d.get("allergen_info_current",True) else 0,1 if d.get("training_current",True) else 0,u["id"],u["name"],now()))
+    audit("Completed", "eho_four_week_review", row_id, f"4-week review {start.isoformat()} to {end.isoformat()}")
+    return jsonify(ok=True,id=row_id)
+
+
+@app.get("/api/eho/audit-pack")
+@login_required
+@manager_required
+def eho_audit_pack():
+    u,site=_eho_scope(); start=request.args.get("start") or (date.today()-timedelta(days=28)).isoformat(); end=request.args.get("end") or date.today().isoformat()
+    daily=q("SELECT * FROM eho_daily_checks WHERE organisation_id=? AND site_id=? AND check_date BETWEEN ? AND ? ORDER BY check_date DESC,id DESC",(u["organisation_id"],site["id"],start,end))
+    temps=q("SELECT * FROM eho_temperature_checks WHERE organisation_id=? AND site_id=? AND check_date BETWEEN ? AND ? ORDER BY check_date DESC,check_time DESC,id DESC",(u["organisation_id"],site["id"],start,end))
+    records=q("SELECT * FROM eho_records WHERE organisation_id=? AND site_id=? AND record_date BETWEEN ? AND ? ORDER BY record_date DESC,id DESC",(u["organisation_id"],site["id"],start,end))
+    reviews=q("SELECT * FROM eho_four_week_reviews WHERE organisation_id=? AND site_id=? AND review_date BETWEEN ? AND ? ORDER BY review_date DESC,id DESC",(u["organisation_id"],site["id"],start,end))
+    daily_out=[]
+    for r in daily:
+        x=dict(r); x["answers"]=_json_load(x.pop("answers_json","{}")); daily_out.append(x)
+    rec_out=[]
+    for r in records:
+        x=dict(r); x["metadata"]=_json_load(x.pop("metadata_json","{}")); rec_out.append(x)
+    return jsonify(site=dict(site),organisation=dict(org()),start=start,end=end,daily_checks=daily_out,temperatures=[dict(x) for x in temps],records=rec_out,reviews=[dict(x) for x in reviews])
 
 
 @app.get("/api/health")
