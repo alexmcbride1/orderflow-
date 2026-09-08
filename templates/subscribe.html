@@ -5,68 +5,55 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>OrderFlow Subscription</title>
 <style>
-:root{--green:#1d5a47;--dark:#0d2018;--bg:#f3f6f4;--card:#fff;--line:#dce6e0;--muted:#6f7f77;--red:#a3423a}*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0d2018 0,#173c2f 44%,#eef3f0 44%);min-height:100vh;color:#17241e;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;padding:32px 16px}.wrap{width:min(980px,100%);margin:auto}.brand{color:#fff;font-size:24px;font-weight:950;margin-bottom:26px}.brand span{color:#75b49a}.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:25px;box-shadow:0 15px 50px #07150e18}.eyebrow{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--green)}h1{font-size:32px;line-height:1.08;margin:8px 0 10px}.sub{color:var(--muted);font-size:13px;line-height:1.55}.price{font-size:42px;font-weight:950;margin:20px 0 2px}.price small{font-size:14px;font-weight:800;color:var(--muted)}.vat{font-size:12px;color:var(--muted);margin-bottom:20px}.line{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #edf2ef;font-size:12px}.line b{text-align:right}.total{font-size:15px}.total b{font-size:20px;color:var(--green)}.notice{background:#eef5f1;border:1px solid #d5e6dc;border-radius:13px;padding:14px;font-size:11px;line-height:1.55;color:#345246;margin-top:16px}.terms{margin-top:18px;border:1px solid var(--line);border-radius:14px;padding:14px}.check{display:flex;align-items:flex-start;gap:10px;font-size:12px;line-height:1.5}.check input{margin-top:3px;width:18px;height:18px;accent-color:var(--green)}button{width:100%;border:0;background:var(--green);color:#fff;padding:14px 16px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;margin-top:14px}.adminbox{margin-top:22px;padding-top:20px;border-top:1px solid #e5ece8}.adminbox h3{margin:0 0 6px;font-size:15px}.adminbox p{margin:0 0 12px;color:var(--muted);font-size:11px;line-height:1.5}.adminbox input{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 13px;margin-top:8px;font:inherit;font-size:12px;background:#fff}.adminbtn{background:var(--dark)}.error{background:#f8e9e7;border:1px solid #efd2ce;color:var(--red);border-radius:12px;padding:12px 14px;font-size:12px;margin:14px 0}.mini{font-size:10px;color:#89958f;text-align:center;margin-top:10px}.feature{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #edf2ef}.dot{width:28px;height:28px;border-radius:9px;background:#e8f2ed;color:var(--green);display:grid;place-items:center;font-weight:950;flex:0 0 auto}.feature b{display:block;font-size:12px}.feature span{display:block;color:var(--muted);font-size:10px;margin-top:3px;line-height:1.45}@media(max-width:760px){body{background:#f3f6f4;padding:18px 12px}.brand{color:#10251d}.brand span{color:var(--green)}.grid{grid-template-columns:1fr}.card{padding:20px}.price{font-size:36px}}
+:root{--green:#1d5a47;--dark:#10251d;--bg:#f4f7f5;--card:#fff;--line:#dfe8e2;--muted:#718079;--red:#a3423a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#17221e;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{width:min(940px,100%);margin:auto;padding:26px 18px 42px}.brand{font-size:23px;font-weight:950;margin:4px 0 24px}.brand span{color:var(--green)}.layout{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}.eyebrow{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;font-weight:900;color:var(--green)}h1{font-size:31px;line-height:1.08;margin:8px 0 10px}.sub{font-size:13px;line-height:1.5;color:var(--muted)}.price{font-size:39px;font-weight:950;margin:24px 0 2px;letter-spacing:-1px}.price small{font-size:13px;letter-spacing:0;color:var(--muted)}.vat{font-size:12px;color:var(--muted);margin-bottom:18px}.row{display:flex;justify-content:space-between;gap:18px;padding:11px 0;border-bottom:1px solid #edf2ef;font-size:12px}.row b{text-align:right}.row.total{font-size:14px;padding-top:14px}.row.total b{font-size:19px;color:var(--green)}.notice{background:#eef5f1;border:1px solid #d7e6dd;border-radius:12px;padding:13px 14px;font-size:11px;line-height:1.55;color:#3e5a4e;margin-top:16px}.terms{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:13px}.check{display:flex;gap:10px;align-items:flex-start;font-size:11px;line-height:1.5}.check input{width:18px;height:18px;margin-top:1px;accent-color:var(--green);flex:0 0 auto}.btn{width:100%;border:0;border-radius:11px;background:var(--green);color:#fff;font-weight:900;font-size:13px;padding:14px 16px;margin-top:13px}.mini{text-align:center;color:#87938d;font-size:10px;line-height:1.45;margin-top:9px}.adminbox{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}.adminbox h3{font-size:14px;margin:0 0 5px}.adminbox p{font-size:10px;line-height:1.5;color:var(--muted);margin:0 0 10px}.adminbox input{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:12px;margin-top:8px;font:inherit;font-size:12px}.adminbtn{background:var(--dark)}.features h2{font-size:15px;margin:3px 0 8px}.feature{padding:12px 0;border-bottom:1px solid #edf2ef}.feature:last-child{border-bottom:0}.feature b{display:block;font-size:12px}.feature span{display:block;font-size:10px;line-height:1.45;color:var(--muted);margin-top:3px}.error{background:#f8e9e7;border:1px solid #efd2ce;color:var(--red);border-radius:11px;padding:11px 13px;font-size:11px;margin:14px 0}@media(max-width:760px){.wrap{padding:20px 14px 34px}.brand{font-size:21px;margin-bottom:18px}.layout{grid-template-columns:1fr}.card{padding:19px;border-radius:16px}h1{font-size:28px}.price{font-size:35px;margin-top:20px}.features{margin-top:0}.row{font-size:11px}.row.total{font-size:13px}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="brand">ORDER<span>FLOW</span></div>
-  <div class="grid">
-    <div class="card">
-      <div class="eyebrow">OrderFlow restaurant subscription</div>
+  <div class="layout">
+    <section class="card">
+      <div class="eyebrow">Restaurant subscription</div>
       <h1>Start your 12-month OrderFlow contract</h1>
-      <div class="sub">{{organisation.name}} will be billed monthly. Your agreed unit rates are fixed for the 12-month minimum term.</div>
-
+      <div class="sub">{{organisation.name}} will be billed monthly. Your agreed rates stay fixed for the 12-month minimum term.</div>
       {% if error %}<div class="error">{{error}}</div>{% endif %}
-
-      <div class="price">Â£{{"%.2f"|format(pricing.net)}} <small>+ VAT / month</small></div>
-      <div class="vat">Â£{{"%.2f"|format(pricing.gross)}} including 20% VAT</div>
-
-      <div class="line"><span>Restaurants</span><b>{{pricing.billable_sites}}</b></div>
-      <div class="line"><span>Base subscription</span><b>Â£{{"%.2f"|format(pricing.base_price)}} + VAT per restaurant</b></div>
-      <div class="line"><span>Users included</span><b>{{pricing.included_users}}</b></div>
-      <div class="line"><span>Current users</span><b>{{pricing.billable_users}}</b></div>
-      <div class="line"><span>Additional users</span><b>{{pricing.extra_users}} Ã Â£{{"%.2f"|format(pricing.extra_user_price)}}</b></div>
-      <div class="line"><span>VAT</span><b>Â£{{"%.2f"|format(pricing.vat)}}</b></div>
-      <div class="line total"><span>Monthly Direct Debit / card charge</span><b>Â£{{"%.2f"|format(pricing.gross)}}</b></div>
-
-      <div class="notice">
-        The minimum contract term is 12 months. The agreed base rate of Â£250 + VAT per restaurant and Â£20 + VAT per additional user is locked for that term. Adding restaurants or user licences increases the monthly total at those fixed rates; removing them does not reduce the committed contract value during the minimum term.
-      </div>
-
+      <div class="price">&pound;{{"%.2f"|format(pricing.net)}} <small>+ VAT / month</small></div>
+      <div class="vat">&pound;{{"%.2f"|format(pricing.gross)}} including 20% VAT</div>
+      <div class="row"><span>Restaurants</span><b>{{pricing.billable_sites}}</b></div>
+      <div class="row"><span>Base subscription</span><b>&pound;{{"%.2f"|format(pricing.base_price)}} + VAT each</b></div>
+      <div class="row"><span>Users included</span><b>{{pricing.included_users}}</b></div>
+      <div class="row"><span>Current users</span><b>{{pricing.billable_users}}</b></div>
+      <div class="row"><span>Additional users</span><b>{{pricing.extra_users}} x &pound;{{"%.2f"|format(pricing.extra_user_price)}}</b></div>
+      <div class="row"><span>VAT</span><b>&pound;{{"%.2f"|format(pricing.vat)}}</b></div>
+      <div class="row total"><span>Monthly charge</span><b>&pound;{{"%.2f"|format(pricing.gross)}}</b></div>
+      <div class="notice"><b>12-month minimum term.</b> The base restaurant rate and additional-user rate are fixed during the term. Adding restaurants or licences can increase the monthly commitment; removing them does not reduce the committed value during the minimum term.</div>
       <form method="post">
         <input type="hidden" name="action" value="pay">
-        <div class="terms">
-          <label class="check">
-            <input type="checkbox" name="accept_contract" value="yes" required>
-            <span>I confirm that I am authorised to enter this agreement for {{organisation.name}} and accept the 12-month minimum term and monthly recurring charges shown above.</span>
-          </label>
-        </div>
-        <button type="submit">Continue to secure payment</button>
+        <div class="terms"><label class="check"><input type="checkbox" name="accept_contract" value="yes" required><span>I confirm that I am authorised to enter this agreement for {{organisation.name}} and accept the 12-month minimum term and recurring monthly charges shown above.</span></label></div>
+        <button class="btn" type="submit">Continue to secure payment</button>
       </form>
-      <div class="mini">Payments are processed securely by Stripe. OrderFlow does not store your card details.</div>
-
+      <div class="mini">Payments are processed securely by Stripe. OrderFlow does not store card details.</div>
       <div class="adminbox">
-        <h3>OrderFlow company admin preview</h3>
-        <p>This is for OrderFlow management only. It lets you preview this restaurant account without taking payment. It does not activate the customer's subscription or change their billing status.</p>
+        <h3>OrderFlow admin preview</h3>
+        <p>Management access only. This previews the restaurant account without activating the subscription or recording a payment.</p>
         <form method="post" autocomplete="off">
           <input type="hidden" name="action" value="admin_preview">
           <input type="email" name="admin_email" placeholder="Company admin email" required autocomplete="username">
           <input type="password" name="admin_password" placeholder="Company admin password" required autocomplete="current-password">
-          <button class="adminbtn" type="submit">Admin preview â enter OrderFlow</button>
+          <button class="btn adminbtn" type="submit">Enter preview</button>
         </form>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="eyebrow">What your subscription includes</div>
-      <div class="feature"><div class="dot">â</div><div><b>One restaurant licence</b><span>Each active restaurant/site is licensed at Â£250 + VAT per month.</span></div></div>
-      <div class="feature"><div class="dot">3</div><div><b>Three users included per restaurant</b><span>Your included user allowance grows with each restaurant added to the account.</span></div></div>
-      <div class="feature"><div class="dot">+</div><div><b>Extra users at Â£20 + VAT</b><span>Additional user licences are charged monthly at the rate fixed in your contract.</span></div></div>
-      <div class="feature"><div class="dot">12</div><div><b>12-month minimum term</b><span>Billed monthly, with contract pricing protected throughout the initial minimum term.</span></div></div>
-      <div class="feature"><div class="dot">Â£</div><div><b>Automatic monthly billing</b><span>Successful Stripe payments activate and maintain access automatically.</span></div></div>
-      <div class="feature"><div class="dot">!</div><div><b>Payment protection</b><span>Failed payments are marked past due and may suspend access after the configured grace period.</span></div></div>
-    </div>
+    </section>
+    <aside class="card features">
+      <div class="eyebrow">Included with OrderFlow</div>
+      <h2>Your subscription</h2>
+      <div class="feature"><b>Restaurant licence</b><span>&pound;250 + VAT per active restaurant/site each month.</span></div>
+      <div class="feature"><b>3 users included per restaurant</b><span>Each restaurant adds three included OrderFlow user licences.</span></div>
+      <div class="feature"><b>Additional users</b><span>&pound;20 + VAT per additional user licence each month.</span></div>
+      <div class="feature"><b>12-month minimum term</b><span>Billed monthly with agreed unit rates fixed for the initial term.</span></div>
+      <div class="feature"><b>Automatic billing</b><span>Stripe handles recurring monthly payments and payment status.</span></div>
+      <div class="feature"><b>Payment protection</b><span>Failed payments can move an account to past due and then suspend access after the configured grace period.</span></div>
+    </aside>
   </div>
 </div>
 </body>
