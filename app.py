@@ -1,6 +1,10 @@
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from functools import wraps
+import hashlib
+import hmac
+import json
+import time
 
 import psycopg
 import requests
@@ -67,6 +71,191 @@ def execute(sql, args=()):
 
 def now():
     return datetime.utcnow().isoformat(timespec="seconds")
+
+
+# -----------------------------------------------------------------------------
+# ORDERFLOW SaaS PRICING / STRIPE BILLING
+# -----------------------------------------------------------------------------
+BASE_PRICE_PER_SITE = 250.0
+INCLUDED_USERS_PER_SITE = 3
+EXTRA_USER_PRICE = 20.0
+VAT_RATE = 0.20
+CONTRACT_MONTHS = 12
+PAYMENT_GRACE_DAYS = 7
+
+
+def _parse_iso_date(value):
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00")).date()
+    except Exception:
+        try:
+            return date.fromisoformat(str(value)[:10])
+        except Exception:
+            return None
+
+
+def _contract_end(start_date):
+    # Exactly 12 months for the current commercial model.
+    try:
+        return start_date.replace(year=start_date.year + 1)
+    except ValueError:
+        # 29 February -> 28 February in the following year.
+        return start_date.replace(month=2, day=28, year=start_date.year + 1)
+
+
+def subscription_for(organisation_id):
+    return q("SELECT * FROM subscriptions WHERE organisation_id=?", (organisation_id,), True)
+
+
+def pricing_for(organisation_id, preserve_commitment=True):
+    sub = subscription_for(organisation_id)
+    sites_row = q("SELECT COUNT(*) AS n FROM sites WHERE organisation_id=? AND active=1", (organisation_id,), True)
+    users_row = q("SELECT COUNT(*) AS n FROM users WHERE organisation_id=? AND active=1", (organisation_id,), True)
+    active_sites = max(1, int((sites_row or {}).get("n") or 0))
+    active_users = max(1, int((users_row or {}).get("n") or 0))
+
+    base = float((sub or {}).get("base_price") or BASE_PRICE_PER_SITE)
+    included_per_site = int((sub or {}).get("included_users_per_site") or INCLUDED_USERS_PER_SITE)
+    extra_price = float((sub or {}).get("extra_user_price") or EXTRA_USER_PRICE)
+    vat_rate = float((sub or {}).get("vat_rate") if (sub or {}).get("vat_rate") is not None else VAT_RATE)
+
+    committed_sites = int((sub or {}).get("contracted_sites") or active_sites)
+    committed_users = int((sub or {}).get("contracted_users") or active_users)
+    contract_end = _parse_iso_date((sub or {}).get("contract_end"))
+    inside_term = bool(contract_end and date.today() < contract_end)
+
+    if preserve_commitment and inside_term:
+        billable_sites = max(active_sites, committed_sites)
+        billable_users = max(active_users, committed_users)
+    else:
+        billable_sites = active_sites
+        billable_users = active_users
+
+    included_users = included_per_site * billable_sites
+    extra_users = max(0, billable_users - included_users)
+    net = round((base * billable_sites) + (extra_price * extra_users), 2)
+    vat = round(net * vat_rate, 2)
+    gross = round(net + vat, 2)
+    return {
+        "active_sites": active_sites,
+        "active_users": active_users,
+        "billable_sites": billable_sites,
+        "billable_users": billable_users,
+        "included_users": included_users,
+        "extra_users": extra_users,
+        "base_price": base,
+        "extra_user_price": extra_price,
+        "vat_rate": vat_rate,
+        "net": net,
+        "vat": vat,
+        "gross": gross,
+        "inside_term": inside_term,
+    }
+
+
+def stripe_configured():
+    return bool(
+        os.environ.get("STRIPE_SECRET_KEY")
+        and os.environ.get("STRIPE_BASE_PRICE_ID")
+        and os.environ.get("STRIPE_EXTRA_USER_PRICE_ID")
+        and os.environ.get("STRIPE_VAT_TAX_RATE_ID")
+    )
+
+
+def stripe_request(method, path, data=None):
+    key = os.environ.get("STRIPE_SECRET_KEY", "").strip()
+    if not key:
+        raise RuntimeError("Stripe is not configured. Add STRIPE_SECRET_KEY in Render.")
+    url = "https://api.stripe.com/v1" + path
+    r = requests.request(method, url, auth=(key, ""), data=data or {}, timeout=20)
+    try:
+        payload = r.json()
+    except Exception:
+        payload = {"error": {"message": "Stripe returned an invalid response."}}
+    if not r.ok:
+        msg = ((payload.get("error") or {}).get("message") or "Stripe request failed")
+        raise RuntimeError(msg)
+    return payload
+
+
+def verify_stripe_signature(payload, signature_header, secret, tolerance=300):
+    if not payload or not signature_header or not secret:
+        return False
+    pieces = {}
+    for part in signature_header.split(","):
+        if "=" in part:
+            k, v = part.split("=", 1)
+            pieces.setdefault(k, []).append(v)
+    try:
+        timestamp = int((pieces.get("t") or ["0"])[0])
+    except Exception:
+        return False
+    if abs(int(time.time()) - timestamp) > tolerance:
+        return False
+    signed = str(timestamp).encode() + b"." + payload
+    expected = hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()
+    return any(hmac.compare_digest(expected, sig) for sig in pieces.get("v1", []))
+
+
+def record_stripe_payment(organisation_id, invoice):
+    invoice_id = str(invoice.get("id") or "")
+    if invoice_id and q("SELECT id FROM subscription_payments WHERE stripe_invoice_id=?", (invoice_id,), True):
+        return
+    total_pence = int(invoice.get("amount_paid") or invoice.get("total") or 0)
+    gross = round(total_pence / 100.0, 2)
+    # OrderFlow commercial pricing is VAT-exclusive. Stripe applies the configured
+    # 20% tax rate, so derive the accounting split from the paid gross amount.
+    net = round(gross / (1 + VAT_RATE), 2) if gross else 0
+    vat = round(gross - net, 2)
+    paid_at = date.today().isoformat()
+    execute(
+        """INSERT INTO subscription_payments(
+               organisation_id,amount,payment_date,status,method,reference,notes,created_at,
+               stripe_invoice_id,vat_amount,net_amount)
+           VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
+        (organisation_id, gross, paid_at, "Paid", "Stripe", invoice_id, "Automatic Stripe subscription payment", now(), invoice_id, vat, net),
+    )
+
+
+def activate_contract_from_checkout(organisation_id, checkout):
+    p = pricing_for(organisation_id, preserve_commitment=False)
+    start = date.today()
+    end = _contract_end(start)
+    customer_id = str(checkout.get("customer") or "")
+    subscription_id = str(checkout.get("subscription") or "")
+    session_id = str(checkout.get("id") or "")
+    base_price_id = os.environ.get("STRIPE_BASE_PRICE_ID", "")
+    extra_price_id = os.environ.get("STRIPE_EXTRA_USER_PRICE_ID", "")
+    execute(
+        """UPDATE subscriptions SET plan=?,monthly_price=?,status='Active',contract_start=?,contract_end=?,
+           contract_months=?,contracted_sites=?,contracted_users=?,stripe_customer_id=?,stripe_subscription_id=?,
+           stripe_checkout_session_id=?,stripe_base_price_id=?,stripe_extra_price_id=?,past_due_since='',
+           last_payment_status='Paid',last_payment_at=? WHERE organisation_id=?""",
+        (
+            "OrderFlow Restaurant", p["net"], start.isoformat(), end.isoformat(), CONTRACT_MONTHS,
+            p["billable_sites"], p["billable_users"], customer_id, subscription_id, session_id,
+            base_price_id, extra_price_id, now(), organisation_id,
+        ),
+    )
+    company_event(
+        "Contract activated",
+        f"12-month minimum term Â· Â£{p['net']:.2f} + VAT/month Â· ends {end.isoformat()}",
+        organisation_id,
+    )
+
+
+def subscription_blocks_access(sub):
+    if not sub:
+        return False
+    status = str(sub.get("status") or "")
+    if status in ("Suspended", "Cancelled"):
+        return True
+    if status == "Past due":
+        since = _parse_iso_date(sub.get("past_due_since"))
+        return bool(since and date.today() >= since + timedelta(days=PAYMENT_GRACE_DAYS))
+    return False
 
 
 SCHEMA = """
@@ -363,6 +552,35 @@ def init_db():
         with c.cursor() as cur:
             for statement in [x.strip() for x in SCHEMA.split(";") if x.strip()]:
                 cur.execute(statement)
+
+            # SaaS billing / 12-month contract fields. ADD COLUMN IF NOT EXISTS
+            # keeps existing Render databases safe during deployment.
+            migrations = [
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS base_price DOUBLE PRECISION NOT NULL DEFAULT 250",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS included_users_per_site INTEGER NOT NULL DEFAULT 3",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS extra_user_price DOUBLE PRECISION NOT NULL DEFAULT 20",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS vat_rate DOUBLE PRECISION NOT NULL DEFAULT 0.20",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS contract_months INTEGER NOT NULL DEFAULT 12",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS contract_start TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS contract_end TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS contracted_sites INTEGER NOT NULL DEFAULT 1",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS contracted_users INTEGER NOT NULL DEFAULT 3",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS billing_email TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS stripe_checkout_session_id TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS stripe_base_price_id TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS stripe_extra_price_id TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS past_due_since TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS last_payment_status TEXT DEFAULT ''",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS last_payment_at TEXT DEFAULT ''",
+                "ALTER TABLE subscription_payments ADD COLUMN IF NOT EXISTS stripe_invoice_id TEXT DEFAULT ''",
+                "ALTER TABLE subscription_payments ADD COLUMN IF NOT EXISTS vat_amount DOUBLE PRECISION NOT NULL DEFAULT 0",
+                "ALTER TABLE subscription_payments ADD COLUMN IF NOT EXISTS net_amount DOUBLE PRECISION NOT NULL DEFAULT 0",
+            ]
+            for statement in migrations:
+                cur.execute(statement)
+
             cur.execute("""
                 INSERT INTO subscriptions(organisation_id, plan, monthly_price, status, started_at)
                 SELECT o.id, 'Starter', 0, 'Trial', o.created_at
@@ -432,6 +650,93 @@ def manager_required(fn):
             return jsonify(error="Manager permission required"), 403
         return fn(*args, **kwargs)
     return wrapped
+
+
+def account_admin_required(fn):
+    """Only organisation owners/admins can manage paid OrderFlow login licences."""
+    @wraps(fn)
+    def wrapped(*args, **kwargs):
+        u = user()
+        if not u:
+            return jsonify(error="Not authenticated"), 401
+        if u["role"] not in ("Owner", "Admin"):
+            return jsonify(error="Owner or Admin permission required"), 403
+        return fn(*args, **kwargs)
+    return wrapped
+
+
+def licence_summary(organisation_id):
+    sub = subscription_for(organisation_id) or {}
+    p = pricing_for(organisation_id)
+    contracted_sites = max(1, int(sub.get("contracted_sites") or p["billable_sites"] or 1))
+    contracted_users = max(0, int(sub.get("contracted_users") or 0))
+    included_capacity = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE) * contracted_sites
+    licensed_capacity = max(included_capacity, contracted_users)
+    active_users = int(q("SELECT COUNT(*) AS n FROM users WHERE organisation_id=? AND active=1", (organisation_id,), True)["n"] or 0)
+    available = max(0, licensed_capacity - active_users)
+    return {
+        **p,
+        "licensed_capacity": licensed_capacity,
+        "active_users": active_users,
+        "available_licences": available,
+        "contracted_users": contracted_users,
+        "contracted_sites": contracted_sites,
+        "contract_start": sub.get("contract_start") or "",
+        "contract_end": sub.get("contract_end") or "",
+        "status": sub.get("status") or "",
+    }
+
+
+def sync_stripe_subscription_quantities(organisation_id, contracted_sites, contracted_users):
+    """Keep Stripe quantities aligned with the contract without changing unit prices."""
+    sub = subscription_for(organisation_id) or {}
+    subscription_id = (sub.get("stripe_subscription_id") or "").strip()
+    if not subscription_id:
+        return
+    base_price_id = (sub.get("stripe_base_price_id") or os.environ.get("STRIPE_BASE_PRICE_ID", "")).strip()
+    extra_price_id = (sub.get("stripe_extra_price_id") or os.environ.get("STRIPE_EXTRA_USER_PRICE_ID", "")).strip()
+    vat_tax_rate_id = os.environ.get("STRIPE_VAT_TAX_RATE_ID", "").strip()
+    included_per_site = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE)
+    included_capacity = included_per_site * int(contracted_sites)
+    extra_quantity = max(0, int(contracted_users) - included_capacity)
+
+    remote = stripe_request("GET", "/subscriptions/" + subscription_id)
+    items = ((remote.get("items") or {}).get("data") or [])
+    by_price = {}
+    for item in items:
+        price = item.get("price") or {}
+        pid = price.get("id") if isinstance(price, dict) else price
+        if pid:
+            by_price[str(pid)] = item
+
+    base_item = by_price.get(base_price_id)
+    if base_item:
+        stripe_request("POST", "/subscription_items/" + str(base_item["id"]), {
+            "quantity": str(max(1, int(contracted_sites))),
+            "proration_behavior": "create_prorations",
+        })
+
+    extra_item = by_price.get(extra_price_id)
+    if extra_quantity > 0:
+        if extra_item:
+            stripe_request("POST", "/subscription_items/" + str(extra_item["id"]), {
+                "quantity": str(extra_quantity),
+                "proration_behavior": "create_prorations",
+            })
+        else:
+            data = {
+                "subscription": subscription_id,
+                "price": extra_price_id,
+                "quantity": str(extra_quantity),
+                "proration_behavior": "create_prorations",
+            }
+            if vat_tax_rate_id:
+                data["tax_rates[0]"] = vat_tax_rate_id
+            stripe_request("POST", "/subscription_items", data)
+    elif extra_item:
+        stripe_request("DELETE", "/subscription_items/" + str(extra_item["id"]), {
+            "proration_behavior": "create_prorations",
+        })
 
 
 def audit(action, entity, entity_id=None, detail=""):
@@ -565,9 +870,9 @@ def login():
             True,
         )
         if u and check_password_hash(u["password_hash"], password):
-            sub = q("SELECT status FROM subscriptions WHERE organisation_id=?", (u["organisation_id"],), True)
-            if sub and sub["status"] == "Suspended":
-                return render_template("login.html", error="This OrderFlow account is currently suspended. Please contact OrderFlow support."), 403
+            sub = subscription_for(u["organisation_id"])
+            if subscription_blocks_access(sub):
+                return render_template("login.html", error="This OrderFlow account is currently suspended because the subscription is not in good standing. Please contact OrderFlow support."), 403
             session.clear()
             session["user_id"] = u["id"]
             s = q(
@@ -577,6 +882,8 @@ def login():
             )
             if s:
                 session["site_id"] = s["id"]
+            if sub and sub.get("status") == "Payment required":
+                return redirect(url_for("subscribe"))
             return redirect(url_for("home"))
         return render_template("login.html", error="Incorrect email or password.")
     return render_template("login.html")
@@ -618,9 +925,17 @@ def onboarding():
                     organisation_id = cur.fetchone()["id"]
 
                     cur.execute(
-                        """INSERT INTO subscriptions(organisation_id,plan,monthly_price,status,started_at)
-                           VALUES(%s,%s,%s,%s,%s) ON CONFLICT (organisation_id) DO NOTHING""",
-                        (organisation_id, "Starter", 0, "Trial", now()),
+                        """INSERT INTO subscriptions(
+                               organisation_id,plan,monthly_price,status,started_at,base_price,
+                               included_users_per_site,extra_user_price,vat_rate,contract_months,
+                               contracted_sites,contracted_users,billing_email)
+                           VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                           ON CONFLICT (organisation_id) DO NOTHING""",
+                        (
+                            organisation_id, "OrderFlow Restaurant", BASE_PRICE_PER_SITE,
+                            "Payment required", now(), BASE_PRICE_PER_SITE, INCLUDED_USERS_PER_SITE,
+                            EXTRA_USER_PRICE, VAT_RATE, CONTRACT_MONTHS, 1, 3, email,
+                        ),
                     )
 
                     cur.execute(
@@ -652,15 +967,163 @@ def onboarding():
         session.clear()
         session["user_id"] = user_id
         session["site_id"] = site_id
-        return redirect(url_for("home"))
+        return redirect(url_for("subscribe"))
 
     return render_template("onboarding.html")
+
+
+@app.route("/subscribe", methods=["GET", "POST"])
+@login_required
+def subscribe():
+    u = user()
+    organisation_id = u["organisation_id"]
+    sub = subscription_for(organisation_id)
+    pricing = pricing_for(organisation_id)
+    if sub and sub.get("status") == "Active":
+        return redirect(url_for("home"))
+
+    error = None
+    if request.method == "POST":
+        if not stripe_configured():
+            error = "Online billing is not fully configured yet. Please contact OrderFlow."
+        elif request.form.get("accept_contract") != "yes":
+            error = "You must accept the 12-month minimum-term agreement to continue."
+        else:
+            try:
+                base_price_id = os.environ.get("STRIPE_BASE_PRICE_ID", "").strip()
+                extra_price_id = os.environ.get("STRIPE_EXTRA_USER_PRICE_ID", "").strip()
+                vat_tax_rate_id = os.environ.get("STRIPE_VAT_TAX_RATE_ID", "").strip()
+                success_url = request.url_root.rstrip("/") + "/subscription/success?session_id={CHECKOUT_SESSION_ID}"
+                cancel_url = request.url_root.rstrip("/") + "/subscribe"
+                data = {
+                    "mode": "subscription",
+                    "success_url": success_url,
+                    "cancel_url": cancel_url,
+                    "client_reference_id": str(organisation_id),
+                    "customer_email": (sub or {}).get("billing_email") or u["email"],
+                    "billing_address_collection": "required",
+                    "tax_id_collection[enabled]": "true",
+                    "payment_method_collection": "always",
+                    "metadata[organisation_id]": str(organisation_id),
+                    "subscription_data[metadata][organisation_id]": str(organisation_id),
+                    "line_items[0][price]": base_price_id,
+                    "line_items[0][quantity]": str(pricing["billable_sites"]),
+                    "line_items[0][tax_rates][0]": vat_tax_rate_id,
+                }
+                if pricing["extra_users"] > 0:
+                    data.update({
+                        "line_items[1][price]": extra_price_id,
+                        "line_items[1][quantity]": str(pricing["extra_users"]),
+                        "line_items[1][tax_rates][0]": vat_tax_rate_id,
+                    })
+                checkout = stripe_request("POST", "/checkout/sessions", data)
+                execute(
+                    """UPDATE subscriptions SET stripe_checkout_session_id=?,stripe_base_price_id=?,
+                       stripe_extra_price_id=?,monthly_price=?,contracted_sites=?,contracted_users=?
+                       WHERE organisation_id=?""",
+                    (
+                        checkout.get("id", ""), base_price_id, extra_price_id, pricing["net"],
+                        pricing["billable_sites"], pricing["billable_users"], organisation_id,
+                    ),
+                )
+                return redirect(checkout["url"])
+            except Exception as exc:
+                error = str(exc)
+
+    return render_template(
+        "subscribe.html", user=u, organisation=org(), pricing=pricing, subscription=sub,
+        error=error, contract_months=CONTRACT_MONTHS,
+    )
+
+
+@app.get("/subscription/success")
+@login_required
+def subscription_success():
+    u = user()
+    sid = (request.args.get("session_id") or "").strip()
+    activated = False
+    error = None
+    if sid and os.environ.get("STRIPE_SECRET_KEY"):
+        try:
+            checkout = stripe_request("GET", "/checkout/sessions/" + sid)
+            if str(checkout.get("client_reference_id") or "") == str(u["organisation_id"]):
+                if checkout.get("status") == "complete" or checkout.get("payment_status") in ("paid", "no_payment_required"):
+                    activate_contract_from_checkout(u["organisation_id"], checkout)
+                    activated = True
+        except Exception as exc:
+            error = str(exc)
+    sub = subscription_for(u["organisation_id"])
+    activated = activated or bool(sub and sub.get("status") == "Active")
+    return render_template("subscription_success.html", activated=activated, error=error, subscription=sub)
+
+
+@app.post("/stripe/webhook")
+def stripe_webhook():
+    payload = request.get_data(cache=False)
+    signature = request.headers.get("Stripe-Signature", "")
+    secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+    if not verify_stripe_signature(payload, signature, secret):
+        return jsonify(error="Invalid Stripe signature"), 400
+    try:
+        event = json.loads(payload.decode("utf-8"))
+        event_type = event.get("type")
+        obj = ((event.get("data") or {}).get("object") or {})
+
+        if event_type == "checkout.session.completed":
+            organisation_id = int((obj.get("metadata") or {}).get("organisation_id") or obj.get("client_reference_id") or 0)
+            if organisation_id:
+                activate_contract_from_checkout(organisation_id, obj)
+
+        elif event_type == "invoice.paid":
+            subscription_id = str(obj.get("subscription") or "")
+            sub = q("SELECT * FROM subscriptions WHERE stripe_subscription_id=?", (subscription_id,), True)
+            if sub:
+                record_stripe_payment(sub["organisation_id"], obj)
+                next_ts = obj.get("period_end")
+                next_date = datetime.utcfromtimestamp(next_ts).date().isoformat() if next_ts else ""
+                execute(
+                    """UPDATE subscriptions SET status='Active',past_due_since='',last_payment_status='Paid',
+                       last_payment_at=?,next_billing_date=? WHERE organisation_id=?""",
+                    (now(), next_date, sub["organisation_id"]),
+                )
+                company_event("Stripe payment received", f"Invoice {obj.get('id','')}", sub["organisation_id"])
+
+        elif event_type == "invoice.payment_failed":
+            subscription_id = str(obj.get("subscription") or "")
+            sub = q("SELECT * FROM subscriptions WHERE stripe_subscription_id=?", (subscription_id,), True)
+            if sub:
+                execute(
+                    """UPDATE subscriptions SET status='Past due',past_due_since=CASE WHEN past_due_since='' THEN ? ELSE past_due_since END,
+                       last_payment_status='Failed' WHERE organisation_id=?""",
+                    (date.today().isoformat(), sub["organisation_id"]),
+                )
+                company_event("Payment failed", f"Stripe invoice {obj.get('id','')}", sub["organisation_id"])
+
+        elif event_type == "customer.subscription.deleted":
+            subscription_id = str(obj.get("id") or "")
+            sub = q("SELECT * FROM subscriptions WHERE stripe_subscription_id=?", (subscription_id,), True)
+            if sub:
+                end = _parse_iso_date(sub.get("contract_end"))
+                status = "Suspended" if end and date.today() < end else "Cancelled"
+                execute("UPDATE subscriptions SET status=?,cancelled_at=? WHERE organisation_id=?", (status, now(), sub["organisation_id"]))
+                company_event("Stripe subscription ended", f"Account status: {status}", sub["organisation_id"])
+
+        return jsonify(received=True)
+    except Exception as exc:
+        return jsonify(error=str(exc)), 400
 
 
 @app.get("/")
 @login_required
 def home():
-    return render_template("app.html", user=user(), organisation=org(), site=current_site())
+    u = user()
+    sub = subscription_for(u["organisation_id"])
+    if sub and sub.get("status") == "Payment required":
+        return redirect(url_for("subscribe"))
+    if subscription_blocks_access(sub):
+        session.clear()
+        return redirect(url_for("login"))
+    return render_template("app.html", user=u, organisation=org(), site=current_site())
 
 
 @app.get("/app")
@@ -674,6 +1137,166 @@ def app_home():
 def api_me():
     u, o, s = user(), org(), current_site()
     return jsonify(user=dict(u), organisation=dict(o), site=dict(s) if s else None)
+
+
+@app.get("/api/licences")
+@login_required
+def licences_overview():
+    u = user()
+    rows = q(
+        "SELECT id,name,email,role,active,created_at FROM users WHERE organisation_id=? ORDER BY active DESC,id",
+        (u["organisation_id"],),
+    )
+    return jsonify(licence=licence_summary(u["organisation_id"]), users=[dict(x) for x in rows])
+
+
+@app.post("/api/licences/upgrade")
+@login_required
+@account_admin_required
+def upgrade_licences():
+    u = user()
+    organisation_id = u["organisation_id"]
+    sub = subscription_for(organisation_id)
+    if not sub:
+        return jsonify(error="Subscription record not found"), 404
+    if sub.get("status") not in ("Active", "Past due"):
+        return jsonify(error="Your subscription must be active before adding paid user licences."), 409
+    try:
+        add_count = int((request.get_json() or {}).get("additional_licences", 1))
+    except Exception:
+        return jsonify(error="Enter a valid number of licences"), 400
+    if add_count < 1 or add_count > 100:
+        return jsonify(error="You can add between 1 and 100 licences at a time"), 400
+
+    summary = licence_summary(organisation_id)
+    new_capacity = summary["licensed_capacity"] + add_count
+    new_contracted_users = max(int(sub.get("contracted_users") or 0), new_capacity)
+    sites = max(1, int(sub.get("contracted_sites") or summary["billable_sites"] or 1))
+    included = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE) * sites
+    extra_users = max(0, new_contracted_users - included)
+    base_price = float(sub.get("base_price") or BASE_PRICE_PER_SITE)
+    extra_price = float(sub.get("extra_user_price") or EXTRA_USER_PRICE)
+    vat_rate = float(sub.get("vat_rate") if sub.get("vat_rate") is not None else VAT_RATE)
+    new_net = round(base_price * sites + extra_price * extra_users, 2)
+    new_vat = round(new_net * vat_rate, 2)
+    new_gross = round(new_net + new_vat, 2)
+
+    try:
+        if sub.get("stripe_subscription_id"):
+            sync_stripe_subscription_quantities(organisation_id, sites, new_contracted_users)
+    except Exception as exc:
+        return jsonify(error=f"Stripe could not update the subscription: {exc}"), 502
+
+    execute(
+        """UPDATE subscriptions SET contracted_users=?,monthly_price=? WHERE organisation_id=?""",
+        (new_contracted_users, new_net, organisation_id),
+    )
+    company_event(
+        "User licences increased",
+        f"{new_capacity} licences Â· Â£{new_net:.2f} + VAT/month",
+        organisation_id,
+    )
+    return jsonify(
+        ok=True,
+        licensed_capacity=new_capacity,
+        monthly_net=new_net,
+        monthly_vat=new_vat,
+        monthly_gross=new_gross,
+        message=f"Licence limit increased to {new_capacity} users.",
+    )
+
+
+@app.post("/api/licences/users")
+@login_required
+@account_admin_required
+def add_login_user():
+    u = user()
+    organisation_id = u["organisation_id"]
+    d = request.get_json() or {}
+    name = (d.get("name") or "").strip()[:120]
+    email = (d.get("email") or "").strip().lower()[:200]
+    password = d.get("password") or ""
+    role = (d.get("role") or "Manager").strip()
+    allowed_roles = ("Admin", "Finance", "General Manager", "Manager", "User")
+    if not name or not email or "@" not in email:
+        return jsonify(error="Name and a valid email address are required"), 400
+    if len(password) < 8:
+        return jsonify(error="Password must be at least 8 characters"), 400
+    if role not in allowed_roles:
+        return jsonify(error="Invalid user role"), 400
+
+    summary = licence_summary(organisation_id)
+    if summary["active_users"] >= summary["licensed_capacity"]:
+        next_capacity = summary["licensed_capacity"] + 1
+        sub = subscription_for(organisation_id) or {}
+        sites = max(1, int(sub.get("contracted_sites") or summary["billable_sites"] or 1))
+        included = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE) * sites
+        next_extra = max(0, next_capacity - included)
+        next_net = round(float(sub.get("base_price") or BASE_PRICE_PER_SITE) * sites + float(sub.get("extra_user_price") or EXTRA_USER_PRICE) * next_extra, 2)
+        next_vat = round(next_net * float(sub.get("vat_rate") if sub.get("vat_rate") is not None else VAT_RATE), 2)
+        return jsonify(
+            error="All purchased user licences are in use.",
+            upgrade_required=True,
+            current_licences=summary["licensed_capacity"],
+            proposed_licences=next_capacity,
+            proposed_net=next_net,
+            proposed_vat=next_vat,
+            proposed_gross=round(next_net + next_vat, 2),
+        ), 409
+
+    existing = q("SELECT id,active FROM users WHERE organisation_id=? AND lower(email)=?", (organisation_id, email), True)
+    if existing:
+        return jsonify(error="That email already belongs to an OrderFlow user for this restaurant."), 409
+    try:
+        user_id = execute(
+            """INSERT INTO users(organisation_id,name,email,password_hash,role,active,created_at)
+               VALUES(?,?,?,?,?,1,?)""",
+            (organisation_id, name, email, generate_password_hash(password), role, now()),
+        )
+    except psycopg.IntegrityError:
+        return jsonify(error="That email is already registered."), 409
+    audit("Created", "login_user", user_id, f"{name} Â· {role}")
+    company_event("OrderFlow user added", f"{name} Â· {email}", organisation_id)
+    return jsonify(ok=True, id=user_id)
+
+
+@app.post("/api/licences/users/<int:user_id>/deactivate")
+@login_required
+@account_admin_required
+def deactivate_login_user(user_id):
+    u = user()
+    target = q("SELECT * FROM users WHERE id=? AND organisation_id=?", (user_id, u["organisation_id"]), True)
+    if not target:
+        return jsonify(error="User not found"), 404
+    if int(target["id"]) == int(u["id"]):
+        return jsonify(error="You cannot deactivate your own account."), 400
+    if target.get("role") == "Owner":
+        owners = q("SELECT COUNT(*) AS n FROM users WHERE organisation_id=? AND role='Owner' AND active=1", (u["organisation_id"],), True)
+        if int(owners["n"] or 0) <= 1:
+            return jsonify(error="The organisation must keep at least one active Owner."), 400
+    execute("UPDATE users SET active=0 WHERE id=? AND organisation_id=?", (user_id, u["organisation_id"]))
+    audit("Deactivated", "login_user", user_id, target["email"])
+    company_event("OrderFlow user deactivated", target["email"], u["organisation_id"])
+    return jsonify(ok=True, message="User deactivated. Contracted licence quantity is unchanged during the minimum term.")
+
+
+@app.post("/api/licences/users/<int:user_id>/activate")
+@login_required
+@account_admin_required
+def activate_login_user(user_id):
+    u = user()
+    target = q("SELECT * FROM users WHERE id=? AND organisation_id=?", (user_id, u["organisation_id"]), True)
+    if not target:
+        return jsonify(error="User not found"), 404
+    if int(target.get("active") or 0) == 1:
+        return jsonify(ok=True)
+    summary = licence_summary(u["organisation_id"])
+    if summary["active_users"] >= summary["licensed_capacity"]:
+        return jsonify(error="All purchased user licences are in use.", upgrade_required=True), 409
+    execute("UPDATE users SET active=1 WHERE id=? AND organisation_id=?", (user_id, u["organisation_id"]))
+    audit("Activated", "login_user", user_id, target["email"])
+    company_event("OrderFlow user reactivated", target["email"], u["organisation_id"])
+    return jsonify(ok=True)
 
 
 @app.post("/api/site")
@@ -691,6 +1314,25 @@ def add_site():
         (u["organisation_id"], name, address, now()),
     )
     audit("Created", "site", site_id, name)
+    sub = subscription_for(u["organisation_id"])
+    if sub and sub.get("status") in ("Active", "Past due"):
+        p = pricing_for(u["organisation_id"])
+        new_sites = p["billable_sites"]
+        included_capacity = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE) * new_sites
+        new_contracted_users = max(int(sub.get("contracted_users") or 0), included_capacity, p["active_users"])
+        extra_users = max(0, new_contracted_users - included_capacity)
+        new_net = round(float(sub.get("base_price") or BASE_PRICE_PER_SITE) * new_sites + float(sub.get("extra_user_price") or EXTRA_USER_PRICE) * extra_users, 2)
+        try:
+            if sub.get("stripe_subscription_id"):
+                sync_stripe_subscription_quantities(u["organisation_id"], new_sites, new_contracted_users)
+        except Exception as exc:
+            return jsonify(error=f"Restaurant created, but Stripe billing could not be updated: {exc}"), 502
+        execute(
+            """UPDATE subscriptions SET contracted_sites=?,contracted_users=?,monthly_price=?
+               WHERE organisation_id=?""",
+            (new_sites, new_contracted_users, new_net, u["organisation_id"]),
+        )
+        company_event("Restaurant added", f"Contract value now Â£{new_net:.2f} + VAT/month", u["organisation_id"])
     return jsonify(ok=True, id=site_id)
 
 
@@ -1694,6 +2336,7 @@ def company_admin_overview():
     users_count = q("SELECT COUNT(*) AS n FROM users WHERE active=1", one=True)["n"]
     active = q("SELECT COUNT(*) AS n FROM subscriptions WHERE status='Active'", one=True)["n"]
     trials = q("SELECT COUNT(*) AS n FROM subscriptions WHERE status='Trial'", one=True)["n"]
+    payment_required = q("SELECT COUNT(*) AS n FROM subscriptions WHERE status='Payment required'", one=True)["n"]
     overdue = q("SELECT COUNT(*) AS n FROM subscriptions WHERE status='Past due'", one=True)["n"]
     mrr = float(q("SELECT COALESCE(SUM(monthly_price),0) AS x FROM subscriptions WHERE status='Active'", one=True)["x"] or 0)
     collected = float(q("SELECT COALESCE(SUM(amount),0) AS x FROM subscription_payments WHERE status='Paid'", one=True)["x"] or 0)
@@ -1702,7 +2345,7 @@ def company_admin_overview():
                   ORDER BY ce.id DESC LIMIT 12""")
     return jsonify(
         organisations=orgs, sites=sites, users=users_count, active=active, trials=trials,
-        overdue=overdue, mrr=mrr, arr=mrr*12, collected=collected,
+        payment_required=payment_required, overdue=overdue, mrr=mrr, arr=mrr*12, collected=collected,
         recent_events=[dict(x) for x in recent],
     )
 
@@ -1714,6 +2357,9 @@ def company_admin_customers():
                 COALESCE(s.plan,'Starter') plan,COALESCE(s.monthly_price,0) monthly_price,
                 COALESCE(s.status,'Trial') subscription_status,COALESCE(s.trial_end,'') trial_end,
                 COALESCE(s.next_billing_date,'') next_billing_date,
+                COALESCE(s.contract_start,'') contract_start,COALESCE(s.contract_end,'') contract_end,
+                COALESCE(s.contracted_sites,1) contracted_sites,COALESCE(s.contracted_users,3) contracted_users,
+                COALESCE(s.base_price,250) base_price,COALESCE(s.extra_user_price,20) extra_user_price,
                 (SELECT COUNT(*) FROM sites st WHERE st.organisation_id=o.id AND st.active=1) site_count,
                 (SELECT COUNT(*) FROM users u WHERE u.organisation_id=o.id AND u.active=1) user_count,
                 (SELECT COALESCE(SUM(sp.amount),0) FROM subscription_payments sp WHERE sp.organisation_id=o.id AND sp.status='Paid') total_paid
@@ -1725,14 +2371,17 @@ def company_admin_customers():
 @app.get("/api/company-admin/customers/<int:organisation_id>")
 @company_admin_required
 def company_admin_customer(organisation_id):
-    customer = q("""SELECT o.*,s.plan,s.monthly_price,s.status subscription_status,s.trial_end,s.next_billing_date,s.notes subscription_notes
+    customer = q("""SELECT o.*,s.plan,s.monthly_price,s.status subscription_status,s.trial_end,s.next_billing_date,
+                    s.notes subscription_notes,s.contract_start,s.contract_end,s.contract_months,s.contracted_sites,
+                    s.contracted_users,s.base_price,s.included_users_per_site,s.extra_user_price,s.vat_rate,
+                    s.last_payment_status,s.last_payment_at,s.past_due_since
                     FROM organisations o LEFT JOIN subscriptions s ON s.organisation_id=o.id WHERE o.id=?""", (organisation_id,), True)
     if not customer:
         return jsonify(error="Customer not found"), 404
     sites = q("SELECT id,name,address,active,created_at FROM sites WHERE organisation_id=? ORDER BY id", (organisation_id,))
     users_rows = q("SELECT id,name,email,role,active,created_at FROM users WHERE organisation_id=? ORDER BY id", (organisation_id,))
     payments = q("SELECT * FROM subscription_payments WHERE organisation_id=? ORDER BY payment_date DESC,id DESC", (organisation_id,))
-    return jsonify(customer=dict(customer), sites=[dict(x) for x in sites], users=[dict(x) for x in users_rows], payments=[dict(x) for x in payments])
+    return jsonify(customer=dict(customer), pricing=pricing_for(organisation_id), sites=[dict(x) for x in sites], users=[dict(x) for x in users_rows], payments=[dict(x) for x in payments])
 
 
 @app.post("/api/company-admin/subscriptions/<int:organisation_id>")
@@ -1743,12 +2392,19 @@ def company_admin_update_subscription(organisation_id):
     d = request.get_json() or {}
     plan = (d.get("plan") or "Starter").strip()[:50]
     status = (d.get("status") or "Trial").strip()
-    if status not in ("Trial", "Active", "Past due", "Suspended", "Cancelled"):
+    if status not in ("Trial", "Payment required", "Active", "Past due", "Suspended", "Cancelled"):
         return jsonify(error="Invalid subscription status"), 400
-    try:
-        monthly_price = max(0, float(d.get("monthly_price", 0)))
-    except Exception:
-        return jsonify(error="Invalid monthly price"), 400
+    current = subscription_for(organisation_id)
+    pricing = pricing_for(organisation_id)
+    # During an active 12-month minimum term the agreed unit rates are locked.
+    # Company admin can change status/notes, but not silently re-price the contract.
+    if current and pricing["inside_term"]:
+        monthly_price = pricing["net"]
+    else:
+        try:
+            monthly_price = max(0, float(d.get("monthly_price", pricing["net"])))
+        except Exception:
+            return jsonify(error="Invalid monthly price"), 400
     trial_end = (d.get("trial_end") or "")[:20]
     next_billing_date = (d.get("next_billing_date") or "")[:20]
     notes = (d.get("notes") or "")[:1000]
