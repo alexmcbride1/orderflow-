@@ -463,11 +463,30 @@ CREATE TABLE IF NOT EXISTS menu_items(
     site_id BIGINT NOT NULL,
     name TEXT NOT NULL,
     category TEXT NOT NULL,
+    menu_type TEXT NOT NULL DEFAULT 'Food',
+    menu_section TEXT NOT NULL DEFAULT 'Mains',
+    portion_weight DOUBLE PRECISION NOT NULL DEFAULT 0,
+    portion_unit TEXT NOT NULL DEFAULT 'g',
     selling_price DOUBLE PRECISION NOT NULL,
     recipe_cost DOUBLE PRECISION NOT NULL DEFAULT 0,
     active INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
     FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS menu_components(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    menu_item_id BIGINT NOT NULL,
+    component_name TEXT NOT NULL,
+    quantity DOUBLE PRECISION NOT NULL DEFAULT 0,
+    unit TEXT NOT NULL DEFAULT 'g',
+    component_cost DOUBLE PRECISION NOT NULL DEFAULT 0,
+    notes TEXT DEFAULT '',
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE,
+    FOREIGN KEY(menu_item_id) REFERENCES menu_items(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS events(
     id BIGSERIAL PRIMARY KEY,
@@ -658,6 +677,10 @@ def init_db():
                 "ALTER TABLE subscription_payments ADD COLUMN IF NOT EXISTS stripe_invoice_id TEXT DEFAULT ''",
                 "ALTER TABLE subscription_payments ADD COLUMN IF NOT EXISTS vat_amount DOUBLE PRECISION NOT NULL DEFAULT 0",
                 "ALTER TABLE subscription_payments ADD COLUMN IF NOT EXISTS net_amount DOUBLE PRECISION NOT NULL DEFAULT 0",
+                "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS menu_type TEXT NOT NULL DEFAULT 'Food'",
+                "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS menu_section TEXT NOT NULL DEFAULT 'Mains'",
+                "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS portion_weight DOUBLE PRECISION NOT NULL DEFAULT 0",
+                "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS portion_unit TEXT NOT NULL DEFAULT 'g'",
             ]
             for statement in migrations:
                 cur.execute(statement)
@@ -2067,11 +2090,71 @@ def add_supplier():
 @login_required
 def get_menu():
     u, s = user(), current_site()
-    result = q(
-        "SELECT * FROM menu_items WHERE organisation_id=? AND site_id=? AND active=1 ORDER BY category,name",
+    items = q(
+        "SELECT * FROM menu_items WHERE organisation_id=? AND site_id=? AND active=1 ORDER BY menu_type,menu_section,name",
         (u["organisation_id"], s["id"]),
     )
-    return jsonify(menu=[dict(x) for x in result])
+    component_rows = q(
+        """SELECT * FROM menu_components WHERE organisation_id=? AND site_id=?
+           ORDER BY menu_item_id,sort_order,id""",
+        (u["organisation_id"], s["id"]),
+    )
+    grouped = {}
+    for row in component_rows:
+        grouped.setdefault(int(row["menu_item_id"]), []).append(dict(row))
+    menu = []
+    for row in items:
+        item = dict(row)
+        components = grouped.get(int(item["id"]), [])
+        recipe_cost = round(sum(float(x.get("component_cost") or 0) for x in components), 2) if components else round(float(item.get("recipe_cost") or 0), 2)
+        selling = float(item.get("selling_price") or 0)
+        gp_value = round(selling - recipe_cost, 2)
+        gp_percent = round((gp_value / selling * 100), 2) if selling else 0
+        item["recipe_cost"] = recipe_cost
+        item["gp_value"] = gp_value
+        item["gp_percent"] = gp_percent
+        item["components"] = components
+        menu.append(item)
+    return jsonify(menu=menu)
+
+
+def _normalise_menu_components(raw):
+    if not isinstance(raw, list):
+        return []
+    components = []
+    for i, part in enumerate(raw[:100]):
+        name = str((part or {}).get("name") or (part or {}).get("component_name") or "").strip()[:160]
+        if not name:
+            continue
+        try:
+            quantity = float((part or {}).get("quantity") or 0)
+            component_cost = float((part or {}).get("component_cost") or 0)
+        except Exception:
+            raise ValueError("Ingredient quantities and costs must be valid numbers")
+        if quantity < 0 or component_cost < 0:
+            raise ValueError("Ingredient quantities and costs cannot be negative")
+        unit = str((part or {}).get("unit") or "g").strip()[:30]
+        notes = str((part or {}).get("notes") or "").strip()[:500]
+        components.append({
+            "name": name,
+            "quantity": quantity,
+            "unit": unit,
+            "component_cost": round(component_cost, 4),
+            "notes": notes,
+            "sort_order": i,
+        })
+    return components
+
+
+def _validate_menu_category(menu_type, menu_section):
+    allowed = {
+        "Food": ("Starters", "Mains", "Desserts"),
+        "Drink": ("Beer", "Wine", "Spirits", "Cocktails", "Soft Drinks"),
+    }
+    if menu_type not in allowed:
+        raise ValueError("Menu type must be Food or Drink")
+    if menu_section not in allowed[menu_type]:
+        raise ValueError("Invalid menu section for the selected menu type")
 
 
 @app.post("/api/menu")
@@ -2080,30 +2163,99 @@ def get_menu():
 def add_menu():
     u, s = user(), current_site()
     d = request.get_json() or {}
-    name = (d.get("name") or "").strip()
+    name = (d.get("name") or "").strip()[:160]
+    menu_type = (d.get("menu_type") or "Food").strip()
+    menu_section = (d.get("menu_section") or ("Mains" if menu_type == "Food" else "Beer")).strip()
     if not name:
         return jsonify(error="Menu item name required"), 400
     try:
+        _validate_menu_category(menu_type, menu_section)
         price = float(d.get("selling_price", 0))
-        cost = float(d.get("recipe_cost", 0))
+        portion_weight = float(d.get("portion_weight", 0) or 0)
+        components = _normalise_menu_components(d.get("components") or [])
+    except ValueError as exc:
+        return jsonify(error=str(exc)), 400
     except Exception:
-        return jsonify(error="Invalid prices"), 400
-    if price <= 0 or cost < 0:
-        return jsonify(error="Invalid menu prices"), 400
-    menu_id = execute(
-        """INSERT INTO menu_items(organisation_id,site_id,name,category,selling_price,recipe_cost)
-           VALUES(?,?,?,?,?,?)""",
-        (
-            u["organisation_id"],
-            s["id"],
-            name,
-            d.get("category") or "Main",
-            price,
-            cost,
-        ),
+        return jsonify(error="Invalid menu values"), 400
+    if price <= 0 or portion_weight < 0:
+        return jsonify(error="Selling price must be positive and portion weight cannot be negative"), 400
+    recipe_cost = round(sum(x["component_cost"] for x in components), 2)
+    category = menu_section
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                """INSERT INTO menu_items(organisation_id,site_id,name,category,menu_type,menu_section,portion_weight,portion_unit,selling_price,recipe_cost)
+                   VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id""",
+                (u["organisation_id"], s["id"], name, category, menu_type, menu_section, portion_weight, (d.get("portion_unit") or "g")[:30], price, recipe_cost),
+            )
+            menu_id = cur.fetchone()["id"]
+            for part in components:
+                cur.execute(
+                    """INSERT INTO menu_components(organisation_id,site_id,menu_item_id,component_name,quantity,unit,component_cost,notes,sort_order)
+                       VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    (u["organisation_id"], s["id"], menu_id, part["name"], part["quantity"], part["unit"], part["component_cost"], part["notes"], part["sort_order"]),
+                )
+    audit("Created", "menu_item", menu_id, f"{menu_type} / {menu_section} / {name}")
+    return jsonify(ok=True, id=menu_id, recipe_cost=recipe_cost)
+
+
+@app.put("/api/menu/<int:menu_id>")
+@login_required
+@manager_required
+def update_menu(menu_id):
+    u, s = user(), current_site()
+    existing = q(
+        "SELECT * FROM menu_items WHERE id=? AND organisation_id=? AND site_id=? AND active=1",
+        (menu_id, u["organisation_id"], s["id"]),
+        True,
     )
-    audit("Created", "menu_item", menu_id, name)
-    return jsonify(ok=True, id=menu_id)
+    if not existing:
+        return jsonify(error="Menu item not found"), 404
+    d = request.get_json() or {}
+    name = (d.get("name") or existing["name"]).strip()[:160]
+    menu_type = (d.get("menu_type") or existing.get("menu_type") or "Food").strip()
+    menu_section = (d.get("menu_section") or existing.get("menu_section") or existing.get("category") or "Mains").strip()
+    try:
+        _validate_menu_category(menu_type, menu_section)
+        price = float(d.get("selling_price", existing["selling_price"]))
+        portion_weight = float(d.get("portion_weight", existing.get("portion_weight") or 0) or 0)
+        components = _normalise_menu_components(d.get("components") or [])
+    except ValueError as exc:
+        return jsonify(error=str(exc)), 400
+    except Exception:
+        return jsonify(error="Invalid menu values"), 400
+    if price <= 0 or portion_weight < 0:
+        return jsonify(error="Selling price must be positive and portion weight cannot be negative"), 400
+    recipe_cost = round(sum(x["component_cost"] for x in components), 2)
+    with conn() as c:
+        with c.cursor() as cur:
+            cur.execute(
+                """UPDATE menu_items SET name=%s,category=%s,menu_type=%s,menu_section=%s,portion_weight=%s,portion_unit=%s,selling_price=%s,recipe_cost=%s
+                   WHERE id=%s AND organisation_id=%s AND site_id=%s""",
+                (name, menu_section, menu_type, menu_section, portion_weight, (d.get("portion_unit") or existing.get("portion_unit") or "g")[:30], price, recipe_cost, menu_id, u["organisation_id"], s["id"]),
+            )
+            cur.execute("DELETE FROM menu_components WHERE menu_item_id=%s AND organisation_id=%s AND site_id=%s", (menu_id, u["organisation_id"], s["id"]))
+            for part in components:
+                cur.execute(
+                    """INSERT INTO menu_components(organisation_id,site_id,menu_item_id,component_name,quantity,unit,component_cost,notes,sort_order)
+                       VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    (u["organisation_id"], s["id"], menu_id, part["name"], part["quantity"], part["unit"], part["component_cost"], part["notes"], part["sort_order"]),
+                )
+    audit("Updated", "menu_item", menu_id, f"{menu_type} / {menu_section} / {name}")
+    return jsonify(ok=True, id=menu_id, recipe_cost=recipe_cost)
+
+
+@app.delete("/api/menu/<int:menu_id>")
+@login_required
+@manager_required
+def archive_menu(menu_id):
+    u, s = user(), current_site()
+    existing = q("SELECT * FROM menu_items WHERE id=? AND organisation_id=? AND site_id=?", (menu_id, u["organisation_id"], s["id"]), True)
+    if not existing:
+        return jsonify(error="Menu item not found"), 404
+    execute("UPDATE menu_items SET active=0 WHERE id=? AND organisation_id=? AND site_id=?", (menu_id, u["organisation_id"], s["id"]))
+    audit("Archived", "menu_item", menu_id, existing["name"])
+    return jsonify(ok=True)
 
 
 @app.get("/api/budget")
