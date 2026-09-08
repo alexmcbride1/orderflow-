@@ -1065,7 +1065,27 @@ def subscribe():
 
     error = None
     if request.method == "POST":
-        if not stripe_configured():
+        action = (request.form.get("action") or "pay").strip()
+
+        if action == "admin_preview":
+            admin_email = (request.form.get("admin_email") or "").strip().lower()
+            admin_password = request.form.get("admin_password") or ""
+            expected_email = os.environ.get("COMPANY_ADMIN_EMAIL", "").strip().lower()
+            expected_password = os.environ.get("COMPANY_ADMIN_PASSWORD", "")
+
+            if (
+                expected_email
+                and expected_password
+                and hmac.compare_digest(admin_email, expected_email)
+                and hmac.compare_digest(admin_password, expected_password)
+            ):
+                session["billing_preview_bypass_org"] = int(organisation_id)
+                session["billing_preview_admin"] = True
+                return redirect(url_for("home"))
+
+            error = "Incorrect company admin email or password."
+
+        elif not stripe_configured():
             error = "Online billing is not fully configured yet. Please contact OrderFlow."
         elif request.form.get("accept_contract") != "yes":
             error = "You must accept the 12-month minimum-term agreement to continue."
@@ -1200,7 +1220,12 @@ def home():
     u = user()
     sub = subscription_for(u["organisation_id"])
     if sub and sub.get("status") == "Payment required":
-        return redirect(url_for("subscribe"))
+        preview_ok = (
+            session.get("billing_preview_admin") is True
+            and int(session.get("billing_preview_bypass_org") or 0) == int(u["organisation_id"])
+        )
+        if not preview_ok:
+            return redirect(url_for("subscribe"))
     if subscription_blocks_access(sub):
         session.clear()
         return redirect(url_for("login"))
