@@ -160,7 +160,6 @@ def stripe_configured():
         os.environ.get("STRIPE_SECRET_KEY")
         and os.environ.get("STRIPE_BASE_PRICE_ID")
         and os.environ.get("STRIPE_EXTRA_USER_PRICE_ID")
-        and os.environ.get("STRIPE_VAT_TAX_RATE_ID")
     )
 
 
@@ -205,8 +204,9 @@ def record_stripe_payment(organisation_id, invoice):
         return
     total_pence = int(invoice.get("amount_paid") or invoice.get("total") or 0)
     gross = round(total_pence / 100.0, 2)
-    # OrderFlow commercial pricing is VAT-exclusive. Stripe applies the configured
-    # 20% tax rate, so derive the accounting split from the paid gross amount.
+    # Stripe prices are stored as VAT-inclusive gross amounts (Â£300 / Â£24).
+    # OrderFlow commercial pricing remains Â£250 / Â£20 + 20% VAT internally,
+    # so derive the accounting split from the gross amount actually paid.
     net = round(gross / (1 + VAT_RATE), 2) if gross else 0
     vat = round(gross - net, 2)
     paid_at = date.today().isoformat()
@@ -799,7 +799,6 @@ def sync_stripe_subscription_quantities(organisation_id, contracted_sites, contr
         return
     base_price_id = (sub.get("stripe_base_price_id") or os.environ.get("STRIPE_BASE_PRICE_ID", "")).strip()
     extra_price_id = (sub.get("stripe_extra_price_id") or os.environ.get("STRIPE_EXTRA_USER_PRICE_ID", "")).strip()
-    vat_tax_rate_id = os.environ.get("STRIPE_VAT_TAX_RATE_ID", "").strip()
     included_per_site = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE)
     included_capacity = included_per_site * int(contracted_sites)
     extra_quantity = max(0, int(contracted_users) - included_capacity)
@@ -834,8 +833,6 @@ def sync_stripe_subscription_quantities(organisation_id, contracted_sites, contr
                 "quantity": str(extra_quantity),
                 "proration_behavior": "create_prorations",
             }
-            if vat_tax_rate_id:
-                data["tax_rates[0]"] = vat_tax_rate_id
             stripe_request("POST", "/subscription_items", data)
     elif extra_item:
         stripe_request("DELETE", "/subscription_items/" + str(extra_item["id"]), {
@@ -1116,7 +1113,6 @@ def subscribe():
             try:
                 base_price_id = os.environ.get("STRIPE_BASE_PRICE_ID", "").strip()
                 extra_price_id = os.environ.get("STRIPE_EXTRA_USER_PRICE_ID", "").strip()
-                vat_tax_rate_id = os.environ.get("STRIPE_VAT_TAX_RATE_ID", "").strip()
                 success_url = request.url_root.rstrip("/") + "/subscription/success?session_id={CHECKOUT_SESSION_ID}"
                 cancel_url = request.url_root.rstrip("/") + "/subscribe"
                 data = {
@@ -1132,13 +1128,11 @@ def subscribe():
                     "subscription_data[metadata][organisation_id]": str(organisation_id),
                     "line_items[0][price]": base_price_id,
                     "line_items[0][quantity]": str(pricing["billable_sites"]),
-                    "line_items[0][tax_rates][0]": vat_tax_rate_id,
                 }
                 if pricing["extra_users"] > 0:
                     data.update({
                         "line_items[1][price]": extra_price_id,
                         "line_items[1][quantity]": str(pricing["extra_users"]),
-                        "line_items[1][tax_rates][0]": vat_tax_rate_id,
                     })
                 checkout = stripe_request("POST", "/checkout/sessions", data)
                 execute(
