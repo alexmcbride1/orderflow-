@@ -1,642 +1,478 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>OrderFlow — Create your account</title>
-
-    <style>
-        :root {
-            --dark: #0e211a;
-            --green: #2f765d;
-            --green-dark: #1d5a47;
-            --background: #f4f7f5;
-            --white: #ffffff;
-            --text: #17221e;
-            --muted: #71807a;
-            --border: #dfe8e2;
-            --error-bg: #fff1f0;
-            --error-text: #a33f38;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
-        }
-
-        body {
-            background: var(--background);
-            color: var(--text);
-
-            font-family:
-                Inter,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Helvetica,
-                Arial,
-                sans-serif;
-
-            min-height: 100vh;
-            padding: 30px 18px;
-        }
-
-        .page {
-            width: 100%;
-            max-width: 620px;
-            margin: 0 auto;
-        }
-
-        .brand {
-            text-align: center;
-            margin-bottom: 26px;
-        }
-
-        .logo {
-            font-size: 38px;
-            line-height: 1;
-            font-weight: 900;
-            letter-spacing: -2px;
-            color: var(--text);
-        }
-
-        .logo span {
-            color: var(--green);
-        }
-
-        .tagline {
-            margin-top: 10px;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(23, 56, 45, 0.10);
-        }
-
-        .heading {
-            margin-bottom: 25px;
-        }
-
-        .eyebrow {
-            color: var(--green);
-            font-size: 11px;
-            font-weight: 850;
-            text-transform: uppercase;
-            letter-spacing: 1.6px;
-            margin-bottom: 8px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 30px;
-            line-height: 1.1;
-            letter-spacing: -1px;
-            font-weight: 850;
-        }
-
-        .intro {
-            margin: 9px 0 0;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .section-title {
-            margin-top: 26px;
-            margin-bottom: 15px;
-            padding-top: 22px;
-            border-top: 1px solid var(--border);
-
-            font-size: 15px;
-            font-weight: 850;
-            color: var(--dark);
-        }
-
-        .error {
-            background: var(--error-bg);
-            border: 1px solid #f1cbc7;
-            color: var(--error-text);
-
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 18px;
-
-            font-size: 13px;
-            font-weight: 650;
-            line-height: 1.4;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .full {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-
-            font-size: 13px;
-            font-weight: 750;
-            color: var(--text);
-        }
-
-        .hint {
-            display: block;
-            margin-top: 6px;
-
-            color: var(--muted);
-            font-size: 11px;
-            line-height: 1.4;
-        }
-
-        input,
-        select {
-            width: 100%;
-            height: 50px;
-
-            padding: 0 14px;
-
-            border: 1px solid var(--border);
-            border-radius: 12px;
-
-            background: #fbfcfb;
-            color: var(--text);
-
-            font-size: 15px;
-            outline: none;
-
-            transition:
-                border-color 0.15s ease,
-                box-shadow 0.15s ease,
-                background 0.15s ease;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 90px;
-
-            padding: 13px 14px;
-
-            border: 1px solid var(--border);
-            border-radius: 12px;
-
-            background: #fbfcfb;
-            color: var(--text);
-
-            font-family: inherit;
-            font-size: 15px;
-
-            resize: vertical;
-            outline: none;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            background: #ffffff;
-            border-color: var(--green);
-            box-shadow: 0 0 0 4px rgba(47, 118, 93, 0.12);
-        }
-
-        input::placeholder,
-        textarea::placeholder {
-            color: #9aa59f;
-        }
-
-        .password-wrapper {
-            position: relative;
-        }
-
-        .password-wrapper input {
-            padding-right: 82px;
-        }
-
-        .show-password {
-            position: absolute;
-
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-
-            border: 0;
-            background: transparent;
-
-            color: var(--green-dark);
-
-            font-size: 12px;
-            font-weight: 800;
-
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .show-password:hover {
-            color: var(--dark);
-        }
-
-        .requirements {
-            background: #f5f8f6;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-
-            padding: 12px 14px;
-            margin-top: 8px;
-
-            color: var(--muted);
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
-        .requirements strong {
-            color: var(--dark);
-        }
-
-        .submit {
-            width: 100%;
-            height: 55px;
-
-            margin-top: 8px;
-
-            border: 0;
-            border-radius: 13px;
-
-            background: var(--dark);
-            color: #ffffff;
-
-            font-size: 15px;
-            font-weight: 800;
-
-            cursor: pointer;
-
-            transition:
-                transform 0.15s ease,
-                background 0.15s ease,
-                box-shadow 0.15s ease;
-        }
-
-        .submit:hover {
-            background: var(--green-dark);
-            box-shadow: 0 8px 24px rgba(14, 33, 26, 0.18);
-        }
-
-        .submit:active {
-            transform: translateY(1px);
-        }
-
-        .login {
-            text-align: center;
-            margin-top: 20px;
-
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .login a {
-            color: var(--green-dark);
-            font-weight: 800;
-            text-decoration: none;
-        }
-
-        .login a:hover {
-            text-decoration: underline;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-
-            color: var(--muted);
-            font-size: 11px;
-        }
-
-        @media (max-width: 600px) {
-
-            body {
-                padding: 18px 12px;
-            }
-
-            .card {
-                padding: 23px 18px;
-                border-radius: 20px;
-            }
-
-            .logo {
-                font-size: 34px;
-            }
-
-            h1 {
-                font-size: 27px;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .full {
-                grid-column: auto;
-            }
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Create your business | Alport Hospitality Solutions</title>
+
+<style>
+:root{
+    --green:#173d32;
+    --green-light:#285c4b;
+    --cream:#f5f1e8;
+    --white:#ffffff;
+    --text:#17211d;
+    --muted:#748079;
+    --line:#dde5df;
+    --gold:#a88a58;
+    --red:#9b4038;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:
+        linear-gradient(
+            135deg,
+            #102b23 0%,
+            #173d32 44%,
+            #f3f1eb 44%,
+            #f7f6f2 100%
+        );
+    color:var(--text);
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    display:grid;
+    place-items:center;
+    padding:30px 20px;
+}
+
+.wrap{
+    width:min(720px,100%);
+}
+
+.brand{
+    text-align:center;
+    color:white;
+    margin-bottom:24px;
+}
+
+.brand-mark{
+    width:70px;
+    height:70px;
+    margin:0 auto 13px;
+    display:block;
+}
+
+.brand-name{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:30px;
+    font-weight:600;
+    letter-spacing:5px;
+    line-height:1;
+}
+
+.brand-sub{
+    margin-top:8px;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    opacity:.82;
+}
+
+.brand-line{
+    width:48px;
+    height:1px;
+    background:var(--gold);
+    margin:13px auto;
+}
+
+.brand-motto{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.card{
+    background:rgba(255,255,255,.98);
+    border-radius:22px;
+    padding:32px;
+    box-shadow:0 24px 75px rgba(5,20,14,.22);
+}
+
+.eyebrow{
+    color:var(--green);
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+}
+
+h1{
+    margin:8px 0 7px;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:32px;
+    font-weight:500;
+    color:var(--green);
+}
+
+.intro{
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.6;
+    margin:0 0 24px;
+}
+
+.error{
+    margin-bottom:18px;
+    padding:11px 13px;
+    border:1px solid #efd2ce;
+    border-radius:10px;
+    background:#f8e9e7;
+    color:var(--red);
+    font-size:12px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.field{
+    display:grid;
+    gap:6px;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+label{
+    color:#405049;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.3px;
+}
+
+input,
+select{
+    width:100%;
+    padding:13px 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    color:var(--text);
+    font:inherit;
+    font-size:14px;
+    outline:none;
+}
+
+input:focus,
+select:focus{
+    border-color:var(--green-light);
+    box-shadow:0 0 0 3px rgba(23,61,50,.08);
+}
+
+button{
+    grid-column:1/-1;
+    width:100%;
+    margin-top:5px;
+    padding:14px 16px;
+    border:0;
+    border-radius:10px;
+    background:var(--green);
+    color:#fff;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.3px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:var(--green-light);
+}
+
+.signin{
+    display:block;
+    margin-top:19px;
+    text-align:center;
+    color:var(--green);
+    font-size:11px;
+    font-weight:700;
+    text-decoration:none;
+}
+
+.signin:hover{
+    text-decoration:underline;
+}
+
+.legal{
+    margin-top:18px;
+    padding-top:17px;
+    border-top:1px solid #edf0ee;
+    text-align:center;
+    color:var(--muted);
+    font-size:9px;
+    line-height:1.6;
+}
+
+.legal a{
+    color:var(--green);
+    text-decoration:none;
+    font-weight:700;
+}
+
+.footer{
+    margin-top:18px;
+    color:rgba(255,255,255,.72);
+    text-align:center;
+    font-size:9px;
+}
+
+@media(max-width:650px){
+
+    body{
+        background:#f4f4ef;
+        padding:20px 13px;
+    }
+
+    .brand{
+        color:var(--green);
+    }
+
+    .card{
+        padding:24px 19px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full,
+    button{
+        grid-column:auto;
+    }
+
+    h1{
+        font-size:28px;
+    }
+
+    .footer{
+        color:var(--muted);
+    }
+}
+</style>
 </head>
 
 <body>
 
-<div class="page">
+<div class="wrap">
 
     <div class="brand">
 
-        <div class="logo">
-            ORDER<span>FLOW</span>
+        <svg
+            class="brand-mark"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Alport Hospitality Solutions"
+        >
+            <circle
+                cx="50"
+                cy="50"
+                r="46"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+            />
+
+            <path
+                d="M18 62
+                   C28 56,35 54,44 55
+                   C54 56,61 61,70 60
+                   C76 59,81 56,84 54"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+            />
+
+            <path
+                d="M18 69
+                   C30 63,40 62,49 64
+                   C60 67,70 67,84 61"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+            />
+
+            <path
+                d="M25 55
+                   L38 39
+                   L47 49
+                   L57 35
+                   L76 56"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+
+            <circle
+                cx="69"
+                cy="31"
+                r="4"
+                fill="currentColor"
+            />
+        </svg>
+
+        <div class="brand-name">ALPORT</div>
+
+        <div class="brand-sub">
+            Hospitality Solutions
         </div>
 
-        <div class="tagline">
-            Hospitality management, simplified.
+        <div class="brand-line"></div>
+
+        <div class="brand-motto">
+            People &nbsp; Process &nbsp; Profit
         </div>
 
     </div>
 
     <div class="card">
 
-        <div class="heading">
-
-            <div class="eyebrow">
-                Get started
-            </div>
-
-            <h1>
-                Create your OrderFlow account
-            </h1>
-
-            <p class="intro">
-                Set up your business and your first location. You can add more
-                locations and team members once you're inside OrderFlow.
-            </p>
-
+        <div class="eyebrow">
+            Get started
         </div>
 
+        <h1>Create your business</h1>
+
+        <p class="intro">
+            Set up your hospitality business and first venue.
+            You can add further sites, users and operational information
+            from within Alport.
+        </p>
+
         {% if error %}
-            <div class="error">
-                {{ error }}
-            </div>
+        <div class="error">
+            {{ error }}
+        </div>
         {% endif %}
 
-        <form method="POST" action="/onboarding">
+        <form class="form-grid" method="post">
 
-            <div class="section-title">
-                Your business
+            <div class="field full">
+                <label for="business_name">BUSINESS NAME</label>
+
+                <input
+                    id="business_name"
+                    name="business_name"
+                    placeholder="Your business or company"
+                    required
+                >
             </div>
 
-            <div class="grid">
+            <div class="field">
+                <label for="business_type">BUSINESS TYPE</label>
 
-                <div class="form-group full">
-
-                    <label for="business_name">
-                        Business name
-                    </label>
-
-                    <input
-                        id="business_name"
-                        name="business_name"
-                        type="text"
-                        placeholder="e.g. The Oak & Crown"
-                        autocomplete="organization"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="business_type">
-                        Business type
-                    </label>
-
-                    <select
-                        id="business_type"
-                        name="business_type"
-                        required
-                    >
-                        <option value="Restaurant">
-                            Restaurant
-                        </option>
-
-                        <option value="Pub">
-                            Pub
-                        </option>
-
-                        <option value="Hotel">
-                            Hotel
-                        </option>
-
-                        <option value="Bar">
-                            Bar
-                        </option>
-
-                        <option value="Cafe">
-                            Café
-                        </option>
-
-                        <option value="Restaurant & Pub">
-                            Restaurant & Pub
-                        </option>
-
-                        <option value="Hospitality Group">
-                            Hospitality Group
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="site_name">
-                        First location
-                    </label>
-
-                    <input
-                        id="site_name"
-                        name="site_name"
-                        type="text"
-                        placeholder="e.g. Derby City Centre"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group full">
-
-                    <label for="address">
-                        Business address
-                    </label>
-
-                    <textarea
-                        id="address"
-                        name="address"
-                        placeholder="Enter the address of your first location"
-                        autocomplete="street-address"
-                    ></textarea>
-
-                </div>
-
+                <select
+                    id="business_type"
+                    name="business_type"
+                >
+                    <option>Pub</option>
+                    <option>Restaurant</option>
+                    <option>Hotel</option>
+                    <option>Bar</option>
+                    <option>Café</option>
+                    <option>Hospitality Group</option>
+                </select>
             </div>
 
+            <div class="field">
+                <label for="site_name">FIRST SITE / VENUE</label>
 
-            <div class="section-title">
-                Owner account
+                <input
+                    id="site_name"
+                    name="site_name"
+                    placeholder="Main site"
+                    required
+                >
             </div>
 
-            <div class="grid">
+            <div class="field full">
+                <label for="address">VENUE ADDRESS</label>
 
-                <div class="form-group">
-
-                    <label for="owner_name">
-                        Your name
-                    </label>
-
-                    <input
-                        id="owner_name"
-                        name="owner_name"
-                        type="text"
-                        placeholder="Your full name"
-                        autocomplete="name"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="email">
-                        Email address
-                    </label>
-
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        placeholder="you@example.com"
-                        autocomplete="email"
-                        autocapitalize="none"
-                        spellcheck="false"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group full">
-
-                    <label for="password">
-                        Password
-                    </label>
-
-                    <div class="password-wrapper">
-
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            placeholder="Create a secure password"
-                            autocomplete="new-password"
-                            minlength="8"
-                            required
-                        >
-
-                        <button
-                            type="button"
-                            class="show-password"
-                            id="passwordToggle"
-                            onclick="togglePassword()"
-                        >
-                            Show
-                        </button>
-
-                    </div>
-
-                    <div class="requirements">
-                        <strong>Password requirement:</strong>
-                        your password must contain at least 8 characters.
-                    </div>
-
-                </div>
-
+                <input
+                    id="address"
+                    name="address"
+                    placeholder="Venue address"
+                >
             </div>
 
+            <div class="field">
+                <label for="owner_name">YOUR NAME</label>
 
-            <button
-                type="submit"
-                class="submit"
-            >
-                Create OrderFlow account
+                <input
+                    id="owner_name"
+                    name="owner_name"
+                    autocomplete="name"
+                    required
+                >
+            </div>
+
+            <div class="field">
+                <label for="email">EMAIL ADDRESS</label>
+
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="field full">
+                <label for="password">PASSWORD</label>
+
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <button type="submit">
+                Create Alport business
             </button>
 
         </form>
 
-        <div class="login">
-            Already have an account?
-            <a href="/login">Sign in</a>
+        <a class="signin" href="/login">
+            Already have an account? Sign in
+        </a>
+
+        <div class="legal">
+            By creating an account, you acknowledge that information
+            submitted to Alport Hospitality Solutions will be handled
+            in accordance with our
+            <a href="/privacy">Privacy Policy</a>.
         </div>
 
     </div>
 
     <div class="footer">
-        OrderFlow · Hospitality management platform
+        &copy; Alport Hospitality Solutions &nbsp; | &nbsp;
+        People &nbsp; Process &nbsp; Profit
     </div>
 
 </div>
-
-
-<script>
-
-function togglePassword() {
-
-    const password =
-        document.getElementById("password");
-
-    const toggle =
-        document.getElementById("passwordToggle");
-
-    if (password.type === "password") {
-
-        password.type = "text";
-        toggle.textContent = "Hide";
-
-    } else {
-
-        password.type = "password";
-        toggle.textContent = "Show";
-
-    }
-}
-
-</script>
 
 </body>
 </html>
