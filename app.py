@@ -33,6 +33,15 @@ app.config.update(
 )
 
 
+# Public privacy-policy identity. Set these in Render before public launch.
+PRIVACY_LEGAL_NAME = os.environ.get("PRIVACY_LEGAL_NAME", "Alport Hospitality Solutions")
+PRIVACY_TRADING_NAME = os.environ.get("PRIVACY_TRADING_NAME", "Alport Hospitality Solutions")
+PRIVACY_EMAIL = os.environ.get("PRIVACY_EMAIL", "")
+PRIVACY_ADDRESS = os.environ.get("PRIVACY_ADDRESS", "")
+PRIVACY_ICO_NUMBER = os.environ.get("PRIVACY_ICO_NUMBER", "")
+PRIVACY_EFFECTIVE_DATE = os.environ.get("PRIVACY_EFFECTIVE_DATE", "10 September 2026")
+
+
 def conn():
     return psycopg.connect(
         DATABASE_URL,
@@ -74,7 +83,7 @@ def now():
 
 
 # -----------------------------------------------------------------------------
-# ORDERFLOW SaaS PRICING / STRIPE BILLING
+# ALPORT SaaS PRICING / STRIPE BILLING
 # -----------------------------------------------------------------------------
 BASE_PRICE_PER_SITE = 250.0
 INCLUDED_USERS_PER_SITE = 3
@@ -205,7 +214,7 @@ def record_stripe_payment(organisation_id, invoice):
     total_pence = int(invoice.get("amount_paid") or invoice.get("total") or 0)
     gross = round(total_pence / 100.0, 2)
     # Stripe prices are stored as VAT-inclusive gross amounts (Â£300 / Â£24).
-    # OrderFlow commercial pricing remains Â£250 / Â£20 + 20% VAT internally,
+    # Alport Hospitality Solutions commercial pricing remains Â£250 / Â£20 + 20% VAT internally,
     # so derive the accounting split from the gross amount actually paid.
     net = round(gross / (1 + VAT_RATE), 2) if gross else 0
     vat = round(gross - net, 2)
@@ -234,7 +243,7 @@ def activate_contract_from_checkout(organisation_id, checkout):
            stripe_checkout_session_id=?,stripe_base_price_id=?,stripe_extra_price_id=?,past_due_since='',
            last_payment_status='Paid',last_payment_at=? WHERE organisation_id=?""",
         (
-            "OrderFlow Restaurant", p["net"], start.isoformat(), end.isoformat(), CONTRACT_MONTHS,
+            "Alport Hospitality Solutions", p["net"], start.isoformat(), end.isoformat(), CONTRACT_MONTHS,
             p["billable_sites"], p["billable_users"], customer_id, subscription_id, session_id,
             base_price_id, extra_price_id, now(), organisation_id,
         ),
@@ -757,7 +766,7 @@ def manager_required(fn):
 
 
 def account_admin_required(fn):
-    """Only organisation owners/admins can manage paid OrderFlow login licences."""
+    """Only organisation owners/admins can manage paid Alport Hospitality Solutions login licences."""
     @wraps(fn)
     def wrapped(*args, **kwargs):
         u = user()
@@ -960,6 +969,20 @@ def finance_summary(month=None):
     }
 
 
+@app.get("/privacy")
+@app.get("/privacy-policy")
+def privacy_policy():
+    return render_template(
+        "privacy.html",
+        legal_name=PRIVACY_LEGAL_NAME,
+        trading_name=PRIVACY_TRADING_NAME,
+        privacy_email=PRIVACY_EMAIL,
+        privacy_address=PRIVACY_ADDRESS,
+        ico_number=PRIVACY_ICO_NUMBER,
+        effective_date=PRIVACY_EFFECTIVE_DATE,
+    )
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -973,7 +996,7 @@ def login():
         if u and check_password_hash(u["password_hash"], password):
             sub = subscription_for(u["organisation_id"])
             if subscription_blocks_access(sub):
-                return render_template("login.html", error="This OrderFlow account is currently suspended because the subscription is not in good standing. Please contact OrderFlow support."), 403
+                return render_template("login.html", error="This Alport Hospitality Solutions account is currently suspended because the subscription is not in good standing. Please contact Alport Hospitality Solutions support."), 403
             session.clear()
             session["user_id"] = u["id"]
             s = q(
@@ -1033,7 +1056,7 @@ def onboarding():
                            VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                            ON CONFLICT (organisation_id) DO NOTHING""",
                         (
-                            organisation_id, "OrderFlow Restaurant", BASE_PRICE_PER_SITE,
+                            organisation_id, "Alport Hospitality Solutions", BASE_PRICE_PER_SITE,
                             "Payment required", now(), BASE_PRICE_PER_SITE, INCLUDED_USERS_PER_SITE,
                             EXTRA_USER_PRICE, VAT_RATE, CONTRACT_MONTHS, 1, 3, email,
                         ),
@@ -1106,7 +1129,7 @@ def subscribe():
             error = "Incorrect company admin email or password."
 
         elif not stripe_configured():
-            error = "Online billing is not fully configured yet. Please contact OrderFlow."
+            error = "Online billing is not fully configured yet. Please contact Alport Hospitality Solutions."
         elif request.form.get("accept_contract") != "yes":
             error = "You must accept the 12-month minimum-term agreement to continue."
         else:
@@ -1369,7 +1392,7 @@ def add_login_user():
 
     existing = q("SELECT id,active FROM users WHERE organisation_id=? AND lower(email)=?", (organisation_id, email), True)
     if existing:
-        return jsonify(error="That email already belongs to an OrderFlow user for this restaurant."), 409
+        return jsonify(error="That email already belongs to an Alport Hospitality Solutions user for this restaurant."), 409
     try:
         user_id = execute(
             """INSERT INTO users(organisation_id,name,email,password_hash,role,active,created_at)
@@ -1379,7 +1402,7 @@ def add_login_user():
     except psycopg.IntegrityError:
         return jsonify(error="That email is already registered."), 409
     audit("Created", "login_user", user_id, f"{name} Â· {role}")
-    company_event("OrderFlow user added", f"{name} Â· {email}", organisation_id)
+    company_event("Alport Hospitality Solutions user added", f"{name} Â· {email}", organisation_id)
     return jsonify(ok=True, id=user_id)
 
 
@@ -1399,7 +1422,7 @@ def deactivate_login_user(user_id):
             return jsonify(error="The organisation must keep at least one active Owner."), 400
     execute("UPDATE users SET active=0 WHERE id=? AND organisation_id=?", (user_id, u["organisation_id"]))
     audit("Deactivated", "login_user", user_id, target["email"])
-    company_event("OrderFlow user deactivated", target["email"], u["organisation_id"])
+    company_event("Alport Hospitality Solutions user deactivated", target["email"], u["organisation_id"])
     return jsonify(ok=True, message="User deactivated. Contracted licence quantity is unchanged during the minimum term.")
 
 
@@ -1418,7 +1441,7 @@ def activate_login_user(user_id):
         return jsonify(error="All purchased user licences are in use.", upgrade_required=True), 409
     execute("UPDATE users SET active=1 WHERE id=? AND organisation_id=?", (user_id, u["organisation_id"]))
     audit("Activated", "login_user", user_id, target["email"])
-    company_event("OrderFlow user reactivated", target["email"], u["organisation_id"])
+    company_event("Alport Hospitality Solutions user reactivated", target["email"], u["organisation_id"])
     return jsonify(ok=True)
 
 
@@ -2354,11 +2377,11 @@ ALLERGENS_14 = [
     "Molluscs", "Mustard", "Nuts", "Peanuts", "Sesame", "Soya", "Sulphur dioxide and sulphites"
 ]
 TEMP_PRESETS = {
-    "Chilled storage": {"max": 8.0, "note": "Legal maximum for foods subject to chill holding requirements in England; OrderFlow recommends operating fridges at 5Â°C or below."},
+    "Chilled storage": {"max": 8.0, "note": "Legal maximum for foods subject to chill holding requirements in England; Alport Hospitality Solutions recommends operating fridges at 5Â°C or below."},
     "Freezer": {"max": -18.0, "note": "FSA recommended operating target for frozen food; set your documented safe method if different."},
     "Hot holding": {"min": 63.0, "note": "Legal hot-holding minimum in England, subject to applicable exemptions/time controls."},
-    "Cooking": {"min": 70.0, "note": "Default OrderFlow verification target only. Record the time/temperature combination required by your documented safe method."},
-    "Reheating": {"min": 70.0, "note": "Default OrderFlow verification target only. Food must be reheated thoroughly; use the limit in your documented safe method."},
+    "Cooking": {"min": 70.0, "note": "Default Alport Hospitality Solutions verification target only. Record the time/temperature combination required by your documented safe method."},
+    "Reheating": {"min": 70.0, "note": "Default Alport Hospitality Solutions verification target only. Food must be reheated thoroughly; use the limit in your documented safe method."},
     "Delivery chilled": {"max": 8.0, "note": "Use supplier/product requirements where stricter; foods subject to chill holding requirements must remain at 8Â°C or below."},
     "Cooling": {"note": "No single universal statutory endpoint is imposed here; record the method and target in your HACCP/SFBB safe method."},
     "Other": {"note": "Use the limits defined in your site food-safety management system."},
@@ -2602,7 +2625,7 @@ def health():
         database_ok = False
     return jsonify(
         status="ok" if database_ok else "database_error",
-        service="OrderFlow",
+        service="Alport",
         database="PostgreSQL",
         database_connected=database_ok,
     ), (200 if database_ok else 503)
@@ -2798,7 +2821,7 @@ def delete_event(event_id):
 
 
 # -----------------------------------------------------------------------------
-# ORDERFLOW COMPANY ADMIN (HQ)
+# ALPORT COMPANY ADMIN (HQ)
 # -----------------------------------------------------------------------------
 
 def company_admin_logged_in():
@@ -2852,7 +2875,7 @@ def company_admin_logout():
 @app.get("/company-admin")
 @company_admin_required
 def company_admin_home():
-    return render_template("company_admin.html", admin_email=session.get("company_admin_email", "OrderFlow Admin"))
+    return render_template("company_admin.html", admin_email=session.get("company_admin_email", "Alport Hospitality Solutions Admin"))
 
 
 @app.get("/api/company-admin/overview")
