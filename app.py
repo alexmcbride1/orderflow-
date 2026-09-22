@@ -541,6 +541,131 @@ CREATE TABLE IF NOT EXISTS subscription_payments(
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS booking_settings(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL UNIQUE,
+    booking_interval INTEGER NOT NULL DEFAULT 15,
+    default_duration INTEGER NOT NULL DEFAULT 120,
+    turnaround_minutes INTEGER NOT NULL DEFAULT 15,
+    max_party_size INTEGER NOT NULL DEFAULT 12,
+    max_covers_per_interval INTEGER NOT NULL DEFAULT 24,
+    min_notice_minutes INTEGER NOT NULL DEFAULT 60,
+    advance_days INTEGER NOT NULL DEFAULT 90,
+    review_delay_hours INTEGER NOT NULL DEFAULT 3,
+    lapsed_guest_weeks INTEGER NOT NULL DEFAULT 6,
+    confirmation_enabled INTEGER NOT NULL DEFAULT 1,
+    reminder_enabled INTEGER NOT NULL DEFAULT 1,
+    review_enabled INTEGER NOT NULL DEFAULT 1,
+    retention_enabled INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS booking_sessions(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    day_of_week INTEGER NOT NULL,
+    name TEXT NOT NULL DEFAULT 'Dinner',
+    start_time TEXT NOT NULL,
+    end_time TEXT NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS restaurant_tables(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    table_name TEXT NOT NULL,
+    area TEXT NOT NULL DEFAULT 'Main',
+    min_capacity INTEGER NOT NULL DEFAULT 1,
+    max_capacity INTEGER NOT NULL DEFAULT 2,
+    active INTEGER NOT NULL DEFAULT 1,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(site_id,table_name),
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS guests(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT DEFAULT '',
+    phone TEXT DEFAULT '',
+    marketing_consent INTEGER NOT NULL DEFAULT 0,
+    marketing_opt_out_at TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS bookings(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    guest_id BIGINT,
+    booking_date TEXT NOT NULL,
+    booking_time TEXT NOT NULL,
+    party_size INTEGER NOT NULL,
+    duration_minutes INTEGER NOT NULL DEFAULT 120,
+    status TEXT NOT NULL DEFAULT 'Confirmed',
+    source TEXT NOT NULL DEFAULT 'Manager',
+    table_id BIGINT,
+    guest_name TEXT NOT NULL,
+    guest_email TEXT DEFAULT '',
+    guest_phone TEXT DEFAULT '',
+    special_requests TEXT DEFAULT '',
+    dietary_requirements TEXT DEFAULT '',
+    internal_notes TEXT DEFAULT '',
+    marketing_consent INTEGER NOT NULL DEFAULT 0,
+    confirmation_sent_at TEXT DEFAULT '',
+    reminder_sent_at TEXT DEFAULT '',
+    review_sent_at TEXT DEFAULT '',
+    arrived_at TEXT DEFAULT '',
+    seated_at TEXT DEFAULT '',
+    completed_at TEXT DEFAULT '',
+    cancelled_at TEXT DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY(organisation_id) REFERENCES organisations(id) ON DELETE CASCADE,
+    FOREIGN KEY(site_id) REFERENCES sites(id) ON DELETE CASCADE,
+    FOREIGN KEY(guest_id) REFERENCES guests(id) ON DELETE SET NULL,
+    FOREIGN KEY(table_id) REFERENCES restaurant_tables(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS guest_feedback(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    booking_id BIGINT NOT NULL,
+    guest_id BIGINT,
+    overall_rating INTEGER NOT NULL,
+    food_rating INTEGER,
+    service_rating INTEGER,
+    atmosphere_rating INTEGER,
+    value_rating INTEGER,
+    comments TEXT DEFAULT '',
+    manager_status TEXT NOT NULL DEFAULT 'New',
+    created_at TEXT NOT NULL,
+    FOREIGN KEY(booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
+    FOREIGN KEY(guest_id) REFERENCES guests(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS guest_communications(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    guest_id BIGINT,
+    booking_id BIGINT,
+    communication_type TEXT NOT NULL,
+    recipient TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    status TEXT NOT NULL,
+    provider_id TEXT DEFAULT '',
+    sent_at TEXT NOT NULL,
+    FOREIGN KEY(guest_id) REFERENCES guests(id) ON DELETE SET NULL,
+    FOREIGN KEY(booking_id) REFERENCES bookings(id) ON DELETE SET NULL
+);
 CREATE TABLE IF NOT EXISTS company_events(
     id BIGSERIAL PRIMARY KEY,
     organisation_id BIGINT,
@@ -1209,6 +1334,89 @@ def stripe_webhook():
         return jsonify(received=True)
     except Exception as exc:
         return jsonify(error=str(exc)), 400
+
+
+def send_alport_email(to_email, subject, text_body):
+    """Send transactional/CRM email through the already configured Resend account."""
+    resend_key = os.environ.get("RESEND_API_KEY", "").strip()
+    from_email = os.environ.get("SUPPORT_FROM_EMAIL", "").strip()
+    if not resend_key or not from_email or not to_email:
+        return {"ok": False, "id": "", "error": "Email is not configured"}
+    try:
+        r = requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
+            json={"from": from_email, "to": [to_email], "subject": subject, "text": text_body},
+            timeout=20,
+        )
+        payload = r.json() if r.content else {}
+        return {"ok": bool(r.ok), "id": str(payload.get("id") or ""), "error": "" if r.ok else str(payload)}
+    except Exception as exc:
+        return {"ok": False, "id": "", "error": str(exc)}
+
+
+def booking_settings_for(organisation_id, site_id):
+    row = q("SELECT * FROM booking_settings WHERE organisation_id=? AND site_id=?", (organisation_id, site_id), True)
+    if row:
+        return row
+    execute("""INSERT INTO booking_settings(organisation_id,site_id,updated_at) VALUES(?,?,?)""", (organisation_id, site_id, now()))
+    return q("SELECT * FROM booking_settings WHERE organisation_id=? AND site_id=?", (organisation_id, site_id), True)
+
+
+def minutes_of(value):
+    try:
+        h, m = str(value)[:5].split(":")
+        return int(h) * 60 + int(m)
+    except Exception:
+        return 0
+
+
+def hhmm(total):
+    total = int(total) % 1440
+    return f"{total//60:02d}:{total%60:02d}"
+
+
+def booking_available_tables(organisation_id, site_id, booking_date, booking_time, party_size, duration_minutes, exclude_booking_id=None):
+    settings = booking_settings_for(organisation_id, site_id)
+    start = minutes_of(booking_time)
+    end = start + int(duration_minutes) + int(settings.get("turnaround_minutes") or 0)
+    tables = q("""SELECT * FROM restaurant_tables WHERE organisation_id=? AND site_id=? AND active=1
+                  AND min_capacity<=? AND max_capacity>=? ORDER BY max_capacity ASC,sort_order,table_name""",
+               (organisation_id, site_id, party_size, party_size))
+    existing = q("""SELECT id,table_id,booking_time,duration_minutes FROM bookings
+                    WHERE organisation_id=? AND site_id=? AND booking_date=?
+                    AND status NOT IN ('Cancelled','No-show') AND table_id IS NOT NULL""",
+                 (organisation_id, site_id, booking_date))
+    available = []
+    for table in tables:
+        clash = False
+        for b in existing:
+            if exclude_booking_id and int(b["id"]) == int(exclude_booking_id):
+                continue
+            if int(b["table_id"]) != int(table["id"]):
+                continue
+            bstart = minutes_of(b["booking_time"])
+            bend = bstart + int(b["duration_minutes"] or 120) + int(settings.get("turnaround_minutes") or 0)
+            if start < bend and bstart < end:
+                clash = True
+                break
+        if not clash:
+            available.append(dict(table))
+    return available
+
+
+def upsert_guest(organisation_id, name, email, phone, marketing_consent=False):
+    guest = None
+    if email:
+        guest = q("SELECT * FROM guests WHERE organisation_id=? AND lower(email)=lower(?) ORDER BY id LIMIT 1", (organisation_id, email), True)
+    if not guest and phone:
+        guest = q("SELECT * FROM guests WHERE organisation_id=? AND phone=? ORDER BY id LIMIT 1", (organisation_id, phone), True)
+    if guest:
+        execute("""UPDATE guests SET name=?,email=?,phone=?,marketing_consent=CASE WHEN ?=1 THEN 1 ELSE marketing_consent END,updated_at=? WHERE id=?""",
+                (name, email, phone, 1 if marketing_consent else 0, now(), guest["id"]))
+        return guest["id"]
+    return execute("""INSERT INTO guests(organisation_id,name,email,phone,marketing_consent,created_at,updated_at) VALUES(?,?,?,?,?,?,?)""",
+                   (organisation_id, name, email, phone, 1 if marketing_consent else 0, now(), now()))
 
 
 @app.get("/")
@@ -2541,6 +2749,244 @@ def eho_audit_pack():
     for r in records:
         x=dict(r); x["metadata"]=_json_load(x.pop("metadata_json","{}")); rec_out.append(x)
     return jsonify(site=dict(site),organisation=dict(org()),start=start,end=end,daily_checks=daily_out,temperatures=[dict(x) for x in temps],records=rec_out,reviews=[dict(x) for x in reviews])
+
+
+# -----------------------------------------------------------------------------
+# ALPORT RESERVATIONS + GUEST CRM
+# -----------------------------------------------------------------------------
+@app.get("/api/bookings/overview")
+@login_required
+def bookings_overview():
+    u, site = user(), current_site()
+    day = request.args.get("date") or date.today().isoformat()
+    rows = q("""SELECT b.*,rt.table_name FROM bookings b LEFT JOIN restaurant_tables rt ON rt.id=b.table_id
+                WHERE b.organisation_id=? AND b.site_id=? AND b.booking_date=? ORDER BY b.booking_time,b.guest_name""",
+             (u["organisation_id"], site["id"], day))
+    active = [dict(x) for x in rows if x["status"] not in ("Cancelled", "No-show")]
+    covers = sum(int(x["party_size"] or 0) for x in active)
+    peak = {}
+    for x in active:
+        slot = str(x["booking_time"])[:5]
+        peak[slot] = peak.get(slot, 0) + int(x["party_size"] or 0)
+    peak_time = max(peak, key=peak.get) if peak else "â"
+    return jsonify(date=day, bookings=[dict(x) for x in rows], covers=covers, booking_count=len(active), peak_time=peak_time, peak_covers=peak.get(peak_time,0) if peak else 0)
+
+
+@app.post("/api/bookings")
+@login_required
+@manager_required
+def create_booking():
+    u, site = user(), current_site()
+    d = request.get_json() or {}
+    name = (d.get("guest_name") or "").strip()
+    email = (d.get("guest_email") or "").strip().lower()
+    phone = (d.get("guest_phone") or "").strip()
+    booking_date = str(d.get("booking_date") or "")[:10]
+    booking_time = str(d.get("booking_time") or "")[:5]
+    try:
+        party = int(d.get("party_size") or 0)
+        duration = int(d.get("duration_minutes") or 0)
+    except Exception:
+        return jsonify(error="Invalid booking details"), 400
+    settings = booking_settings_for(u["organisation_id"], site["id"])
+    duration = duration or int(settings["default_duration"] or 120)
+    if not name or not booking_date or not booking_time or party < 1:
+        return jsonify(error="Guest, date, time and party size are required"), 400
+    table_id = d.get("table_id")
+    if table_id:
+        valid = [x for x in booking_available_tables(u["organisation_id"],site["id"],booking_date,booking_time,party,duration) if int(x["id"])==int(table_id)]
+        if not valid:
+            return jsonify(error="That table is no longer available for this sitting"), 409
+    else:
+        options = booking_available_tables(u["organisation_id"],site["id"],booking_date,booking_time,party,duration)
+        table_id = options[0]["id"] if options else None
+    guest_id = upsert_guest(u["organisation_id"], name, email, phone, bool(d.get("marketing_consent")))
+    booking_id = execute("""INSERT INTO bookings(organisation_id,site_id,guest_id,booking_date,booking_time,party_size,duration_minutes,status,source,table_id,guest_name,guest_email,guest_phone,special_requests,dietary_requirements,internal_notes,marketing_consent,created_at,updated_at)
+                            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                         (u["organisation_id"],site["id"],guest_id,booking_date,booking_time,party,duration,d.get("status") or "Confirmed",d.get("source") or "Manager",table_id,name,email,phone,d.get("special_requests") or "",d.get("dietary_requirements") or "",d.get("internal_notes") or "",1 if d.get("marketing_consent") else 0,now(),now()))
+    if email and int(settings.get("confirmation_enabled") or 0):
+        result=send_alport_email(email,f"Booking confirmed â {site['name']}",f"Hi {name},\n\nYour table at {site['name']} is confirmed for {party} guest(s) on {booking_date} at {booking_time}.\n\nWe look forward to welcoming you.")
+        if result["ok"]:
+            execute("UPDATE bookings SET confirmation_sent_at=? WHERE id=?",(now(),booking_id))
+            execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,booking_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],guest_id,booking_id,"Confirmation",email,f"Booking confirmed â {site['name']}","Sent",result["id"],now()))
+    audit("Created","booking",booking_id,f"{name} Â· {party} Â· {booking_date} {booking_time}")
+    return jsonify(ok=True,id=booking_id,table_id=table_id)
+
+
+@app.patch("/api/bookings/<int:booking_id>")
+@login_required
+@manager_required
+def update_booking(booking_id):
+    u, site = user(), current_site(); d=request.get_json() or {}
+    b=q("SELECT * FROM bookings WHERE id=? AND organisation_id=? AND site_id=?",(booking_id,u["organisation_id"],site["id"]),True)
+    if not b:return jsonify(error="Booking not found"),404
+    allowed={"status","booking_date","booking_time","party_size","duration_minutes","table_id","special_requests","dietary_requirements","internal_notes"}
+    sets=[];args=[]
+    for k in allowed:
+        if k in d:
+            sets.append(f"{k}=?");args.append(d[k] if d[k] not in ("") else None if k=="table_id" else d[k])
+    if not sets:return jsonify(error="Nothing to update"),400
+    sets.append("updated_at=?");args.append(now());args.extend([booking_id,u["organisation_id"],site["id"]])
+    execute(f"UPDATE bookings SET {','.join(sets)} WHERE id=? AND organisation_id=? AND site_id=?",tuple(args))
+    status=d.get("status")
+    if status=="Arrived":execute("UPDATE bookings SET arrived_at=? WHERE id=?",(now(),booking_id))
+    if status=="Seated":execute("UPDATE bookings SET seated_at=? WHERE id=?",(now(),booking_id))
+    if status=="Completed":execute("UPDATE bookings SET completed_at=? WHERE id=?",(now(),booking_id))
+    if status=="Cancelled":execute("UPDATE bookings SET cancelled_at=? WHERE id=?",(now(),booking_id))
+    audit("Updated","booking",booking_id,str(d))
+    return jsonify(ok=True)
+
+
+@app.get("/api/bookings/tables")
+@login_required
+def booking_tables():
+    u,site=user(),current_site()
+    rows=q("SELECT * FROM restaurant_tables WHERE organisation_id=? AND site_id=? ORDER BY sort_order,table_name",(u["organisation_id"],site["id"]))
+    return jsonify(tables=[dict(x) for x in rows])
+
+
+@app.post("/api/bookings/tables")
+@login_required
+@manager_required
+def add_booking_table():
+    u,site=user(),current_site();d=request.get_json() or {}
+    name=(d.get("table_name") or "").strip()
+    if not name:return jsonify(error="Table name required"),400
+    try: minc=max(1,int(d.get("min_capacity") or 1));maxc=max(minc,int(d.get("max_capacity") or 2))
+    except:return jsonify(error="Invalid capacity"),400
+    try:
+        tid=execute("INSERT INTO restaurant_tables(organisation_id,site_id,table_name,area,min_capacity,max_capacity,sort_order) VALUES(?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],name,d.get("area") or "Main",minc,maxc,int(d.get("sort_order") or 0)))
+    except Exception:return jsonify(error="That table name already exists"),409
+    return jsonify(ok=True,id=tid)
+
+
+@app.delete("/api/bookings/tables/<int:table_id>")
+@login_required
+@manager_required
+def archive_booking_table(table_id):
+    u,site=user(),current_site();execute("UPDATE restaurant_tables SET active=0 WHERE id=? AND organisation_id=? AND site_id=?",(table_id,u["organisation_id"],site["id"]));return jsonify(ok=True)
+
+
+@app.get("/api/bookings/settings")
+@login_required
+def get_booking_settings():
+    u,site=user(),current_site();settings=dict(booking_settings_for(u["organisation_id"],site["id"]));sessions=q("SELECT * FROM booking_sessions WHERE organisation_id=? AND site_id=? ORDER BY day_of_week,start_time",(u["organisation_id"],site["id"]));return jsonify(settings=settings,sessions=[dict(x) for x in sessions])
+
+
+@app.post("/api/bookings/settings")
+@login_required
+@manager_required
+def save_booking_settings():
+    u,site=user(),current_site();d=request.get_json() or {};booking_settings_for(u["organisation_id"],site["id"])
+    fields=["booking_interval","default_duration","turnaround_minutes","max_party_size","max_covers_per_interval","min_notice_minutes","advance_days","review_delay_hours","lapsed_guest_weeks","confirmation_enabled","reminder_enabled","review_enabled","retention_enabled"]
+    vals=[]
+    for f in fields: vals.append(int(d.get(f,0)))
+    execute("UPDATE booking_settings SET "+",".join(f+"=?" for f in fields)+",updated_at=? WHERE organisation_id=? AND site_id=?",tuple(vals+[now(),u["organisation_id"],site["id"]]))
+    return jsonify(ok=True)
+
+
+@app.post("/api/bookings/sessions")
+@login_required
+@manager_required
+def add_booking_session():
+    u,site=user(),current_site();d=request.get_json() or {}
+    try:dow=int(d.get("day_of_week"))
+    except:return jsonify(error="Invalid day"),400
+    if dow<0 or dow>6 or not d.get("start_time") or not d.get("end_time"):return jsonify(error="Day and times required"),400
+    sid=execute("INSERT INTO booking_sessions(organisation_id,site_id,day_of_week,name,start_time,end_time,active) VALUES(?,?,?,?,?,?,1)",(u["organisation_id"],site["id"],dow,d.get("name") or "Service",str(d["start_time"])[:5],str(d["end_time"])[:5]))
+    return jsonify(ok=True,id=sid)
+
+
+@app.delete("/api/bookings/sessions/<int:session_id>")
+@login_required
+@manager_required
+def delete_booking_session(session_id):
+    u,site=user(),current_site();execute("DELETE FROM booking_sessions WHERE id=? AND organisation_id=? AND site_id=?",(session_id,u["organisation_id"],site["id"]));return jsonify(ok=True)
+
+
+@app.get("/api/bookings/guests")
+@login_required
+def booking_guests():
+    u=user();rows=q("""SELECT g.*,COUNT(b.id) visits,MAX(CASE WHEN b.status='Completed' THEN b.booking_date ELSE NULL END) last_visit,
+                       SUM(CASE WHEN b.status='No-show' THEN 1 ELSE 0 END) no_shows
+                       FROM guests g LEFT JOIN bookings b ON b.guest_id=g.id WHERE g.organisation_id=?
+                       GROUP BY g.id ORDER BY last_visit DESC NULLS LAST,g.name""",(u["organisation_id"],));return jsonify(guests=[dict(x) for x in rows])
+
+
+@app.get("/api/bookings/reports")
+@login_required
+def booking_reports():
+    u,site=user(),current_site();period=request.args.get("period","week")
+    today=date.today()
+    if period=="year": start=today.replace(month=1,day=1)
+    elif period=="month": start=today.replace(day=1)
+    else:start=today-timedelta(days=today.weekday())
+    rows=q("SELECT * FROM bookings WHERE organisation_id=? AND site_id=? AND booking_date>=? AND booking_date<=?",(u["organisation_id"],site["id"],start.isoformat(),today.isoformat()))
+    active=[x for x in rows if x["status"] not in ("Cancelled","No-show")];covers=sum(int(x["party_size"] or 0) for x in active);completed=sum(1 for x in rows if x["status"]=="Completed");cancelled=sum(1 for x in rows if x["status"]=="Cancelled");noshow=sum(1 for x in rows if x["status"]=="No-show")
+    feedback=q("SELECT AVG(overall_rating) avg_rating,COUNT(*) n FROM guest_feedback WHERE organisation_id=? AND site_id=? AND created_at>=?",(u["organisation_id"],site["id"],start.isoformat()),True)
+    byday={}
+    for x in active:byday[x["booking_date"]]=byday.get(x["booking_date"],0)+int(x["party_size"] or 0)
+    return jsonify(period=period,start=start.isoformat(),end=today.isoformat(),bookings=len(active),covers=covers,completed=completed,cancelled=cancelled,no_shows=noshow,average_party=round(covers/len(active),1) if active else 0,average_rating=round(float((feedback or {}).get("avg_rating") or 0),1),feedback_count=int((feedback or {}).get("n") or 0),by_day=[{"date":k,"covers":v} for k,v in sorted(byday.items())])
+
+
+@app.get("/api/bookings/rota-demand")
+@login_required
+def booking_rota_demand():
+    u,site=user(),current_site();start=request.args.get("start") or date.today().isoformat();end=request.args.get("end") or (date.today()+timedelta(days=7)).isoformat()
+    rows=q("""SELECT booking_date,booking_time,SUM(party_size) covers,COUNT(*) bookings FROM bookings WHERE organisation_id=? AND site_id=? AND booking_date>=? AND booking_date<=? AND status NOT IN ('Cancelled','No-show') GROUP BY booking_date,booking_time ORDER BY booking_date,booking_time""",(u["organisation_id"],site["id"],start,end))
+    return jsonify(demand=[dict(x) for x in rows])
+
+
+@app.post("/api/bookings/<int:booking_id>/send-review")
+@login_required
+@manager_required
+def send_booking_review(booking_id):
+    u,site=user(),current_site();b=q("SELECT * FROM bookings WHERE id=? AND organisation_id=? AND site_id=?",(booking_id,u["organisation_id"],site["id"]),True)
+    if not b:return jsonify(error="Booking not found"),404
+    if not b["guest_email"]:return jsonify(error="Guest has no email address"),400
+    public_url=(os.environ.get("PUBLIC_BASE_URL") or request.url_root.rstrip("/")).rstrip("/")
+    link=f"{public_url}/booking-feedback/{booking_id}"
+    result=send_alport_email(b["guest_email"],f"How was your visit to {site['name']}?",f"Hi {b['guest_name']},\n\nThank you for visiting {site['name']}. We would really value your feedback.\n\nShare your feedback: {link}\n\nThank you.")
+    if not result["ok"]:return jsonify(error="Review email could not be sent"),502
+    execute("UPDATE bookings SET review_sent_at=? WHERE id=?",(now(),booking_id));execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,booking_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],b["guest_id"],booking_id,"Review",b["guest_email"],f"How was your visit to {site['name']}?","Sent",result["id"],now()));return jsonify(ok=True)
+
+
+@app.post("/api/bookings/retention/send")
+@login_required
+@manager_required
+def send_retention_campaign():
+    u,site=user(),current_site();settings=booking_settings_for(u["organisation_id"],site["id"]);weeks=int(settings.get("lapsed_guest_weeks") or 6);cutoff=(date.today()-timedelta(weeks=weeks)).isoformat()
+    guests=q("""SELECT g.*,MAX(CASE WHEN b.status='Completed' THEN b.booking_date ELSE NULL END) last_visit FROM guests g LEFT JOIN bookings b ON b.guest_id=g.id WHERE g.organisation_id=? AND g.marketing_consent=1 AND COALESCE(g.marketing_opt_out_at,'')='' GROUP BY g.id HAVING MAX(CASE WHEN b.status='Completed' THEN b.booking_date ELSE NULL END) IS NOT NULL AND MAX(CASE WHEN b.status='Completed' THEN b.booking_date ELSE NULL END)<=?""",(u["organisation_id"],cutoff))
+    sent=0
+    for g in guests:
+        if not g["email"]:continue
+        result=send_alport_email(g["email"],f"We'd love to welcome you back to {site['name']}",f"Hi {g['name']},\n\nIt's been a little while since your last visit to {site['name']}. We'd love to welcome you back soon.\n\nBest wishes,\n{site['name']}")
+        if result["ok"]:
+            sent+=1;execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],g["id"],"Retention",g["email"],f"We'd love to welcome you back to {site['name']}","Sent",result["id"],now()))
+    return jsonify(ok=True,sent=sent,eligible=len(guests))
+
+
+@app.get("/booking-feedback/<int:booking_id>")
+def booking_feedback_page(booking_id):
+    b=q("SELECT b.*,s.name site_name FROM bookings b JOIN sites s ON s.id=b.site_id WHERE b.id=?",(booking_id,),True)
+    if not b:return "Booking not found",404
+    return render_template("booking_feedback.html",booking=b)
+
+
+@app.post("/booking-feedback/<int:booking_id>")
+def booking_feedback_submit(booking_id):
+    b=q("SELECT b.*,s.name site_name FROM bookings b JOIN sites s ON s.id=b.site_id WHERE b.id=?",(booking_id,),True)
+    if not b:return "Booking not found",404
+    if q("SELECT id FROM guest_feedback WHERE booking_id=?",(booking_id,),True):return render_template("booking_feedback.html",booking=b,submitted=True)
+    try:overall=max(1,min(5,int(request.form.get("overall_rating") or 0)))
+    except:return render_template("booking_feedback.html",booking=b,error="Please choose an overall rating."),400
+    def rating(name):
+        try:return max(1,min(5,int(request.form.get(name) or 0))) or None
+        except:return None
+    execute("""INSERT INTO guest_feedback(organisation_id,site_id,booking_id,guest_id,overall_rating,food_rating,service_rating,atmosphere_rating,value_rating,comments,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)""",(b["organisation_id"],b["site_id"],booking_id,b["guest_id"],overall,rating("food_rating"),rating("service_rating"),rating("atmosphere_rating"),rating("value_rating"),(request.form.get("comments") or "")[:3000],now()))
+    manager_email=os.environ.get("SUPPORT_EMAIL","").strip()
+    if manager_email:send_alport_email(manager_email,f"New guest feedback â {b['site_name']} â {overall}/5",f"Guest: {b['guest_name']}\nVisit: {b['booking_date']} {b['booking_time']}\nOverall: {overall}/5\n\n{(request.form.get('comments') or '').strip()}")
+    return render_template("booking_feedback.html",booking=b,submitted=True)
 
 
 @app.get("/api/health")
