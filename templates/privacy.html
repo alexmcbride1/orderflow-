@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Privacy Policy | Alport Hospitality Solutions</title>
+<style>
+:root{--green:#10342a;--cream:#f7f3e8;--ink:#17221e;--muted:#66766f;--line:#dce3de;--card:#fff;--soft:#eef3f0}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65}.wrap{width:min(980px,calc(100% - 28px));margin:0 auto}.top{padding:28px 0 16px;border-bottom:1px solid #ded8ca}.brand-logo{width:250px;max-width:72%;height:auto;display:block}.hero{padding:44px 0 30px}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:10px;font-weight:900;color:var(--green)}h1{font-family:Georgia,"Times New Roman",serif;font-size:44px;line-height:1.05;margin:7px 0 12px;font-weight:500}h2{font-family:Georgia,"Times New Roman",serif;font-size:25px;margin:36px 0 10px;color:var(--green)}h3{font-size:14px;margin:22px 0 5px}p,li{font-size:13px}.muted{color:var(--muted)}.summary{background:var(--green);color:#fff;border-radius:18px;padding:22px;margin:12px 0 28px}.summary strong{font-family:Georgia,"Times New Roman",serif;font-size:19px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;margin-bottom:30px}.notice{background:var(--soft);border-left:4px solid var(--green);padding:14px 16px;border-radius:10px;margin:16px 0}.table{overflow:auto;margin:14px 0}table{border-collapse:collapse;width:100%;min-width:680px;font-size:12px}th,td{border-bottom:1px solid var(--line);padding:11px;text-align:left;vertical-align:top}th{background:#f5f7f5;color:var(--green)}a{color:var(--green)}.right-to-object{border:2px solid var(--green);border-radius:14px;padding:16px;margin:18px 0;background:#fbfcfb}.foot{border-top:1px solid #ded8ca;padding:24px 0 36px;font-size:11px;color:var(--muted)}@media(max-width:650px){.hero{padding-top:28px}h1{font-size:36px}.card{padding:19px}h2{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><a href="/"><img class="brand-logo" src="/static/alport-logo.svg" alt="Alport Hospitality Solutions"></a></header>
+<section class="hero"><div class="eyebrow">Privacy & data protection</div><h1>Privacy Policy</h1><p class="muted">Effective date: {{effective_date}}. This notice explains how {{trading_name}} handles personal data when operating our website, hospitality-management platform, customer accounts, billing, support and connected services.</p></section>
+<div class="summary"><strong>People | Process | Profit</strong><p>We only use personal data where we have a proper purpose and lawful basis. We design the platform to keep venue data separated by organisation and site, restrict access by user role, and use specialist service providers where needed to operate the service.</p></div>
+<div class="card">
+<h2>1. Who we are</h2>
+<p><b>Controller for our own business data:</b> {{legal_name}}{% if trading_name and trading_name != legal_name %}, trading as {{trading_name}}{% endif %}.</p>
+{% if privacy_address %}<p><b>Contact address:</b> {{privacy_address}}</p>{% else %}<p><b>Contact address:</b> to be added before public commercial launch.</p>{% endif %}
+{% if privacy_email %}<p><b>Privacy contact:</b> <a href="mailto:{{privacy_email}}">{{privacy_email}}</a></p>{% else %}<p><b>Privacy contact:</b> a dedicated privacy email address will be published before public commercial launch.</p>{% endif %}
+{% if ico_number %}<p><b>ICO registration number:</b> {{ico_number}}</p>{% endif %}
+<p>For information that a customer venue uploads about its own staff, guests, suppliers or other individuals, the customer will normally be the <b>data controller</b> and we will normally act as its <b>data processor</b>, processing that information on the customer's documented instructions and under the applicable customer agreement or data-processing agreement.</p>
+
+<h2>2. What this policy covers</h2>
+<p>This policy covers the Alport Hospitality Solutions website and platform, including account creation, login and access management, sites and venues, sales, stock, suppliers, purchasing, menu and recipe costing, staff records, rota and shifts, payroll-management records, finance and EBITDA tools, supplier invoices and payment instructions, budgets, audit logs, EHO and food-safety compliance records, subscription and licence management, company administration, support, and integrations that a customer chooses to connect.</p>
+
+<h2>3. Personal data we may process</h2>
+<div class="table"><table><thead><tr><th>Category</th><th>Examples</th><th>Why it may be used</th></tr></thead><tbody>
+<tr><td>Account and identity data</td><td>Name, work email, username/login details, password hash, role, permissions, account status, organisation and site association.</td><td>Create and secure accounts, authenticate users, control access and administer licences.</td></tr>
+<tr><td>Business and venue data</td><td>Business name/type, venue name and address, site details, contact information and operational settings.</td><td>Set up and operate customer organisations and sites.</td></tr>
+<tr><td>Employee and workforce data</td><td>Employee name, work email, department, job title, pay type/rate, holiday allowance, shift/rota data, payroll totals, deductions and employer-cost data.</td><td>Provide staff, rota, labour planning and payroll-management features for customer venues.</td></tr>
+<tr><td>Health or special-category data</td><td>Where a customer records fit-to-work, sickness, allergy, medical or other health-related information in compliance workflows.</td><td>Only where the customer chooses and has its own lawful basis and applicable Article 9 condition. Access should be restricted to authorised roles.</td></tr>
+<tr><td>Food-safety and compliance data</td><td>Staff sign-off names, opening/closing checks, temperature records, corrective actions, training/compliance records, verification and review history.</td><td>Provide audit trails and support a venue's food-safety management processes.</td></tr>
+<tr><td>Finance and commercial data</td><td>Sales, expenses, budgets, supplier invoice details, payment instructions, references, subscription amounts and transaction status.</td><td>Provide reporting, finance, purchasing, subscription and management functions.</td></tr>
+<tr><td>Supplier/contact data</td><td>Supplier contact names, business emails, phone numbers, payment terms, invoices and order details.</td><td>Manage supplier relationships, purchasing and ordering workflows.</td></tr>
+<tr><td>Guest/booking data</td><td>Booking names, contact details, reservation times, party size and related reservation information where a booking integration is enabled.</td><td>Forecast demand, staffing, stock and operational requirements. We only process what the connected service/customer makes available.</td></tr>
+<tr><td>Technical and security data</td><td>IP address, device/browser information, timestamps, session identifiers, request logs, security events and audit-log entries.</td><td>Secure, troubleshoot, monitor and protect the service.</td></tr>
+<tr><td>Billing data</td><td>Billing email/address, tax/VAT information, Stripe customer, subscription, checkout and invoice identifiers, payment status and payment history.</td><td>Create and administer subscriptions, invoices and payment status. Card details are handled by Stripe and are not stored by Alport Hospitality Solutions.</td></tr>
+<tr><td>Support and communications</td><td>Messages, support requests, feedback, attachments and records of account-related communications.</td><td>Provide support, respond to requests and improve the service.</td></tr>
+<tr><td>Forecast/context data</td><td>Venue location, weather data, public/local events and operational forecasts.</td><td>Help venues forecast demand. Weather/public-event data is generally not personal data unless combined with identifiable information.</td></tr>
+</tbody></table></div>
+
+<h2>4. Where we get personal data</h2>
+<p>We may receive data directly from users and customer administrators; from other users within the same customer organisation; from connected EPOS, booking, supplier, payment or hospitality systems that the customer authorises; from Stripe for subscription billing; from service providers that help us operate the platform; and from public sources used for contextual data such as weather or local events.</p>
+
+<h2>5. Our purposes and lawful bases</h2>
+<div class="table"><table><thead><tr><th>Purpose</th><th>Typical UK GDPR lawful basis</th></tr></thead><tbody>
+<tr><td>Provide accounts, subscriptions and the contracted platform.</td><td>Contract; and legitimate interests where the contract is with the user's employer/business rather than the individual.</td></tr>
+<tr><td>Billing, invoicing, tax/accounting and financial administration.</td><td>Contract; legal obligation; legitimate interests.</td></tr>
+<tr><td>Security, fraud prevention, logging, service reliability and abuse prevention.</td><td>Legitimate interests; legal obligation where applicable.</td></tr>
+<tr><td>Customer support, product administration and service communications.</td><td>Contract and/or legitimate interests.</td></tr>
+<tr><td>Product analytics and service improvement using operational data.</td><td>Legitimate interests, with aggregation or de-identification where appropriate. Non-essential tracking cookies will only be used with required consent.</td></tr>
+<tr><td>Direct marketing.</td><td>Consent where required by law, or legitimate interests where permitted. Individuals can opt out at any time.</td></tr>
+<tr><td>Customer-controlled workforce, booking and compliance data.</td><td>The customer determines its lawful basis as controller. We process the data under the customer's documented instructions as processor.</td></tr>
+</tbody></table></div>
+<p>If special-category data such as health information is processed, the customer/controller must identify both an Article 6 lawful basis and a valid Article 9 condition. We do not use special-category data for advertising.</p>
+
+<h2>6. Automated forecasting and decision support</h2>
+<p>The platform may use sales, bookings, stock, rota, weather, event and historical operating data to create forecasts, alerts or recommendations. These features are intended as management decision-support. Unless we tell you otherwise, Alport Hospitality Solutions does not make solely automated decisions about individuals that produce legal or similarly significant effects. Customers remain responsible for employment, staffing, disciplinary, pay, health-and-safety and other consequential decisions.</p>
+
+<h2>7. Who we share information with</h2>
+<p>We may share personal data with vetted service providers acting on our behalf, including hosting/database infrastructure, payment processing, email/communications, error monitoring, security, support and professional advisers. Current production services may include <b>Render</b> for application/database hosting and <b>Stripe</b> for subscription payment processing. Where a customer enables an integration, we may also exchange the minimum necessary data with the chosen EPOS, booking, supplier, banking/payment or other integration provider.</p>
+<p>We may also disclose information where required by law, court order, regulator or competent authority; to protect the rights, safety and security of users or the service; or in connection with a merger, acquisition, financing or sale of all or part of the business, subject to appropriate confidentiality and data-protection safeguards.</p>
+
+<h2>8. Stripe and payment information</h2>
+<p>Subscription checkout is provided by Stripe. Stripe may collect card or bank details, billing address, tax information and fraud-prevention data under its own privacy terms. Alport Hospitality Solutions receives transaction and subscription information needed to administer the account, but our application does not store full payment-card details.</p>
+
+<h2>9. Cookies and similar technologies</h2>
+<p>The platform uses a session cookie that is necessary for secure login and maintaining an authenticated session. Necessary cookies do not require optional analytics/advertising consent. If we introduce analytics, advertising or other non-essential cookies, we will provide clear information and obtain consent where required before setting them. Users can also manage cookies through their browser, although blocking necessary cookies may prevent sign-in or core functionality.</p>
+
+<h2>10. International transfers</h2>
+<p>Some service providers may process data outside the UK. Where UK personal data is transferred internationally, the controller will use a lawful transfer mechanism as required, such as UK adequacy regulations, the UK International Data Transfer Agreement, the UK Addendum to EU Standard Contractual Clauses, or another permitted safeguard. Further information on safeguards can be requested using the privacy contact above.</p>
+
+<h2>11. How long we keep information</h2>
+<p>We keep personal data only for as long as it is reasonably needed for the purpose for which it was collected, to provide the service, meet customer instructions, resolve disputes, protect legal rights and satisfy legal/accounting obligations. Retention may vary by data type and customer configuration.</p>
+<div class="table"><table><thead><tr><th>Data</th><th>General retention approach</th></tr></thead><tbody>
+<tr><td>Active account and operational data</td><td>For the life of the customer account/contract, subject to the customer's deletion and retention instructions.</td></tr>
+<tr><td>Closed customer-account data</td><td>Normally deleted or anonymised after an appropriate offboarding/export period, except where a longer period is required for legal claims, security, accounting or statutory obligations. The precise production retention schedule should be stated in the customer contract/DPA.</td></tr>
+<tr><td>Subscription, invoice and accounting records</td><td>Retained for the period required by applicable tax/accounting law and legitimate record-keeping needs.</td></tr>
+<tr><td>Security and application logs</td><td>Kept for a limited period proportionate to security, troubleshooting and abuse-prevention needs.</td></tr>
+<tr><td>Support records</td><td>For as long as required to resolve the matter and maintain an appropriate service history.</td></tr>
+<tr><td>Backups</td><td>May remain for a limited backup-rotation period after deletion from the live service, after which they are overwritten or expire.</td></tr>
+</tbody></table></div>
+
+<h2>12. Security</h2>
+<p>We use technical and organisational measures designed to protect personal data, including encrypted HTTPS transport, password hashing, role-based access controls, authenticated sessions, organisation/site data separation, database access restrictions, audit logging, restricted company-admin access, secure environment-variable storage for secrets, and controlled access by authorised personnel. No internet service can guarantee absolute security, so customers should also use strong unique passwords, limit user access and promptly remove accounts that are no longer required.</p>
+
+<h2>13. Customer responsibilities</h2>
+<p>Customer organisations are responsible for ensuring that personal data they enter or connect to the platform is collected lawfully, is relevant and accurate, is only visible to appropriate users, and is supported by their own staff/customer privacy information where they act as controller. Customers should not place highly sensitive personal data into free-text fields unless the feature is intended for it and they have a proper legal basis.</p>
+
+<h2>14. Your data-protection rights</h2>
+<p>Depending on the circumstances and lawful basis, individuals may have rights to be informed, access their personal data, correct inaccurate data, request erasure, restrict processing, receive/transfer certain data, object to processing, withdraw consent where consent is relied upon, and obtain safeguards in relation to qualifying automated decisions.</p>
+<div class="right-to-object"><b>Your right to object</b><p>If we process your personal data on the basis of legitimate interests, you have the right to object. You also have an absolute right to object to the use of your personal data for direct marketing.</p></div>
+<p>If the information is held by us only on behalf of one of our customer venues, we may need to refer your request to that customer as the relevant controller. We will assist the controller as required by our contractual and legal obligations.</p>
+
+<h2>15. Children</h2>
+<p>The Alport Hospitality Solutions business platform is intended for authorised business users and is not directed at children. A hospitality customer may employ young workers or hold booking information involving children; in those cases the customer remains responsible for the lawful basis, transparency and safeguards for that processing, and we process the information on the customer's instructions.</p>
+
+<h2>16. Data breaches</h2>
+<p>We maintain processes to investigate suspected personal-data breaches. Where we act as processor, we will notify the relevant customer/controller without undue delay after becoming aware of a personal-data breach affecting that customer's data, in accordance with the contract/DPA. Where we are controller, we will assess whether notification to the ICO and affected individuals is required.</p>
+
+<h2>17. Complaints</h2>
+<p>Please contact us first so we can try to resolve any concern. Individuals also have the right to complain to the UK's data-protection regulator, the <b>Information Commissioner's Office (ICO)</b>. Current ICO contact information is available at <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener">ico.org.uk</a>.</p>
+
+<h2>18. Changes to this policy</h2>
+<p>We may update this policy when the platform, our suppliers, integrations, law or business structure changes. We will publish the revised version here and change the effective date. Where a change materially affects how we use personal data, we will provide additional notice where appropriate.</p>
+
+<h2>19. Contact</h2>
+{% if privacy_email %}<p>Privacy requests can be sent to <a href="mailto:{{privacy_email}}">{{privacy_email}}</a>.</p>{% else %}<div class="notice"><b>Before public launch:</b> set <code>PRIVACY_EMAIL</code>, <code>PRIVACY_LEGAL_NAME</code>, <code>PRIVACY_ADDRESS</code> and, when applicable, <code>PRIVACY_ICO_NUMBER</code> in Render so the published notice contains the final legal contact information.</div>{% endif %}
+</div>
+<footer class="foot">&copy; 2026 {{trading_name}}. People | Process | Profit.</footer>
+</div>
+</body></html>
