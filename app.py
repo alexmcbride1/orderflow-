@@ -85,9 +85,9 @@ def now():
 # -----------------------------------------------------------------------------
 # ALPORT SaaS PRICING / STRIPE BILLING
 # -----------------------------------------------------------------------------
-BASE_PRICE_PER_SITE = 250.0
-INCLUDED_USERS_PER_SITE = 3
-EXTRA_USER_PRICE = 20.0
+BASE_PRICE_PER_SITE = 500.0
+INCLUDED_USERS_PER_SITE = 0  # users are unlimited and included
+EXTRA_USER_PRICE = 0.0
 VAT_RATE = 0.20
 CONTRACT_MONTHS = 12
 PAYMENT_GRACE_DAYS = 7
@@ -123,44 +123,33 @@ def pricing_for(organisation_id, preserve_commitment=True):
     sites_row = q("SELECT COUNT(*) AS n FROM sites WHERE organisation_id=? AND active=1", (organisation_id,), True)
     users_row = q("SELECT COUNT(*) AS n FROM users WHERE organisation_id=? AND active=1", (organisation_id,), True)
     active_sites = max(1, int((sites_row or {}).get("n") or 0))
-    active_users = max(1, int((users_row or {}).get("n") or 0))
+    active_users = max(0, int((users_row or {}).get("n") or 0))
 
-    base = float((sub or {}).get("base_price") or BASE_PRICE_PER_SITE)
-    included_per_site = int((sub or {}).get("included_users_per_site") or INCLUDED_USERS_PER_SITE)
-    extra_price = float((sub or {}).get("extra_user_price") or EXTRA_USER_PRICE)
-    vat_rate = float((sub or {}).get("vat_rate") if (sub or {}).get("vat_rate") is not None else VAT_RATE)
-
+    # Alport is Â£500 + VAT per active/contracted venue per month. Users are unlimited.
+    base = BASE_PRICE_PER_SITE
+    vat_rate = VAT_RATE
     committed_sites = int((sub or {}).get("contracted_sites") or active_sites)
-    committed_users = int((sub or {}).get("contracted_users") or active_users)
     contract_end = _parse_iso_date((sub or {}).get("contract_end"))
     inside_term = bool(contract_end and date.today() < contract_end)
-
-    if preserve_commitment and inside_term:
-        billable_sites = max(active_sites, committed_sites)
-        billable_users = max(active_users, committed_users)
-    else:
-        billable_sites = active_sites
-        billable_users = active_users
-
-    included_users = included_per_site * billable_sites
-    extra_users = max(0, billable_users - included_users)
-    net = round((base * billable_sites) + (extra_price * extra_users), 2)
+    billable_sites = max(active_sites, committed_sites) if preserve_commitment and inside_term else active_sites
+    net = round(base * billable_sites, 2)
     vat = round(net * vat_rate, 2)
     gross = round(net + vat, 2)
     return {
         "active_sites": active_sites,
         "active_users": active_users,
         "billable_sites": billable_sites,
-        "billable_users": billable_users,
-        "included_users": included_users,
-        "extra_users": extra_users,
+        "billable_users": active_users,
+        "included_users": active_users,
+        "extra_users": 0,
         "base_price": base,
-        "extra_user_price": extra_price,
+        "extra_user_price": 0.0,
         "vat_rate": vat_rate,
         "net": net,
         "vat": vat,
         "gross": gross,
         "inside_term": inside_term,
+        "unlimited_users": True,
     }
 
 
@@ -168,7 +157,6 @@ def stripe_configured():
     return bool(
         os.environ.get("STRIPE_SECRET_KEY")
         and os.environ.get("STRIPE_BASE_PRICE_ID")
-        and os.environ.get("STRIPE_EXTRA_USER_PRICE_ID")
     )
 
 
@@ -213,9 +201,8 @@ def record_stripe_payment(organisation_id, invoice):
         return
     total_pence = int(invoice.get("amount_paid") or invoice.get("total") or 0)
     gross = round(total_pence / 100.0, 2)
-    # Stripe prices are stored as VAT-inclusive gross amounts (Â£300 / Â£24).
-    # Alport Hospitality Solutions commercial pricing remains Â£250 / Â£20 + 20% VAT internally,
-    # so derive the accounting split from the gross amount actually paid.
+    # Stripe base price is VAT-inclusive gross (Â£600 per venue/month).
+    # Commercial pricing is Â£500 + 20% VAT per venue/month.
     net = round(gross / (1 + VAT_RATE), 2) if gross else 0
     vat = round(gross - net, 2)
     paid_at = date.today().isoformat()
@@ -236,7 +223,7 @@ def activate_contract_from_checkout(organisation_id, checkout):
     subscription_id = str(checkout.get("subscription") or "")
     session_id = str(checkout.get("id") or "")
     base_price_id = os.environ.get("STRIPE_BASE_PRICE_ID", "")
-    extra_price_id = os.environ.get("STRIPE_EXTRA_USER_PRICE_ID", "")
+    extra_price_id = ""
     execute(
         """UPDATE subscriptions SET plan=?,monthly_price=?,status='Active',contract_start=?,contract_end=?,
            contract_months=?,contracted_sites=?,contracted_users=?,stripe_customer_id=?,stripe_subscription_id=?,
@@ -665,9 +652,9 @@ def init_db():
             # SaaS billing / 12-month contract fields. ADD COLUMN IF NOT EXISTS
             # keeps existing Render databases safe during deployment.
             migrations = [
-                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS base_price DOUBLE PRECISION NOT NULL DEFAULT 250",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS base_price DOUBLE PRECISION NOT NULL DEFAULT 500",
                 "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS included_users_per_site INTEGER NOT NULL DEFAULT 3",
-                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS extra_user_price DOUBLE PRECISION NOT NULL DEFAULT 20",
+                "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS extra_user_price DOUBLE PRECISION NOT NULL DEFAULT 0",
                 "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS vat_rate DOUBLE PRECISION NOT NULL DEFAULT 0.20",
                 "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS contract_months INTEGER NOT NULL DEFAULT 12",
                 "ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS contract_start TEXT DEFAULT ''",
@@ -704,6 +691,14 @@ def init_db():
 
 
 init_db()
+
+# Normalize the commercial model for existing database rows. Stripe recurring price
+# itself is controlled by STRIPE_BASE_PRICE_ID and must point to the Â£600 gross price.
+try:
+    execute("UPDATE subscriptions SET base_price=?,extra_user_price=?,included_users_per_site=?", (BASE_PRICE_PER_SITE, 0.0, 0))
+    execute("UPDATE subscriptions SET monthly_price=? * GREATEST(1,COALESCE(contracted_sites,1))", (BASE_PRICE_PER_SITE,))
+except Exception:
+    pass
 
 
 def user():
@@ -781,72 +776,39 @@ def account_admin_required(fn):
 def licence_summary(organisation_id):
     sub = subscription_for(organisation_id) or {}
     p = pricing_for(organisation_id)
-    contracted_sites = max(1, int(sub.get("contracted_sites") or p["billable_sites"] or 1))
-    contracted_users = max(0, int(sub.get("contracted_users") or 0))
-    included_capacity = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE) * contracted_sites
-    licensed_capacity = max(included_capacity, contracted_users)
     active_users = int(q("SELECT COUNT(*) AS n FROM users WHERE organisation_id=? AND active=1", (organisation_id,), True)["n"] or 0)
-    available = max(0, licensed_capacity - active_users)
     return {
         **p,
-        "licensed_capacity": licensed_capacity,
+        "licensed_capacity": None,
         "active_users": active_users,
-        "available_licences": available,
-        "contracted_users": contracted_users,
-        "contracted_sites": contracted_sites,
+        "available_licences": None,
+        "contracted_users": active_users,
+        "contracted_sites": max(1, int(sub.get("contracted_sites") or p["billable_sites"] or 1)),
         "contract_start": sub.get("contract_start") or "",
         "contract_end": sub.get("contract_end") or "",
         "status": sub.get("status") or "",
+        "unlimited_users": True,
     }
 
 
-def sync_stripe_subscription_quantities(organisation_id, contracted_sites, contracted_users):
-    """Keep Stripe quantities aligned with the contract without changing unit prices."""
+def sync_stripe_subscription_quantities(organisation_id, contracted_sites, contracted_users=0):
+    """Keep the per-venue Stripe quantity aligned. User quantity is never billed."""
     sub = subscription_for(organisation_id) or {}
     subscription_id = (sub.get("stripe_subscription_id") or "").strip()
     if not subscription_id:
         return
     base_price_id = (sub.get("stripe_base_price_id") or os.environ.get("STRIPE_BASE_PRICE_ID", "")).strip()
-    extra_price_id = (sub.get("stripe_extra_price_id") or os.environ.get("STRIPE_EXTRA_USER_PRICE_ID", "")).strip()
-    included_per_site = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE)
-    included_capacity = included_per_site * int(contracted_sites)
-    extra_quantity = max(0, int(contracted_users) - included_capacity)
-
     remote = stripe_request("GET", "/subscriptions/" + subscription_id)
     items = ((remote.get("items") or {}).get("data") or [])
-    by_price = {}
     for item in items:
         price = item.get("price") or {}
         pid = price.get("id") if isinstance(price, dict) else price
-        if pid:
-            by_price[str(pid)] = item
-
-    base_item = by_price.get(base_price_id)
-    if base_item:
-        stripe_request("POST", "/subscription_items/" + str(base_item["id"]), {
-            "quantity": str(max(1, int(contracted_sites))),
-            "proration_behavior": "create_prorations",
-        })
-
-    extra_item = by_price.get(extra_price_id)
-    if extra_quantity > 0:
-        if extra_item:
-            stripe_request("POST", "/subscription_items/" + str(extra_item["id"]), {
-                "quantity": str(extra_quantity),
+        if str(pid or "") == base_price_id:
+            stripe_request("POST", "/subscription_items/" + str(item["id"]), {
+                "quantity": str(max(1, int(contracted_sites))),
                 "proration_behavior": "create_prorations",
             })
-        else:
-            data = {
-                "subscription": subscription_id,
-                "price": extra_price_id,
-                "quantity": str(extra_quantity),
-                "proration_behavior": "create_prorations",
-            }
-            stripe_request("POST", "/subscription_items", data)
-    elif extra_item:
-        stripe_request("DELETE", "/subscription_items/" + str(extra_item["id"]), {
-            "proration_behavior": "create_prorations",
-        })
+            return
 
 
 def audit(action, entity, entity_id=None, detail=""):
@@ -1008,7 +970,7 @@ def login():
                 session["site_id"] = s["id"]
             if sub and sub.get("status") == "Payment required":
                 return redirect(url_for("subscribe"))
-            return redirect(url_for("home"))
+            return redirect(url_for("app_home"))
         return render_template("login.html", error="Incorrect email or password.")
     return render_template("login.html")
 
@@ -1022,7 +984,7 @@ def logout():
 @app.route("/onboarding", methods=["GET", "POST"])
 def onboarding():
     if user():
-        return redirect(url_for("home"))
+        return redirect(url_for("app_home"))
 
     if request.method == "POST":
         business = (request.form.get("business_name") or "").strip()
@@ -1058,7 +1020,7 @@ def onboarding():
                         (
                             organisation_id, "Alport Hospitality Solutions", BASE_PRICE_PER_SITE,
                             "Payment required", now(), BASE_PRICE_PER_SITE, INCLUDED_USERS_PER_SITE,
-                            EXTRA_USER_PRICE, VAT_RATE, CONTRACT_MONTHS, 1, 3, email,
+                            EXTRA_USER_PRICE, VAT_RATE, CONTRACT_MONTHS, 1, 1, email,
                         ),
                     )
 
@@ -1104,7 +1066,7 @@ def subscribe():
     sub = subscription_for(organisation_id)
     pricing = pricing_for(organisation_id)
     if sub and sub.get("status") == "Active":
-        return redirect(url_for("home"))
+        return redirect(url_for("app_home"))
 
     error = None
     if request.method == "POST":
@@ -1124,7 +1086,7 @@ def subscribe():
             ):
                 session["billing_preview_bypass_org"] = int(organisation_id)
                 session["billing_preview_admin"] = True
-                return redirect(url_for("home"))
+                return redirect(url_for("app_home"))
 
             error = "Incorrect company admin email or password."
 
@@ -1135,7 +1097,7 @@ def subscribe():
         else:
             try:
                 base_price_id = os.environ.get("STRIPE_BASE_PRICE_ID", "").strip()
-                extra_price_id = os.environ.get("STRIPE_EXTRA_USER_PRICE_ID", "").strip()
+                extra_price_id = ""
                 success_url = request.url_root.rstrip("/") + "/subscription/success?session_id={CHECKOUT_SESSION_ID}"
                 cancel_url = request.url_root.rstrip("/") + "/subscribe"
                 data = {
@@ -1152,11 +1114,6 @@ def subscribe():
                     "line_items[0][price]": base_price_id,
                     "line_items[0][quantity]": str(pricing["billable_sites"]),
                 }
-                if pricing["extra_users"] > 0:
-                    data.update({
-                        "line_items[1][price]": extra_price_id,
-                        "line_items[1][quantity]": str(pricing["extra_users"]),
-                    })
                 checkout = stripe_request("POST", "/checkout/sessions", data)
                 execute(
                     """UPDATE subscriptions SET stripe_checkout_session_id=?,stripe_base_price_id=?,
@@ -1255,8 +1212,58 @@ def stripe_webhook():
 
 
 @app.get("/")
+def public_home():
+    return render_template("home.html")
+
+
+@app.post("/support")
+def public_support():
+    name = (request.form.get("name") or "").strip()[:120]
+    email = (request.form.get("email") or "").strip()[:200]
+    business = (request.form.get("business") or "").strip()[:160]
+    subject = (request.form.get("subject") or "General enquiry").strip()[:160]
+    message = (request.form.get("message") or "").strip()[:5000]
+    if not name or not email or "@" not in email or not message:
+        return redirect(url_for("public_home", support="missing") + "#support")
+
+    support_email = os.environ.get("SUPPORT_EMAIL", "").strip()
+    from_email = os.environ.get("SUPPORT_FROM_EMAIL", "").strip()
+    resend_key = os.environ.get("RESEND_API_KEY", "").strip()
+    if not support_email or not from_email or not resend_key:
+        return redirect(url_for("public_home", support="unavailable") + "#support")
+
+    safe_subject = f"Alport support: {subject}"
+    body = (
+        f"New Alport website enquiry\n\n"
+        f"Name: {name}\n"
+        f"Email: {email}\n"
+        f"Business: {business or 'Not supplied'}\n"
+        f"Subject: {subject}\n\n"
+        f"Message:\n{message}\n"
+    )
+    try:
+        r = requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
+            json={
+                "from": from_email,
+                "to": [support_email],
+                "reply_to": email,
+                "subject": safe_subject,
+                "text": body,
+            },
+            timeout=20,
+        )
+        if not r.ok:
+            raise RuntimeError("Email provider rejected the message")
+    except Exception:
+        return redirect(url_for("public_home", support="error") + "#support")
+    return redirect(url_for("public_home", support="sent") + "#support")
+
+
+@app.get("/app")
 @login_required
-def home():
+def app_home():
     u = user()
     sub = subscription_for(u["organisation_id"])
     if sub and sub.get("status") == "Payment required":
@@ -1270,12 +1277,6 @@ def home():
         session.clear()
         return redirect(url_for("login"))
     return render_template("app.html", user=u, organisation=org(), site=current_site())
-
-
-@app.get("/app")
-@login_required
-def app_home():
-    return redirect(url_for("home"))
 
 
 @app.get("/api/me")
@@ -1300,56 +1301,7 @@ def licences_overview():
 @login_required
 @account_admin_required
 def upgrade_licences():
-    u = user()
-    organisation_id = u["organisation_id"]
-    sub = subscription_for(organisation_id)
-    if not sub:
-        return jsonify(error="Subscription record not found"), 404
-    if sub.get("status") not in ("Active", "Past due"):
-        return jsonify(error="Your subscription must be active before adding paid user licences."), 409
-    try:
-        add_count = int((request.get_json() or {}).get("additional_licences", 1))
-    except Exception:
-        return jsonify(error="Enter a valid number of licences"), 400
-    if add_count < 1 or add_count > 100:
-        return jsonify(error="You can add between 1 and 100 licences at a time"), 400
-
-    summary = licence_summary(organisation_id)
-    new_capacity = summary["licensed_capacity"] + add_count
-    new_contracted_users = max(int(sub.get("contracted_users") or 0), new_capacity)
-    sites = max(1, int(sub.get("contracted_sites") or summary["billable_sites"] or 1))
-    included = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE) * sites
-    extra_users = max(0, new_contracted_users - included)
-    base_price = float(sub.get("base_price") or BASE_PRICE_PER_SITE)
-    extra_price = float(sub.get("extra_user_price") or EXTRA_USER_PRICE)
-    vat_rate = float(sub.get("vat_rate") if sub.get("vat_rate") is not None else VAT_RATE)
-    new_net = round(base_price * sites + extra_price * extra_users, 2)
-    new_vat = round(new_net * vat_rate, 2)
-    new_gross = round(new_net + new_vat, 2)
-
-    try:
-        if sub.get("stripe_subscription_id"):
-            sync_stripe_subscription_quantities(organisation_id, sites, new_contracted_users)
-    except Exception as exc:
-        return jsonify(error=f"Stripe could not update the subscription: {exc}"), 502
-
-    execute(
-        """UPDATE subscriptions SET contracted_users=?,monthly_price=? WHERE organisation_id=?""",
-        (new_contracted_users, new_net, organisation_id),
-    )
-    company_event(
-        "User licences increased",
-        f"{new_capacity} licences Â· Â£{new_net:.2f} + VAT/month",
-        organisation_id,
-    )
-    return jsonify(
-        ok=True,
-        licensed_capacity=new_capacity,
-        monthly_net=new_net,
-        monthly_vat=new_vat,
-        monthly_gross=new_gross,
-        message=f"Licence limit increased to {new_capacity} users.",
-    )
+    return jsonify(ok=True, message="Alport now includes unlimited users at no additional charge.")
 
 
 @app.post("/api/licences/users")
@@ -1370,25 +1322,6 @@ def add_login_user():
         return jsonify(error="Password must be at least 8 characters"), 400
     if role not in allowed_roles:
         return jsonify(error="Invalid user role"), 400
-
-    summary = licence_summary(organisation_id)
-    if summary["active_users"] >= summary["licensed_capacity"]:
-        next_capacity = summary["licensed_capacity"] + 1
-        sub = subscription_for(organisation_id) or {}
-        sites = max(1, int(sub.get("contracted_sites") or summary["billable_sites"] or 1))
-        included = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE) * sites
-        next_extra = max(0, next_capacity - included)
-        next_net = round(float(sub.get("base_price") or BASE_PRICE_PER_SITE) * sites + float(sub.get("extra_user_price") or EXTRA_USER_PRICE) * next_extra, 2)
-        next_vat = round(next_net * float(sub.get("vat_rate") if sub.get("vat_rate") is not None else VAT_RATE), 2)
-        return jsonify(
-            error="All purchased user licences are in use.",
-            upgrade_required=True,
-            current_licences=summary["licensed_capacity"],
-            proposed_licences=next_capacity,
-            proposed_net=next_net,
-            proposed_vat=next_vat,
-            proposed_gross=round(next_net + next_vat, 2),
-        ), 409
 
     existing = q("SELECT id,active FROM users WHERE organisation_id=? AND lower(email)=?", (organisation_id, email), True)
     if existing:
@@ -1423,7 +1356,7 @@ def deactivate_login_user(user_id):
     execute("UPDATE users SET active=0 WHERE id=? AND organisation_id=?", (user_id, u["organisation_id"]))
     audit("Deactivated", "login_user", user_id, target["email"])
     company_event("Alport Hospitality Solutions user deactivated", target["email"], u["organisation_id"])
-    return jsonify(ok=True, message="User deactivated. Contracted licence quantity is unchanged during the minimum term.")
+    return jsonify(ok=True, message="User deactivated.")
 
 
 @app.post("/api/licences/users/<int:user_id>/activate")
@@ -1436,9 +1369,6 @@ def activate_login_user(user_id):
         return jsonify(error="User not found"), 404
     if int(target.get("active") or 0) == 1:
         return jsonify(ok=True)
-    summary = licence_summary(u["organisation_id"])
-    if summary["active_users"] >= summary["licensed_capacity"]:
-        return jsonify(error="All purchased user licences are in use.", upgrade_required=True), 409
     execute("UPDATE users SET active=1 WHERE id=? AND organisation_id=?", (user_id, u["organisation_id"]))
     audit("Activated", "login_user", user_id, target["email"])
     company_event("Alport Hospitality Solutions user reactivated", target["email"], u["organisation_id"])
@@ -1464,10 +1394,8 @@ def add_site():
     if sub and sub.get("status") in ("Active", "Past due"):
         p = pricing_for(u["organisation_id"])
         new_sites = p["billable_sites"]
-        included_capacity = int(sub.get("included_users_per_site") or INCLUDED_USERS_PER_SITE) * new_sites
-        new_contracted_users = max(int(sub.get("contracted_users") or 0), included_capacity, p["active_users"])
-        extra_users = max(0, new_contracted_users - included_capacity)
-        new_net = round(float(sub.get("base_price") or BASE_PRICE_PER_SITE) * new_sites + float(sub.get("extra_user_price") or EXTRA_USER_PRICE) * extra_users, 2)
+        new_contracted_users = p["active_users"]
+        new_net = round(BASE_PRICE_PER_SITE * new_sites, 2)
         try:
             if sub.get("stripe_subscription_id"):
                 sync_stripe_subscription_quantities(u["organisation_id"], new_sites, new_contracted_users)
@@ -2909,7 +2837,7 @@ def company_admin_customers():
                 COALESCE(s.next_billing_date,'') next_billing_date,
                 COALESCE(s.contract_start,'') contract_start,COALESCE(s.contract_end,'') contract_end,
                 COALESCE(s.contracted_sites,1) contracted_sites,COALESCE(s.contracted_users,3) contracted_users,
-                COALESCE(s.base_price,250) base_price,COALESCE(s.extra_user_price,20) extra_user_price,
+                COALESCE(s.base_price,500) base_price,0 extra_user_price,
                 (SELECT COUNT(*) FROM sites st WHERE st.organisation_id=o.id AND st.active=1) site_count,
                 (SELECT COUNT(*) FROM users u WHERE u.organisation_id=o.id AND u.active=1) user_count,
                 (SELECT COALESCE(SUM(sp.amount),0) FROM subscription_payments sp WHERE sp.organisation_id=o.id AND sp.status='Paid') total_paid
