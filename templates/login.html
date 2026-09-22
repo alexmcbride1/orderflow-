@@ -1,437 +1,397 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-    <title>OrderFlow — Sign in</title>
+<title>Sign in | Alport Hospitality Solutions</title>
 
-    <style>
-        :root {
-            --dark: #0e211a;
-            --green: #2f765d;
-            --green-dark: #1d5a47;
-            --background: #f4f7f5;
-            --white: #ffffff;
-            --text: #17221e;
-            --muted: #71807a;
-            --border: #dfe8e2;
-            --error-bg: #fff1f0;
-            --error-text: #a33f38;
-        }
+<style>
+:root{
+    --green:#173d32;
+    --green-light:#285c4b;
+    --cream:#f5f1e8;
+    --white:#ffffff;
+    --text:#17211d;
+    --muted:#748079;
+    --line:#dde5df;
+    --gold:#a88a58;
+    --red:#9b4038;
+}
 
-        * {
-            box-sizing: border-box;
-        }
+*{
+    box-sizing:border-box;
+}
 
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
-        }
+body{
+    margin:0;
+    min-height:100vh;
+    background:
+        linear-gradient(
+            135deg,
+            #102b23 0%,
+            #173d32 48%,
+            #f3f1eb 48%,
+            #f7f6f2 100%
+        );
+    color:var(--text);
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    display:grid;
+    place-items:center;
+    padding:24px;
+}
 
-        body {
-            background: var(--background);
-            color: var(--text);
+.login-wrap{
+    width:min(440px,100%);
+}
 
-            font-family:
-                Inter,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Helvetica,
-                Arial,
-                sans-serif;
+.brand{
+    text-align:center;
+    color:white;
+    margin-bottom:24px;
+}
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+.brand-mark{
+    width:74px;
+    height:74px;
+    margin:0 auto 14px;
+    display:block;
+}
 
-            min-height: 100vh;
-            padding: 24px;
-        }
+.brand-name{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:31px;
+    font-weight:600;
+    letter-spacing:5px;
+    line-height:1;
+}
 
-        .page {
-            width: 100%;
-            max-width: 440px;
-        }
+.brand-sub{
+    margin-top:8px;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    opacity:.82;
+}
 
-        .brand {
-            text-align: center;
-            margin-bottom: 28px;
-        }
+.brand-line{
+    width:48px;
+    height:1px;
+    background:var(--gold);
+    margin:13px auto;
+}
 
-        .logo {
-            font-size: 38px;
-            line-height: 1;
-            font-weight: 900;
-            letter-spacing: -2px;
-            color: var(--text);
-        }
+.brand-motto{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:12px;
+    letter-spacing:2px;
+    opacity:.9;
+}
 
-        .logo span {
-            color: var(--green);
-        }
+.card{
+    background:rgba(255,255,255,.98);
+    border:1px solid rgba(255,255,255,.6);
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 24px 70px rgba(5,20,14,.22);
+}
 
-        .tagline {
-            margin-top: 10px;
-            color: var(--muted);
-            font-size: 14px;
-            font-weight: 500;
-        }
+.eyebrow{
+    color:var(--green);
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+}
 
-        .card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 20px 60px rgba(23, 56, 45, 0.10);
-        }
+h1{
+    margin:8px 0 7px;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:30px;
+    font-weight:500;
+    color:var(--green);
+}
 
-        .heading {
-            margin-bottom: 26px;
-        }
+.intro{
+    margin:0 0 23px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.55;
+}
 
-        .eyebrow {
-            color: var(--green);
-            font-size: 11px;
-            font-weight: 850;
-            text-transform: uppercase;
-            letter-spacing: 1.6px;
-            margin-bottom: 8px;
-        }
+.error{
+    margin-bottom:17px;
+    padding:11px 13px;
+    border:1px solid #efd2ce;
+    border-radius:10px;
+    background:#f8e9e7;
+    color:var(--red);
+    font-size:12px;
+    line-height:1.45;
+}
 
-        h1 {
-            margin: 0;
-            font-size: 30px;
-            line-height: 1.1;
-            letter-spacing: -1px;
-            font-weight: 850;
-        }
+form{
+    display:grid;
+    gap:13px;
+}
 
-        .intro {
-            margin: 9px 0 0;
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.5;
-        }
+.field{
+    display:grid;
+    gap:6px;
+}
 
-        .error {
-            background: var(--error-bg);
-            border: 1px solid #f1cbc7;
-            color: var(--error-text);
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 18px;
-            font-size: 13px;
-            font-weight: 650;
-        }
+label{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.3px;
+    color:#405049;
+}
 
-        .form-group {
-            margin-bottom: 18px;
-        }
+input{
+    width:100%;
+    padding:13px 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:white;
+    color:var(--text);
+    font:inherit;
+    font-size:14px;
+    outline:none;
+    transition:.15s ease;
+}
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 13px;
-            font-weight: 750;
-            color: var(--text);
-        }
+input:focus{
+    border-color:var(--green-light);
+    box-shadow:0 0 0 3px rgba(23,61,50,.08);
+}
 
-        input {
-            width: 100%;
-            height: 52px;
-            padding: 0 15px;
+button{
+    width:100%;
+    margin-top:5px;
+    border:0;
+    border-radius:10px;
+    padding:13px 16px;
+    background:var(--green);
+    color:white;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.3px;
+    cursor:pointer;
+}
 
-            border: 1px solid var(--border);
-            border-radius: 12px;
+button:hover{
+    background:var(--green-light);
+}
 
-            background: #fbfcfb;
-            color: var(--text);
+.create{
+    display:block;
+    margin-top:18px;
+    text-align:center;
+    color:var(--green);
+    font-size:11px;
+    font-weight:700;
+    text-decoration:none;
+}
 
-            font-size: 16px;
-            outline: none;
+.create:hover{
+    text-decoration:underline;
+}
 
-            transition:
-                border-color 0.15s ease,
-                box-shadow 0.15s ease,
-                background 0.15s ease;
-        }
+.footer{
+    margin-top:20px;
+    text-align:center;
+    color:rgba(255,255,255,.72);
+    font-size:9px;
+    line-height:1.6;
+}
 
-        input:focus {
-            background: #ffffff;
-            border-color: var(--green);
-            box-shadow: 0 0 0 4px rgba(47, 118, 93, 0.12);
-        }
+.footer a{
+    color:inherit;
+    text-decoration:none;
+}
 
-        input::placeholder {
-            color: #9aa59f;
-        }
+@media(max-width:600px){
+    body{
+        background:#f4f4ef;
+        padding:20px 14px;
+    }
 
-        .password-wrapper {
-            position: relative;
-        }
+    .brand{
+        color:var(--green);
+    }
 
-        .password-wrapper input {
-            padding-right: 88px;
-        }
+    .brand-mark{
+        width:66px;
+        height:66px;
+    }
 
-        .show-password {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+    .brand-name{
+        font-size:27px;
+    }
 
-            border: 0;
-            background: transparent;
+    .card{
+        padding:24px 20px;
+    }
 
-            color: var(--green-dark);
-
-            font-size: 12px;
-            font-weight: 800;
-
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .show-password:hover {
-            color: var(--dark);
-        }
-
-        .submit {
-            width: 100%;
-            height: 54px;
-
-            border: 0;
-            border-radius: 13px;
-
-            background: var(--dark);
-            color: #ffffff;
-
-            font-size: 15px;
-            font-weight: 800;
-
-            cursor: pointer;
-
-            transition:
-                transform 0.15s ease,
-                background 0.15s ease,
-                box-shadow 0.15s ease;
-        }
-
-        .submit:hover {
-            background: var(--green-dark);
-            box-shadow: 0 8px 24px rgba(14, 33, 26, 0.18);
-        }
-
-        .submit:active {
-            transform: translateY(1px);
-        }
-
-        .create-account {
-            text-align: center;
-            margin-top: 20px;
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .create-account a {
-            color: var(--green-dark);
-            font-weight: 800;
-            text-decoration: none;
-        }
-
-        .create-account a:hover {
-            text-decoration: underline;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 22px;
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .footer strong {
-            color: var(--green-dark);
-            font-weight: 800;
-        }
-
-        @media (max-width: 480px) {
-
-            body {
-                padding: 16px;
-            }
-
-            .card {
-                padding: 24px 20px;
-                border-radius: 20px;
-            }
-
-            .logo {
-                font-size: 34px;
-            }
-
-            h1 {
-                font-size: 27px;
-            }
-        }
-    </style>
+    .footer{
+        color:var(--muted);
+    }
+}
+</style>
 </head>
 
 <body>
 
-<div class="page">
+<div class="login-wrap">
 
     <div class="brand">
 
-        <div class="logo">
-            ORDER<span>FLOW</span>
+        <svg
+            class="brand-mark"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Alport Hospitality Solutions"
+        >
+            <circle
+                cx="50"
+                cy="50"
+                r="46"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+            />
+
+            <path
+                d="M18 62
+                   C28 56,35 54,44 55
+                   C54 56,61 61,70 60
+                   C76 59,81 56,84 54"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+            />
+
+            <path
+                d="M18 69
+                   C30 63,40 62,49 64
+                   C60 67,70 67,84 61"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+            />
+
+            <path
+                d="M25 55
+                   L38 39
+                   L47 49
+                   L57 35
+                   L76 56"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+
+            <circle
+                cx="69"
+                cy="31"
+                r="4"
+                fill="currentColor"
+            />
+        </svg>
+
+        <div class="brand-name">ALPORT</div>
+
+        <div class="brand-sub">
+            Hospitality Solutions
         </div>
 
-        <div class="tagline">
-            Hospitality management, simplified.
+        <div class="brand-line"></div>
+
+        <div class="brand-motto">
+            People &nbsp; Process &nbsp; Profit
         </div>
 
     </div>
 
-
     <div class="card">
 
-        <div class="heading">
-
-            <div class="eyebrow">
-                Secure access
-            </div>
-
-            <h1>
-                Welcome back
-            </h1>
-
-            <p class="intro">
-                Sign in to manage your hospitality business.
-            </p>
-
+        <div class="eyebrow">
+            Alport Hospitality Solutions
         </div>
 
+        <h1>Welcome back</h1>
+
+        <p class="intro">
+            Sign in to manage your hospitality business.
+        </p>
 
         {% if error %}
-            <div class="error">
-                {{ error }}
-            </div>
+        <div class="error">
+            {{ error }}
+        </div>
         {% endif %}
 
+        <form method="post">
 
-        <form method="POST" action="/login">
-
-            <div class="form-group">
-
-                <label for="email">
-                    Email address
-                </label>
+            <div class="field">
+                <label for="email">EMAIL ADDRESS</label>
 
                 <input
                     id="email"
-                    name="email"
                     type="email"
-                    placeholder="you@example.com"
-                    autocomplete="email"
-                    autocapitalize="none"
-                    spellcheck="false"
+                    name="email"
                     required
-                    autofocus
+                    autocomplete="email"
+                    placeholder="you@company.co.uk"
                 >
-
             </div>
 
+            <div class="field">
+                <label for="password">PASSWORD</label>
 
-            <div class="form-group">
-
-                <label for="password">
-                    Password
-                </label>
-
-                <div class="password-wrapper">
-
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        placeholder="Enter your password"
-                        autocomplete="current-password"
-                        required
-                    >
-
-                    <button
-                        type="button"
-                        class="show-password"
-                        id="passwordToggle"
-                        onclick="togglePassword()"
-                    >
-                        Show
-                    </button>
-
-                </div>
-
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    required
+                    autocomplete="current-password"
+                    placeholder="Your password"
+                >
             </div>
 
-
-            <button
-                type="submit"
-                class="submit"
-            >
-                Sign in to OrderFlow
+            <button type="submit">
+                Sign in
             </button>
 
         </form>
 
-
-        <div class="create-account">
-            Don't have an account?
-            <a href="/onboarding">
-                Create one
-            </a>
-        </div>
+        <a class="create" href="/onboarding">
+            Create a new business
+        </a>
 
     </div>
 
-
     <div class="footer">
-        <strong>OrderFlow</strong><br>
-        One platform for your entire hospitality operation.
+        <div>
+            &copy; Alport Hospitality Solutions
+        </div>
+
+        <div>
+            <a href="/privacy">Privacy Policy</a>
+        </div>
     </div>
 
 </div>
-
-
-<script>
-
-function togglePassword() {
-
-    const password =
-        document.getElementById("password");
-
-    const toggle =
-        document.getElementById("passwordToggle");
-
-    if (password.type === "password") {
-
-        password.type = "text";
-        toggle.textContent = "Hide";
-
-    } else {
-
-        password.type = "password";
-        toggle.textContent = "Show";
-
-    }
-}
-
-</script>
 
 </body>
 </html>
