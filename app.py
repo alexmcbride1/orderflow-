@@ -5,8 +5,6 @@ import hashlib
 import hmac
 import json
 import time
-import secrets
-from html import escape
 
 import psycopg
 import requests
@@ -804,27 +802,6 @@ def init_db():
                 "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS menu_section TEXT NOT NULL DEFAULT 'Mains'",
                 "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS portion_weight DOUBLE PRECISION NOT NULL DEFAULT 0",
                 "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS portion_unit TEXT NOT NULL DEFAULT 'g'",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS cancellation_notice_hours INTEGER NOT NULL DEFAULT 24",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS amendment_notice_hours INTEGER NOT NULL DEFAULT 4",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS guest_can_change_date INTEGER NOT NULL DEFAULT 1",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS guest_can_change_time INTEGER NOT NULL DEFAULT 1",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS guest_can_change_party INTEGER NOT NULL DEFAULT 1",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS large_party_threshold INTEGER NOT NULL DEFAULT 6",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS deposit_type TEXT NOT NULL DEFAULT 'none'",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS deposit_value DOUBLE PRECISION NOT NULL DEFAULT 0",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS deposit_min_party INTEGER NOT NULL DEFAULT 1",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS cancellation_policy TEXT DEFAULT ''",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS logo_url TEXT DEFAULT ''",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS confirmation_subject TEXT DEFAULT 'Your reservation is confirmed â {{venue_name}}'",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS confirmation_message TEXT DEFAULT 'Thank you for choosing {{venue_name}}. We are pleased to confirm your reservation and look forward to welcoming you.'",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS review_subject TEXT DEFAULT 'Thank you for dining with us â {{venue_name}}'",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS review_message TEXT DEFAULT 'Thank you for joining us. We would really appreciate hearing about your experience.'",
-                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS stripe_connect_account_id TEXT DEFAULT ''",
-                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS manage_token TEXT DEFAULT ''",
-                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS deposit_required DOUBLE PRECISION NOT NULL DEFAULT 0",
-                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS deposit_paid DOUBLE PRECISION NOT NULL DEFAULT 0",
-                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS deposit_status TEXT NOT NULL DEFAULT 'Not required'",
-                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS deposit_checkout_session_id TEXT DEFAULT ''",
             ]
             for statement in migrations:
                 cur.execute(statement)
@@ -1316,16 +1293,9 @@ def stripe_webhook():
         obj = ((event.get("data") or {}).get("object") or {})
 
         if event_type == "checkout.session.completed":
-            booking_id = int((obj.get("metadata") or {}).get("booking_id") or 0)
-            if booking_id and obj.get("payment_status") in ("paid","no_payment_required"):
-                booking=q("SELECT * FROM bookings WHERE id=?",(booking_id,),True)
-                if booking:
-                    paid=float(obj.get("amount_total") or 0)/100.0
-                    execute("UPDATE bookings SET deposit_paid=?,deposit_status='Paid',updated_at=? WHERE id=?",(paid,now(),booking_id))
-            else:
-                organisation_id = int((obj.get("metadata") or {}).get("organisation_id") or obj.get("client_reference_id") or 0)
-                if organisation_id:
-                    activate_contract_from_checkout(organisation_id, obj)
+            organisation_id = int((obj.get("metadata") or {}).get("organisation_id") or obj.get("client_reference_id") or 0)
+            if organisation_id:
+                activate_contract_from_checkout(organisation_id, obj)
 
         elif event_type == "invoice.paid":
             subscription_id = str(obj.get("subscription") or "")
@@ -1366,19 +1336,21 @@ def stripe_webhook():
         return jsonify(error=str(exc)), 400
 
 
-def send_alport_email(to_email, subject, text_body, html_body=None):
-    """Send a venue-branded transactional/CRM email through Resend."""
+def send_alport_email(to_email, subject, text_body):
+    """Send transactional/CRM email through the already configured Resend account."""
     resend_key = os.environ.get("RESEND_API_KEY", "").strip()
     from_email = os.environ.get("SUPPORT_FROM_EMAIL", "").strip()
     if not resend_key or not from_email or not to_email:
         return {"ok": False, "id": "", "error": "Email is not configured"}
-    payload = {"from": from_email, "to": [to_email], "subject": subject, "text": text_body}
-    if html_body:
-        payload["html"] = html_body
     try:
-        r = requests.post("https://api.resend.com/emails", headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"}, json=payload, timeout=20)
-        result = r.json() if r.content else {}
-        return {"ok": bool(r.ok), "id": str(result.get("id") or ""), "error": "" if r.ok else str(result)}
+        r = requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
+            json={"from": from_email, "to": [to_email], "subject": subject, "text": text_body},
+            timeout=20,
+        )
+        payload = r.json() if r.content else {}
+        return {"ok": bool(r.ok), "id": str(payload.get("id") or ""), "error": "" if r.ok else str(payload)}
     except Exception as exc:
         return {"ok": False, "id": "", "error": str(exc)}
 
@@ -2800,145 +2772,6 @@ def bookings_overview():
     return jsonify(date=day, bookings=[dict(x) for x in rows], covers=covers, booking_count=len(active), peak_time=peak_time, peak_covers=peak.get(peak_time,0) if peak else 0)
 
 
-
-def _public_base_url():
-    return os.environ.get("PUBLIC_BASE_URL", "").strip().rstrip("/") or request.url_root.rstrip("/")
-
-
-def _booking_manage_token(booking):
-    token=(booking.get("manage_token") or "").strip()
-    if token: return token
-    token=secrets.token_urlsafe(32)
-    execute("UPDATE bookings SET manage_token=? WHERE id=?",(token,booking["id"]))
-    return token
-
-
-def _render_booking_text(template, booking, site):
-    values={
-        "guest_first_name": (booking.get("guest_name") or "Guest").split()[0],
-        "guest_name": booking.get("guest_name") or "Guest",
-        "venue_name": site.get("name") or "our restaurant",
-        "booking_date": booking.get("booking_date") or "",
-        "booking_time": str(booking.get("booking_time") or "")[:5],
-        "party_size": str(booking.get("party_size") or ""),
-        "booking_reference": str(booking.get("id") or ""),
-    }
-    text=template or ""
-    for k,v in values.items(): text=text.replace("{{"+k+"}}",str(v))
-    return text
-
-
-def _booking_email_html(site, settings, booking, heading, message, button_label="Manage reservation", button_url=""):
-    logo=(settings.get("logo_url") or "").strip()
-    logo_html=f'<img src="{escape(logo)}" alt="{escape(site.get("name") or "Venue")}" style="max-width:180px;max-height:70px;margin-bottom:24px">' if logo else f'<div style="font-size:22px;font-weight:800;letter-spacing:.08em;margin-bottom:24px">{escape(site.get("name") or "Venue")}</div>'
-    button=f'<p style="margin:28px 0"><a href="{escape(button_url)}" style="display:inline-block;background:#1d5a47;color:white;text-decoration:none;padding:13px 20px;border-radius:8px;font-weight:700">{escape(button_label)}</a></p>' if button_url else ''
-    details=f'''<div style="background:#f4f7f5;border:1px solid #dfe8e2;border-radius:12px;padding:18px;margin:24px 0"><strong>{escape(str(booking.get("booking_date") or ""))}</strong><br>{escape(str(booking.get("booking_time") or "")[:5])} &nbsp;Â·&nbsp; {escape(str(booking.get("party_size") or ""))} guests<br><span style="color:#718079">Reference #{escape(str(booking.get("id") or ""))}</span></div>'''
-    return f'''<!doctype html><html><body style="margin:0;background:#f4f7f5;font-family:Arial,sans-serif;color:#17221e"><div style="max-width:620px;margin:0 auto;padding:36px 18px"><div style="background:white;border:1px solid #dfe8e2;border-radius:18px;padding:34px">{logo_html}<h1 style="font-size:26px;margin:0 0 16px">{escape(heading)}</h1><p style="font-size:16px;line-height:1.6;color:#46534e">{escape(message).replace(chr(10),'<br>')}</p>{details}{button}<p style="font-size:13px;color:#718079;margin-top:28px">{escape(settings.get("cancellation_policy") or "Please contact the restaurant if you need any assistance with your reservation.")}</p></div><p style="text-align:center;color:#89958f;font-size:11px;margin:18px">Reservation communications powered by Alport Hospitality Solutions</p></div></body></html>'''
-
-
-def _deposit_amount(settings, party_size):
-    if int(party_size or 0) < int(settings.get("deposit_min_party") or 1): return 0.0
-    kind=(settings.get("deposit_type") or "none").lower(); value=float(settings.get("deposit_value") or 0)
-    if kind=="per_person": return round(value*int(party_size),2)
-    if kind=="fixed": return round(value,2)
-    return 0.0
-
-
-def stripe_connected_request(method,path,account_id,data=None):
-    key=os.environ.get("STRIPE_SECRET_KEY","").strip()
-    if not key: raise RuntimeError("Stripe is not configured")
-    r=requests.request(method,"https://api.stripe.com/v1"+path,auth=(key,""),headers={"Stripe-Account":account_id},data=data or {},timeout=20)
-    payload=r.json() if r.content else {}
-    if not r.ok: raise RuntimeError(((payload.get("error") or {}).get("message") or "Stripe request failed"))
-    return payload
-
-
-@app.get("/api/bookings/communications")
-@login_required
-def booking_communications_get():
-    u,site=user(),current_site(); return jsonify(settings=dict(booking_settings_for(u["organisation_id"],site["id"])))
-
-
-@app.post("/api/bookings/communications")
-@login_required
-@manager_required
-def booking_communications_save():
-    u,site=user(),current_site(); d=request.get_json() or {}
-    fields=["logo_url","confirmation_subject","confirmation_message","review_subject","review_message","cancellation_policy"]
-    execute("UPDATE booking_settings SET "+",".join(f+"=?" for f in fields)+",updated_at=? WHERE organisation_id=? AND site_id=?",tuple([str(d.get(f) or "") for f in fields]+[now(),u["organisation_id"],site["id"]]))
-    return jsonify(ok=True)
-
-
-@app.post("/api/bookings/connect-payments")
-@login_required
-@manager_required
-def booking_connect_payments():
-    u,site=user(),current_site(); settings=booking_settings_for(u["organisation_id"],site["id"])
-    account=(settings.get("stripe_connect_account_id") or "").strip()
-    try:
-        if not account:
-            created=stripe_request("POST","/accounts",{"type":"express","country":"GB","capabilities[card_payments][requested]":"true","capabilities[transfers][requested]":"true","metadata[organisation_id]":str(u["organisation_id"]),"metadata[site_id]":str(site["id"])})
-            account=created["id"]
-            execute("UPDATE booking_settings SET stripe_connect_account_id=?,updated_at=? WHERE organisation_id=? AND site_id=?",(account,now(),u["organisation_id"],site["id"]))
-        link=stripe_request("POST","/account_links",{"account":account,"refresh_url":_public_base_url()+"/app","return_url":_public_base_url()+"/app","type":"account_onboarding"})
-        return jsonify(ok=True,url=link["url"])
-    except Exception as exc: return jsonify(error=str(exc)),400
-
-
-@app.get("/manage-reservation/<token>")
-def manage_reservation_page(token):
-    b=q("SELECT b.*,s.name site_name,s.address site_address FROM bookings b JOIN sites s ON s.id=b.site_id WHERE b.manage_token=?",(token,),True)
-    if not b: return "Reservation not found",404
-    settings=dict(booking_settings_for(b["organisation_id"],b["site_id"]))
-    return render_template("manage_reservation.html",booking=b,settings=settings)
-
-
-@app.post("/manage-reservation/<token>")
-def manage_reservation_action(token):
-    b=q("SELECT b.*,s.name site_name,s.address site_address FROM bookings b JOIN sites s ON s.id=b.site_id WHERE b.manage_token=?",(token,),True)
-    if not b: return "Reservation not found",404
-    settings=dict(booking_settings_for(b["organisation_id"],b["site_id"])); action=request.form.get("action") or "update"
-    try: arrival=datetime.fromisoformat(f"{b['booking_date']}T{str(b['booking_time'])[:5]}")
-    except: arrival=datetime.now()
-    hours=max(0,(arrival-datetime.now()).total_seconds()/3600)
-    if action=="cancel":
-        if hours < int(settings.get("cancellation_notice_hours") or 0):
-            return render_template("manage_reservation.html",booking=b,settings=settings,error="Online cancellation is no longer available for this booking. Please contact the restaurant directly."),400
-        execute("UPDATE bookings SET status='Cancelled',cancelled_at=?,updated_at=? WHERE id=?",(now(),now(),b["id"]))
-        return render_template("manage_reservation.html",booking=dict(b),settings=settings,success="Your reservation has been cancelled.")
-    if hours < int(settings.get("amendment_notice_hours") or 0):
-        return render_template("manage_reservation.html",booking=b,settings=settings,error="Online changes are no longer available for this booking. Please contact the restaurant directly."),400
-    new_date=request.form.get("booking_date") if int(settings.get("guest_can_change_date") or 0) else b["booking_date"]
-    new_time=request.form.get("booking_time") if int(settings.get("guest_can_change_time") or 0) else b["booking_time"]
-    new_party=int(request.form.get("party_size") or b["party_size"]) if int(settings.get("guest_can_change_party") or 0) else int(b["party_size"])
-    duration=int(b["duration_minutes"] or settings.get("default_duration") or 120)
-    options=booking_available_tables(b["organisation_id"],b["site_id"],new_date,new_time,new_party,duration,exclude_booking_id=b["id"])
-    if not options: return render_template("manage_reservation.html",booking=b,settings=settings,error="That change is not available. Please choose another time or contact the restaurant."),409
-    table_id=options[0]["id"]
-    execute("UPDATE bookings SET booking_date=?,booking_time=?,party_size=?,table_id=?,special_requests=?,dietary_requirements=?,updated_at=? WHERE id=?",(new_date,new_time,new_party,table_id,request.form.get("special_requests") or "",request.form.get("dietary_requirements") or "",now(),b["id"]))
-    updated=q("SELECT b.*,s.name site_name,s.address site_address FROM bookings b JOIN sites s ON s.id=b.site_id WHERE b.id=?",(b["id"],),True)
-    return render_template("manage_reservation.html",booking=updated,settings=settings,success="Your reservation has been updated.")
-
-
-@app.post("/api/bookings/<int:booking_id>/deposit-checkout")
-@login_required
-@manager_required
-def booking_deposit_checkout(booking_id):
-    u,site=user(),current_site(); b=q("SELECT * FROM bookings WHERE id=? AND organisation_id=? AND site_id=?",(booking_id,u["organisation_id"],site["id"]),True)
-    if not b:return jsonify(error="Booking not found"),404
-    settings=dict(booking_settings_for(u["organisation_id"],site["id"])); account=(settings.get("stripe_connect_account_id") or "").strip()
-    if not account:return jsonify(error="Connect the restaurant payment account first"),400
-    amount=float(b.get("deposit_required") or _deposit_amount(settings,b["party_size"]))
-    if amount<=0:return jsonify(error="No deposit is required for this booking"),400
-    try:
-        manage=_public_base_url()+"/manage-reservation/"+_booking_manage_token(b)
-        data={"mode":"payment","success_url":manage+"?payment=success","cancel_url":manage,"customer_email":b.get("guest_email") or None,"line_items[0][price_data][currency]":"gbp","line_items[0][price_data][product_data][name]":f"Reservation deposit â {site['name']}","line_items[0][price_data][unit_amount]":str(int(round(amount*100))),"line_items[0][quantity]":"1","metadata[booking_id]":str(b["id"])}
-        data={k:v for k,v in data.items() if v is not None}
-        checkout=stripe_connected_request("POST","/checkout/sessions",account,data)
-        execute("UPDATE bookings SET deposit_required=?,deposit_status='Payment requested',deposit_checkout_session_id=?,updated_at=? WHERE id=?",(amount,checkout["id"],now(),booking_id))
-        return jsonify(ok=True,url=checkout["url"])
-    except Exception as exc:return jsonify(error=str(exc)),400
-
 @app.post("/api/bookings")
 @login_required
 @manager_required
@@ -2968,22 +2801,14 @@ def create_booking():
         options = booking_available_tables(u["organisation_id"],site["id"],booking_date,booking_time,party,duration)
         table_id = options[0]["id"] if options else None
     guest_id = upsert_guest(u["organisation_id"], name, email, phone, bool(d.get("marketing_consent")))
-    manage_token=secrets.token_urlsafe(32)
-    deposit_required=_deposit_amount(settings,party)
-    deposit_status="Required" if deposit_required>0 else "Not required"
-    booking_id = execute("""INSERT INTO bookings(organisation_id,site_id,guest_id,booking_date,booking_time,party_size,duration_minutes,status,source,table_id,guest_name,guest_email,guest_phone,special_requests,dietary_requirements,internal_notes,marketing_consent,manage_token,deposit_required,deposit_status,created_at,updated_at)
-                          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                         (u["organisation_id"],site["id"],guest_id,booking_date,booking_time,party,duration,d.get("status") or "Confirmed",d.get("source") or "Manager",table_id,name,email,phone,d.get("special_requests") or "",d.get("dietary_requirements") or "",d.get("internal_notes") or "",1 if d.get("marketing_consent") else 0,manage_token,deposit_required,deposit_status,now(),now()))
-    booking=q("SELECT * FROM bookings WHERE id=?",(booking_id,),True)
+    booking_id = execute("""INSERT INTO bookings(organisation_id,site_id,guest_id,booking_date,booking_time,party_size,duration_minutes,status,source,table_id,guest_name,guest_email,guest_phone,special_requests,dietary_requirements,internal_notes,marketing_consent,created_at,updated_at)
+                            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                         (u["organisation_id"],site["id"],guest_id,booking_date,booking_time,party,duration,d.get("status") or "Confirmed",d.get("source") or "Manager",table_id,name,email,phone,d.get("special_requests") or "",d.get("dietary_requirements") or "",d.get("internal_notes") or "",1 if d.get("marketing_consent") else 0,now(),now()))
     if email and int(settings.get("confirmation_enabled") or 0):
-        subject=_render_booking_text(settings.get("confirmation_subject") or "Your reservation is confirmed â {{venue_name}}",booking,site)
-        message=_render_booking_text(settings.get("confirmation_message") or "Thank you for choosing {{venue_name}}. We look forward to welcoming you.",booking,site)
-        manage_url=_public_base_url()+"/manage-reservation/"+manage_token
-        text=f"{message}\n\n{booking_date} at {booking_time} Â· {party} guests\n\nManage reservation: {manage_url}"
-        result=send_alport_email(email,subject,text,_booking_email_html(site,settings,booking,"Your reservation is confirmed",message,"Manage reservation",manage_url))
+        result=send_alport_email(email,f"Booking confirmed â {site['name']}",f"Hi {name},\n\nYour table at {site['name']} is confirmed for {party} guest(s) on {booking_date} at {booking_time}.\n\nWe look forward to welcoming you.")
         if result["ok"]:
             execute("UPDATE bookings SET confirmation_sent_at=? WHERE id=?",(now(),booking_id))
-            execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,booking_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],guest_id,booking_id,"Confirmation",email,subject,"Sent",result["id"],now()))
+            execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,booking_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],guest_id,booking_id,"Confirmation",email,f"Booking confirmed â {site['name']}","Sent",result["id"],now()))
     audit("Created","booking",booking_id,f"{name} Â· {party} Â· {booking_date} {booking_time}")
     return jsonify(ok=True,id=booking_id,table_id=table_id)
 
@@ -3053,13 +2878,9 @@ def get_booking_settings():
 @manager_required
 def save_booking_settings():
     u,site=user(),current_site();d=request.get_json() or {};booking_settings_for(u["organisation_id"],site["id"])
-    fields=["booking_interval","default_duration","turnaround_minutes","max_party_size","max_covers_per_interval","min_notice_minutes","advance_days","review_delay_hours","lapsed_guest_weeks","confirmation_enabled","reminder_enabled","review_enabled","retention_enabled","cancellation_notice_hours","amendment_notice_hours","guest_can_change_date","guest_can_change_time","guest_can_change_party","large_party_threshold","deposit_type","deposit_value","deposit_min_party","cancellation_policy"]
-    integer_fields={"booking_interval","default_duration","turnaround_minutes","max_party_size","max_covers_per_interval","min_notice_minutes","advance_days","review_delay_hours","lapsed_guest_weeks","confirmation_enabled","reminder_enabled","review_enabled","retention_enabled","cancellation_notice_hours","amendment_notice_hours","guest_can_change_date","guest_can_change_time","guest_can_change_party","large_party_threshold","deposit_min_party"}
+    fields=["booking_interval","default_duration","turnaround_minutes","max_party_size","max_covers_per_interval","min_notice_minutes","advance_days","review_delay_hours","lapsed_guest_weeks","confirmation_enabled","reminder_enabled","review_enabled","retention_enabled"]
     vals=[]
-    for f in fields:
-        if f in integer_fields: vals.append(int(d.get(f,0) or 0))
-        elif f=="deposit_value": vals.append(float(d.get(f,0) or 0))
-        else: vals.append(str(d.get(f) or ""))
+    for f in fields: vals.append(int(d.get(f,0)))
     execute("UPDATE booking_settings SET "+",".join(f+"=?" for f in fields)+",updated_at=? WHERE organisation_id=? AND site_id=?",tuple(vals+[now(),u["organisation_id"],site["id"]]))
     return jsonify(ok=True)
 
@@ -3125,10 +2946,7 @@ def send_booking_review(booking_id):
     if not b["guest_email"]:return jsonify(error="Guest has no email address"),400
     public_url=(os.environ.get("PUBLIC_BASE_URL") or request.url_root.rstrip("/")).rstrip("/")
     link=f"{public_url}/booking-feedback/{booking_id}"
-    settings=dict(booking_settings_for(u["organisation_id"],site["id"]))
-    subject=_render_booking_text(settings.get("review_subject") or "Thank you for dining with us â {{venue_name}}",b,site)
-    message=_render_booking_text(settings.get("review_message") or "Thank you for joining us. We would really appreciate hearing about your experience.",b,site)
-    result=send_alport_email(b["guest_email"],subject,f"{message}\n\nShare your feedback: {link}",_booking_email_html(site,settings,b,"Thank you for dining with us",message,"Share your feedback",link))
+    result=send_alport_email(b["guest_email"],f"How was your visit to {site['name']}?",f"Hi {b['guest_name']},\n\nThank you for visiting {site['name']}. We would really value your feedback.\n\nShare your feedback: {link}\n\nThank you.")
     if not result["ok"]:return jsonify(error="Review email could not be sent"),502
     execute("UPDATE bookings SET review_sent_at=? WHERE id=?",(now(),booking_id));execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,booking_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],b["guest_id"],booking_id,"Review",b["guest_email"],f"How was your visit to {site['name']}?","Sent",result["id"],now()));return jsonify(ok=True)
 
