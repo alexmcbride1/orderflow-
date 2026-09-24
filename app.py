@@ -5,12 +5,16 @@ import hashlib
 import hmac
 import json
 import time
+import secrets
+from html import escape
 
 import psycopg
 import requests
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from psycopg.rows import dict_row
 from werkzeug.security import generate_password_hash, check_password_hash
+from cryptography.fernet import Fernet, InvalidToken
+import base64
 
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
@@ -755,6 +759,78 @@ CREATE TABLE IF NOT EXISTS eho_four_week_reviews(
     FOREIGN KEY(signed_by) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS employee_onboarding(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    employee_id BIGINT NOT NULL UNIQUE,
+    token TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL DEFAULT 'Invited',
+    invited_at TEXT NOT NULL,
+    personal_completed_at TEXT DEFAULT '',
+    training_completed_at TEXT DEFAULT '',
+    completed_at TEXT DEFAULT '',
+    date_of_birth_enc TEXT DEFAULT '',
+    address_enc TEXT DEFAULT '',
+    ni_number_enc TEXT DEFAULT '',
+    bank_account_name_enc TEXT DEFAULT '',
+    bank_sort_code_enc TEXT DEFAULT '',
+    bank_account_number_enc TEXT DEFAULT '',
+    emergency_name_enc TEXT DEFAULT '',
+    emergency_phone_enc TEXT DEFAULT '',
+    starter_declaration TEXT DEFAULT '',
+    p45_status TEXT DEFAULT '',
+    student_loan TEXT DEFAULT '',
+    right_to_work_status TEXT NOT NULL DEFAULT 'Pending',
+    right_to_work_checked_at TEXT DEFAULT '',
+    right_to_work_checked_by BIGINT,
+    right_to_work_reference TEXT DEFAULT '',
+    privacy_ack_at TEXT DEFAULT '',
+    revoked_at TEXT DEFAULT '',
+    FOREIGN KEY(employee_id) REFERENCES employees(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS employee_training(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    employee_id BIGINT NOT NULL,
+    module_key TEXT NOT NULL,
+    module_version TEXT NOT NULL DEFAULT '2026.1',
+    status TEXT NOT NULL DEFAULT 'Not started',
+    score DOUBLE PRECISION NOT NULL DEFAULT 0,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    assigned_at TEXT NOT NULL,
+    completed_at TEXT DEFAULT '',
+    refresher_due TEXT DEFAULT '',
+    UNIQUE(employee_id,module_key,module_version),
+    FOREIGN KEY(employee_id) REFERENCES employees(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS stocktakes(
+    id BIGSERIAL PRIMARY KEY,
+    organisation_id BIGINT NOT NULL,
+    site_id BIGINT NOT NULL,
+    stocktake_date TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'Open',
+    started_by BIGINT,
+    started_at TEXT NOT NULL,
+    completed_by BIGINT,
+    completed_at TEXT DEFAULT '',
+    notes TEXT DEFAULT ''
+);
+CREATE TABLE IF NOT EXISTS stocktake_lines(
+    id BIGSERIAL PRIMARY KEY,
+    stocktake_id BIGINT NOT NULL,
+    stock_item_id BIGINT NOT NULL,
+    expected_quantity DOUBLE PRECISION NOT NULL DEFAULT 0,
+    counted_quantity DOUBLE PRECISION,
+    unit_cost DOUBLE PRECISION NOT NULL DEFAULT 0,
+    variance_quantity DOUBLE PRECISION NOT NULL DEFAULT 0,
+    variance_value DOUBLE PRECISION NOT NULL DEFAULT 0,
+    counted_at TEXT DEFAULT '',
+    FOREIGN KEY(stocktake_id) REFERENCES stocktakes(id) ON DELETE CASCADE,
+    FOREIGN KEY(stock_item_id) REFERENCES stock_items(id) ON DELETE CASCADE,
+    UNIQUE(stocktake_id,stock_item_id)
+);
 CREATE TABLE IF NOT EXISTS audit_log(
     id BIGSERIAL PRIMARY KEY,
     organisation_id BIGINT,
@@ -766,6 +842,132 @@ CREATE TABLE IF NOT EXISTS audit_log(
     created_at TEXT NOT NULL
 );
 """
+
+
+def _staff_fernet():
+    raw = os.environ.get("STAFF_DATA_KEY", "").strip()
+    if raw:
+        try:
+            return Fernet(raw.encode())
+        except Exception:
+            raise RuntimeError("STAFF_DATA_KEY must be a valid Fernet key")
+    # Safe fallback for existing deployments: derive a dedicated encryption key
+    # from the stable Flask SECRET_KEY. Do not change SECRET_KEY after collecting staff data.
+    digest = hashlib.sha256((app.secret_key + "|alport-staff-data-v1").encode()).digest()
+    return Fernet(base64.urlsafe_b64encode(digest))
+
+
+def encrypt_staff(value):
+    value = (value or "").strip()
+    return _staff_fernet().encrypt(value.encode()).decode() if value else ""
+
+
+def decrypt_staff(value):
+    if not value:
+        return ""
+    try:
+        return _staff_fernet().decrypt(value.encode()).decode()
+    except (InvalidToken, ValueError):
+        return ""
+
+
+TRAINING_MODULES = {
+    "food_hygiene": {
+        "title": "Food Hygiene Essentials",
+        "version": "2026.1",
+        "refresh_months": 24,
+        "summary": "Personal hygiene, contamination control, safe temperatures, cleaning, illness reporting and safe working practices.",
+        "lessons": [
+            "Wash hands effectively before handling food, after raw food, waste, cleaning, breaks, toilet use and whenever contamination may have occurred.",
+            "Prevent cross-contamination by separating raw and ready-to-eat food, using clean equipment and following the venue's documented safe methods.",
+            "Follow the site's documented temperature controls. Record checks accurately and take corrective action when a limit is missed.",
+            "Do not work with or around open food when illness could make food unsafe. Report vomiting, diarrhoea, infected wounds and other relevant symptoms immediately to the manager.",
+            "Clean and disinfect using the venue's approved method, correct chemical, dilution, contact time and equipment. Never mix chemicals.",
+        ],
+        "questions": [
+            {"q":"When should hands be washed?","options":["Only at the start of a shift","Whenever contamination may have occurred, including after raw food, waste and toilet use","Only when visibly dirty"],"answer":1},
+            {"q":"What should you do if a recorded food-safety limit is missed?","options":["Ignore it if the food looks fine","Change the record","Follow the site's corrective action and tell the appropriate manager"],"answer":2},
+            {"q":"What is the safest approach to raw and ready-to-eat food?","options":["Keep them separated and follow the site's controls","Store them together to save space","Use the same equipment without cleaning"],"answer":0},
+            {"q":"What should you do if you have vomiting or diarrhoea?","options":["Work as normal","Report it immediately and follow the site's fitness-to-work procedure","Only tell colleagues"],"answer":1},
+            {"q":"Can cleaning chemicals be mixed?","options":["Yes, if both are approved","Only in hot water","No, follow the manufacturer's and site instructions"],"answer":2},
+        ],
+    },
+    "allergens": {
+        "title": "Allergen Safety",
+        "version": "2026.1",
+        "refresh_months": 12,
+        "summary": "The 14 regulated allergens, accurate information, cross-contact prevention and handling guest allergen requests.",
+        "lessons": [
+            "Never guess allergen information. Use the venue's current written allergen information and approved procedure.",
+            "Treat every allergy request seriously. Confirm the request, communicate it clearly to the kitchen/service team and identify the correct meal to the guest.",
+            "Prevent allergen cross-contact through hand washing, cleaned equipment and surfaces, controlled storage and the venue's preparation procedure.",
+            "Ingredient, supplier and recipe changes can change allergen information. Stop and re-check the current specification before giving information.",
+            "If the venue cannot safely meet a request, say so clearly. Never promise an allergen-free meal unless the business can genuinely control that risk.",
+        ],
+        "questions": [
+            {"q":"A guest asks whether a dish contains an allergen and you are unsure. What do you do?","options":["Guess from memory","Use current written information and the venue's allergen procedure","Say it is probably safe"],"answer":1},
+            {"q":"Can a supplier or recipe change affect allergen information?","options":["Yes","No","Only for desserts"],"answer":0},
+            {"q":"Which is part of preventing allergen cross-contact?","options":["Using the same unclean equipment","Cleaning hands, surfaces and equipment as required by the procedure","Removing the allergen after cooking"],"answer":1},
+            {"q":"What should happen to an allergy request?","options":["It should be clearly communicated and the correct meal identified to the guest","Only the server needs to know","It can wait until after cooking"],"answer":0},
+            {"q":"If the business cannot safely meet an allergy request, what should staff do?","options":["Promise it is safe anyway","Be clear that the request cannot be safely accommodated","Remove visible ingredients only"],"answer":1},
+        ],
+    },
+    "haccp_sfbb": {
+        "title": "HACCP and Safer Food Better Business",
+        "version": "2026.1",
+        "refresh_months": 24,
+        "summary": "How the venue's food-safety management system works, critical controls, monitoring, corrective action and records.",
+        "lessons": [
+            "The venue's food-safety system is site-specific. Staff must know the safe methods and controls relevant to their actual duties.",
+            "Monitoring records must reflect what actually happened. Never pre-fill, back-date or falsify a food-safety record.",
+            "When a control fails, make the food safe or remove it from use as required, record the issue and corrective action, and escalate where necessary.",
+            "Managers responsible for developing or maintaining HACCP controls need training appropriate to that responsibility in addition to this induction module.",
+            "Changes to menu, process, equipment, suppliers or premises can require the food-safety system and training to be reviewed.",
+        ],
+        "questions": [
+            {"q":"Should food-safety records be completed in advance?","options":["Yes","No, they must accurately record what happened","Only on quiet days"],"answer":1},
+            {"q":"What happens when a food-safety control fails?","options":["Record and follow the site's corrective action","Delete the check","Wait until the next review"],"answer":0},
+            {"q":"Are all safe methods identical for every venue?","options":["Yes","No, the system must reflect the site's actual operation","Only chains need site-specific methods"],"answer":1},
+            {"q":"Can a major process or menu change require a review?","options":["Yes","No","Only if an EHO asks"],"answer":0},
+            {"q":"Does this induction replace role-appropriate HACCP training for a manager who develops the HACCP system?","options":["Yes","No","Only after one year"],"answer":1},
+        ],
+    },
+    "workplace_safety": {
+        "title": "Workplace Safety and Site Induction",
+        "version": "2026.1",
+        "refresh_months": 12,
+        "summary": "Accident reporting, slips and trips, burns and cuts, manual handling, fire procedures and safe equipment use.",
+        "lessons": [
+            "Follow the venue's fire and emergency arrangements, including alarm, escape routes, assembly point and who to report to.",
+            "Report hazards, accidents and near misses promptly. Keep routes clear and deal with spills using the site's procedure.",
+            "Use knives, hot equipment, machinery and chemicals only when trained and authorised. Use guards and PPE where required.",
+            "Assess manual-handling tasks before lifting. Use aids or ask for help when a load or movement cannot be handled safely.",
+            "This module supports induction but does not replace site-specific instruction, risk assessments or task-specific training required by the employer.",
+        ],
+        "questions": [
+            {"q":"What should you do with a hazard or near miss?","options":["Ignore it if nobody was hurt","Report it promptly and make the area safe where possible","Wait for the next staff meeting"],"answer":1},
+            {"q":"When should machinery be used?","options":["Whenever it is available","Only when trained and authorised for that equipment","Only by managers"],"answer":1},
+            {"q":"What should you know about fire arrangements?","options":["Alarm, escape route, assembly point and reporting procedure","Only where extinguishers are","Nothing until there is a fire"],"answer":0},
+            {"q":"What is the first step before a difficult lift?","options":["Lift quickly","Assess the task and use help or aids if needed","Twist while lifting"],"answer":1},
+            {"q":"Does online induction replace site-specific safety instruction?","options":["Yes","No","Only for kitchen staff"],"answer":1},
+        ],
+    },
+}
+
+
+def required_training_keys(employee):
+    # Core induction for hospitality staff. Managers must still receive any additional
+    # role/site-specific instruction required by the employer's risk assessment/HACCP system.
+    return list(TRAINING_MODULES.keys())
+
+
+def ensure_training_assignments(employee):
+    for key in required_training_keys(employee):
+        module = TRAINING_MODULES[key]
+        if not q("SELECT id FROM employee_training WHERE employee_id=? AND module_key=? AND module_version=?", (employee["id"], key, module["version"]), True):
+            execute("""INSERT INTO employee_training(organisation_id,site_id,employee_id,module_key,module_version,status,assigned_at)
+                       VALUES(?,?,?,?,?,'Not started',?)""",
+                    (employee["organisation_id"], employee["site_id"], employee["id"], key, module["version"], now()))
 
 
 def init_db():
@@ -802,6 +1004,30 @@ def init_db():
                 "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS menu_section TEXT NOT NULL DEFAULT 'Mains'",
                 "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS portion_weight DOUBLE PRECISION NOT NULL DEFAULT 0",
                 "ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS portion_unit TEXT NOT NULL DEFAULT 'g'",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS cancellation_notice_hours INTEGER NOT NULL DEFAULT 24",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS amendment_notice_hours INTEGER NOT NULL DEFAULT 4",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS guest_can_change_date INTEGER NOT NULL DEFAULT 1",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS guest_can_change_time INTEGER NOT NULL DEFAULT 1",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS guest_can_change_party INTEGER NOT NULL DEFAULT 1",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS large_party_threshold INTEGER NOT NULL DEFAULT 6",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS deposit_type TEXT NOT NULL DEFAULT 'none'",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS deposit_value DOUBLE PRECISION NOT NULL DEFAULT 0",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS deposit_min_party INTEGER NOT NULL DEFAULT 1",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS cancellation_policy TEXT DEFAULT ''",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS logo_url TEXT DEFAULT ''",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS confirmation_subject TEXT DEFAULT 'Your reservation is confirmed â {{venue_name}}'",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS confirmation_message TEXT DEFAULT 'Thank you for choosing {{venue_name}}. We are pleased to confirm your reservation and look forward to welcoming you.'",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS review_subject TEXT DEFAULT 'Thank you for dining with us â {{venue_name}}'",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS review_message TEXT DEFAULT 'Thank you for joining us. We would really appreciate hearing about your experience.'",
+                "ALTER TABLE booking_settings ADD COLUMN IF NOT EXISTS stripe_connect_account_id TEXT DEFAULT ''",
+                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS manage_token TEXT DEFAULT ''",
+                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS deposit_required DOUBLE PRECISION NOT NULL DEFAULT 0",
+                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS deposit_paid DOUBLE PRECISION NOT NULL DEFAULT 0",
+                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS deposit_status TEXT NOT NULL DEFAULT 'Not required'",
+                "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS deposit_checkout_session_id TEXT DEFAULT ''",
+                "ALTER TABLE employees ADD COLUMN IF NOT EXISTS onboarding_status TEXT NOT NULL DEFAULT 'Not invited'",
+                "ALTER TABLE employees ADD COLUMN IF NOT EXISTS training_status TEXT NOT NULL DEFAULT 'Not started'",
+                "ALTER TABLE employees ADD COLUMN IF NOT EXISTS start_date TEXT DEFAULT ''",
             ]
             for statement in migrations:
                 cur.execute(statement)
@@ -1293,9 +1519,16 @@ def stripe_webhook():
         obj = ((event.get("data") or {}).get("object") or {})
 
         if event_type == "checkout.session.completed":
-            organisation_id = int((obj.get("metadata") or {}).get("organisation_id") or obj.get("client_reference_id") or 0)
-            if organisation_id:
-                activate_contract_from_checkout(organisation_id, obj)
+            booking_id = int((obj.get("metadata") or {}).get("booking_id") or 0)
+            if booking_id and obj.get("payment_status") in ("paid","no_payment_required"):
+                booking=q("SELECT * FROM bookings WHERE id=?",(booking_id,),True)
+                if booking:
+                    paid=float(obj.get("amount_total") or 0)/100.0
+                    execute("UPDATE bookings SET deposit_paid=?,deposit_status='Paid',updated_at=? WHERE id=?",(paid,now(),booking_id))
+            else:
+                organisation_id = int((obj.get("metadata") or {}).get("organisation_id") or obj.get("client_reference_id") or 0)
+                if organisation_id:
+                    activate_contract_from_checkout(organisation_id, obj)
 
         elif event_type == "invoice.paid":
             subscription_id = str(obj.get("subscription") or "")
@@ -1336,21 +1569,19 @@ def stripe_webhook():
         return jsonify(error=str(exc)), 400
 
 
-def send_alport_email(to_email, subject, text_body):
-    """Send transactional/CRM email through the already configured Resend account."""
+def send_alport_email(to_email, subject, text_body, html_body=None):
+    """Send a venue-branded transactional/CRM email through Resend."""
     resend_key = os.environ.get("RESEND_API_KEY", "").strip()
     from_email = os.environ.get("SUPPORT_FROM_EMAIL", "").strip()
     if not resend_key or not from_email or not to_email:
         return {"ok": False, "id": "", "error": "Email is not configured"}
+    payload = {"from": from_email, "to": [to_email], "subject": subject, "text": text_body}
+    if html_body:
+        payload["html"] = html_body
     try:
-        r = requests.post(
-            "https://api.resend.com/emails",
-            headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
-            json={"from": from_email, "to": [to_email], "subject": subject, "text": text_body},
-            timeout=20,
-        )
-        payload = r.json() if r.content else {}
-        return {"ok": bool(r.ok), "id": str(payload.get("id") or ""), "error": "" if r.ok else str(payload)}
+        r = requests.post("https://api.resend.com/emails", headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"}, json=payload, timeout=20)
+        result = r.json() if r.content else {}
+        return {"ok": bool(r.ok), "id": str(result.get("id") or ""), "error": "" if r.ok else str(result)}
     except Exception as exc:
         return {"ok": False, "id": "", "error": str(exc)}
 
@@ -1941,8 +2172,22 @@ def add_employee():
             holiday_allowance,
         ),
     )
-    audit("Created", "employee", employee_id, name)
-    return jsonify(ok=True, id=employee_id)
+    employee = q("SELECT * FROM employees WHERE id=?", (employee_id,), True)
+    token = secrets.token_urlsafe(32)
+    execute("""INSERT INTO employee_onboarding(organisation_id,site_id,employee_id,token,status,invited_at)
+               VALUES(?,?,?,?,?,?)""", (u["organisation_id"], s["id"], employee_id, token, "Invited", now()))
+    ensure_training_assignments(employee)
+    execute("UPDATE employees SET onboarding_status='Invited',training_status='Not started' WHERE id=?", (employee_id,))
+    link = _public_base_url() + "/staff-onboarding/" + token
+    email_result = send_alport_email(
+        employee.get("email") or "",
+        f"Complete your onboarding - {s['name']}",
+        f"Hello {name},\n\n{s['name']} has invited you to complete your staff onboarding with Alport Hospitality Solutions. "
+        f"Please complete your payroll details and compulsory induction training before your first working shift.\n\n{link}\n\n"
+        "Your personal information is used by your employer for employment and payroll administration. Do not forward this secure link."
+    ) if employee.get("email") else {"ok": False, "error": "No employee email"}
+    audit("Created and invited", "employee", employee_id, name)
+    return jsonify(ok=True, id=employee_id, invited=bool(email_result.get("ok")), invite_error=email_result.get("error", ""))
 
 
 @app.get("/api/shifts")
@@ -2110,6 +2355,186 @@ def pay_payroll(rid):
     )
     audit("Recorded paid", "payroll", rid)
     return jsonify(ok=True)
+
+
+@app.get("/staff-onboarding/<token>")
+def staff_onboarding_portal(token):
+    ob = q("""SELECT eo.*,e.name,e.email,e.department,e.job_title,s.name site_name,o.name organisation_name
+              FROM employee_onboarding eo JOIN employees e ON e.id=eo.employee_id
+              JOIN sites s ON s.id=eo.site_id JOIN organisations o ON o.id=eo.organisation_id
+              WHERE eo.token=? AND COALESCE(eo.revoked_at,'')=''""", (token,), True)
+    if not ob:
+        return "This onboarding link is invalid or has been withdrawn.", 404
+    employee = q("SELECT * FROM employees WHERE id=?", (ob["employee_id"],), True)
+    ensure_training_assignments(employee)
+    training = q("SELECT * FROM employee_training WHERE employee_id=? ORDER BY id", (ob["employee_id"],))
+    modules=[]
+    for row in training:
+        x=dict(row); definition=TRAINING_MODULES.get(x["module_key"],{})
+        x["title"]=definition.get("title",x["module_key"]); x["summary"]=definition.get("summary","")
+        x["lessons"]=definition.get("lessons",[]); x["questions"]=definition.get("questions",[])
+        modules.append(x)
+    return render_template("staff_onboarding.html", onboarding=dict(ob), modules=modules)
+
+
+@app.post("/staff-onboarding/<token>/details")
+def staff_onboarding_details(token):
+    ob=q("SELECT * FROM employee_onboarding WHERE token=? AND COALESCE(revoked_at,'')=''",(token,),True)
+    if not ob: return jsonify(error="Invalid onboarding link"),404
+    d=request.get_json() or request.form
+    required=["date_of_birth","address","ni_number","bank_account_name","bank_sort_code","bank_account_number","emergency_name","emergency_phone"]
+    if any(not str(d.get(k) or "").strip() for k in required): return jsonify(error="Complete all required personal and payroll fields"),400
+    ni=''.join(str(d.get("ni_number") or '').upper().split())
+    if len(ni)<8 or len(ni)>9: return jsonify(error="Check the National Insurance number"),400
+    sort=''.join(ch for ch in str(d.get("bank_sort_code") or '') if ch.isdigit())
+    account=''.join(ch for ch in str(d.get("bank_account_number") or '') if ch.isdigit())
+    if len(sort)!=6 or len(account)!=8: return jsonify(error="Enter a 6-digit sort code and 8-digit account number"),400
+    execute("""UPDATE employee_onboarding SET status='Details complete',personal_completed_at=?,date_of_birth_enc=?,address_enc=?,ni_number_enc=?,
+               bank_account_name_enc=?,bank_sort_code_enc=?,bank_account_number_enc=?,emergency_name_enc=?,emergency_phone_enc=?,
+               starter_declaration=?,p45_status=?,student_loan=?,privacy_ack_at=? WHERE id=?""",
+            (now(),encrypt_staff(d.get("date_of_birth")),encrypt_staff(d.get("address")),encrypt_staff(ni),encrypt_staff(d.get("bank_account_name")),
+             encrypt_staff(sort),encrypt_staff(account),encrypt_staff(d.get("emergency_name")),encrypt_staff(d.get("emergency_phone")),
+             str(d.get("starter_declaration") or ''),str(d.get("p45_status") or ''),str(d.get("student_loan") or ''),now(),ob["id"]))
+    execute("UPDATE employees SET onboarding_status='Details complete' WHERE id=?",(ob["employee_id"],))
+    return jsonify(ok=True)
+
+
+@app.post("/staff-onboarding/<token>/training/<module_key>")
+def staff_training_submit(token,module_key):
+    ob=q("SELECT * FROM employee_onboarding WHERE token=? AND COALESCE(revoked_at,'')=''",(token,),True)
+    module=TRAINING_MODULES.get(module_key)
+    if not ob or not module: return jsonify(error="Training module not found"),404
+    assignment=q("SELECT * FROM employee_training WHERE employee_id=? AND module_key=? AND module_version=?",(ob["employee_id"],module_key,module["version"]),True)
+    if not assignment: return jsonify(error="Training is not assigned"),404
+    d=request.get_json() or {}; answers=d.get("answers") or []
+    if len(answers)!=len(module["questions"]): return jsonify(error="Answer every question"),400
+    correct=sum(1 for i,qx in enumerate(module["questions"]) if str(answers[i])==str(qx["answer"]))
+    score=round(correct/len(module["questions"])*100,1); passed=score>=80
+    completed=now() if passed else ''
+    due=(date.today()+timedelta(days=int(module["refresh_months"]*30.4375))).isoformat() if passed else ''
+    execute("UPDATE employee_training SET attempts=attempts+1,score=?,status=?,completed_at=?,refresher_due=? WHERE id=?",
+            (score,"Complete" if passed else "Retry required",completed,due,assignment["id"]))
+    rows=q("SELECT status FROM employee_training WHERE employee_id=?",(ob["employee_id"],))
+    # Re-read after update before deciding overall completion.
+    rows=q("SELECT status FROM employee_training WHERE employee_id=?",(ob["employee_id"],))
+    all_done=bool(rows) and all(x["status"]=="Complete" for x in rows)
+    if all_done:
+        execute("UPDATE employees SET training_status='Complete' WHERE id=?",(ob["employee_id"],))
+        execute("UPDATE employee_onboarding SET training_completed_at=?,status=CASE WHEN personal_completed_at<>'' THEN 'Training complete' ELSE status END WHERE id=?",(now(),ob["id"]))
+    else:
+        execute("UPDATE employees SET training_status='In progress' WHERE id=?",(ob["employee_id"],))
+    return jsonify(ok=True,passed=passed,score=score,correct=correct,total=len(module["questions"]))
+
+
+@app.get("/api/staff-onboarding")
+@login_required
+@manager_required
+def staff_onboarding_dashboard():
+    u,s=user(),current_site()
+    rows=q("""SELECT e.id,e.name,e.email,e.department,e.job_title,e.onboarding_status,e.training_status,
+              eo.status,eo.invited_at,eo.personal_completed_at,eo.training_completed_at,eo.completed_at,
+              eo.right_to_work_status,eo.right_to_work_checked_at,eo.right_to_work_reference
+              FROM employees e LEFT JOIN employee_onboarding eo ON eo.employee_id=e.id
+              WHERE e.organisation_id=? AND e.site_id=? AND e.active=1 ORDER BY e.name""",(u["organisation_id"],s["id"]))
+    out=[]
+    for row in rows:
+        x=dict(row); tr=q("SELECT module_key,module_version,status,score,attempts,completed_at,refresher_due FROM employee_training WHERE employee_id=? ORDER BY id",(x["id"],))
+        x["training"]=[{**dict(t),"title":TRAINING_MODULES.get(t["module_key"],{}).get("title",t["module_key"])} for t in tr]
+        x["complete_modules"]=sum(1 for t in tr if t["status"]=="Complete"); x["total_modules"]=len(tr)
+        out.append(x)
+    return jsonify(employees=out)
+
+
+@app.post("/api/staff-onboarding/<int:employee_id>/resend")
+@login_required
+@manager_required
+def staff_onboarding_resend(employee_id):
+    u,s=user(),current_site(); emp=q("SELECT * FROM employees WHERE id=? AND organisation_id=? AND site_id=?",(employee_id,u["organisation_id"],s["id"]),True)
+    if not emp or not emp.get("email"): return jsonify(error="Employee email is required"),400
+    ob=q("SELECT * FROM employee_onboarding WHERE employee_id=?",(employee_id,),True)
+    if not ob:
+        token=secrets.token_urlsafe(32); execute("INSERT INTO employee_onboarding(organisation_id,site_id,employee_id,token,status,invited_at) VALUES(?,?,?,?,?,?)",(u["organisation_id"],s["id"],employee_id,token,"Invited",now())); ob=q("SELECT * FROM employee_onboarding WHERE employee_id=?",(employee_id,),True)
+    ensure_training_assignments(emp); link=_public_base_url()+"/staff-onboarding/"+ob["token"]
+    result=send_alport_email(emp["email"],f"Complete your onboarding - {s['name']}",f"Hello {emp['name']},\n\nPlease complete your Alport staff onboarding and compulsory induction training here:\n\n{link}\n\nDo not forward this secure link.")
+    if not result.get("ok"): return jsonify(error=result.get("error") or "Email could not be sent"),502
+    execute("UPDATE employees SET onboarding_status='Invited' WHERE id=?",(employee_id,)); return jsonify(ok=True)
+
+
+@app.post("/api/staff-onboarding/<int:employee_id>/right-to-work")
+@login_required
+@manager_required
+def staff_right_to_work(employee_id):
+    u,s=user(),current_site(); d=request.get_json() or {}
+    ob=q("""SELECT eo.* FROM employee_onboarding eo JOIN employees e ON e.id=eo.employee_id
+            WHERE e.id=? AND e.organisation_id=? AND e.site_id=?""",(employee_id,u["organisation_id"],s["id"]),True)
+    if not ob: return jsonify(error="Onboarding record not found"),404
+    status=str(d.get("status") or "Pending"); allowed=("Pending","Checked - unrestricted","Checked - time limited","Follow-up required")
+    if status not in allowed: return jsonify(error="Invalid right-to-work status"),400
+    checked_at=now() if status.startswith("Checked") else ''
+    execute("UPDATE employee_onboarding SET right_to_work_status=?,right_to_work_checked_at=?,right_to_work_checked_by=?,right_to_work_reference=? WHERE id=?",
+            (status,checked_at,u["id"] if checked_at else None,str(d.get("reference") or ''),ob["id"]))
+    return jsonify(ok=True)
+
+
+@app.get("/api/stocktakes")
+@login_required
+def stocktakes_list():
+    u,s=user(),current_site(); rows=q("""SELECT st.*,COALESCE(SUM(ABS(sl.variance_value)),0) variance_value
+      FROM stocktakes st LEFT JOIN stocktake_lines sl ON sl.stocktake_id=st.id WHERE st.organisation_id=? AND st.site_id=?
+      GROUP BY st.id ORDER BY st.id DESC LIMIT 30""",(u["organisation_id"],s["id"]))
+    return jsonify(stocktakes=[dict(x) for x in rows])
+
+
+@app.post("/api/stocktakes")
+@login_required
+@manager_required
+def stocktake_start():
+    u,s=user(),current_site()
+    if q("SELECT id FROM stocktakes WHERE organisation_id=? AND site_id=? AND status='Open'",(u["organisation_id"],s["id"]),True): return jsonify(error="Finish the open stocktake first"),400
+    sid=execute("INSERT INTO stocktakes(organisation_id,site_id,stocktake_date,status,started_by,started_at) VALUES(?,?,?,?,?,?)",(u["organisation_id"],s["id"],date.today().isoformat(),"Open",u["id"],now()))
+    items=q("SELECT * FROM stock_items WHERE organisation_id=? AND site_id=? AND active=1 ORDER BY name",(u["organisation_id"],s["id"]))
+    for item in items: execute("INSERT INTO stocktake_lines(stocktake_id,stock_item_id,expected_quantity,unit_cost) VALUES(?,?,?,?)",(sid,item["id"],item["on_hand"],item["unit_cost"]))
+    audit("Started","stocktake",sid,f"{len(items)} stock lines"); return jsonify(ok=True,id=sid)
+
+
+@app.get("/api/stocktakes/<int:stocktake_id>")
+@login_required
+def stocktake_detail(stocktake_id):
+    u,s=user(),current_site(); st=q("SELECT * FROM stocktakes WHERE id=? AND organisation_id=? AND site_id=?",(stocktake_id,u["organisation_id"],s["id"]),True)
+    if not st: return jsonify(error="Stocktake not found"),404
+    lines=q("""SELECT sl.*,si.name,si.category,si.unit,si.supplier FROM stocktake_lines sl JOIN stock_items si ON si.id=sl.stock_item_id
+               WHERE sl.stocktake_id=? ORDER BY si.category,si.name""",(stocktake_id,))
+    return jsonify(stocktake=dict(st),lines=[dict(x) for x in lines])
+
+
+@app.post("/api/stocktakes/<int:stocktake_id>/count")
+@login_required
+@manager_required
+def stocktake_count(stocktake_id):
+    u,s=user(),current_site(); st=q("SELECT * FROM stocktakes WHERE id=? AND organisation_id=? AND site_id=? AND status='Open'",(stocktake_id,u["organisation_id"],s["id"]),True)
+    if not st: return jsonify(error="Open stocktake not found"),404
+    d=request.get_json() or {}; line_id=int(d.get("line_id") or 0); counted=float(d.get("counted_quantity"))
+    if counted<0: return jsonify(error="Count cannot be negative"),400
+    line=q("SELECT * FROM stocktake_lines WHERE id=? AND stocktake_id=?",(line_id,stocktake_id),True)
+    if not line: return jsonify(error="Stocktake line not found"),404
+    variance=counted-float(line["expected_quantity"]); value=variance*float(line["unit_cost"])
+    execute("UPDATE stocktake_lines SET counted_quantity=?,variance_quantity=?,variance_value=?,counted_at=? WHERE id=?",(counted,variance,value,now(),line_id)); return jsonify(ok=True)
+
+
+@app.post("/api/stocktakes/<int:stocktake_id>/complete")
+@login_required
+@manager_required
+def stocktake_complete(stocktake_id):
+    u,s=user(),current_site(); st=q("SELECT * FROM stocktakes WHERE id=? AND organisation_id=? AND site_id=? AND status='Open'",(stocktake_id,u["organisation_id"],s["id"]),True)
+    if not st: return jsonify(error="Open stocktake not found"),404
+    lines=q("SELECT * FROM stocktake_lines WHERE stocktake_id=?",(stocktake_id,))
+    if any(x["counted_quantity"] is None for x in lines): return jsonify(error="Count every stock item before completing the stocktake"),400
+    for line in lines:
+        execute("UPDATE stock_items SET on_hand=? WHERE id=?",(line["counted_quantity"],line["stock_item_id"]))
+        if abs(float(line["variance_quantity"]))>0.000001:
+            execute("INSERT INTO stock_movements(organisation_id,site_id,stock_item_id,quantity,movement_type,note,created_at) VALUES(?,?,?,?,?,?,?)",
+                    (u["organisation_id"],s["id"],line["stock_item_id"],line["variance_quantity"],"Stocktake variance",f"Stocktake #{stocktake_id}",now()))
+    execute("UPDATE stocktakes SET status='Complete',completed_by=?,completed_at=? WHERE id=?",(u["id"],now(),stocktake_id)); audit("Completed","stocktake",stocktake_id); return jsonify(ok=True)
 
 
 @app.get("/api/stock")
@@ -2748,7 +3173,13 @@ def eho_audit_pack():
     rec_out=[]
     for r in records:
         x=dict(r); x["metadata"]=_json_load(x.pop("metadata_json","{}")); rec_out.append(x)
-    return jsonify(site=dict(site),organisation=dict(org()),start=start,end=end,daily_checks=daily_out,temperatures=[dict(x) for x in temps],records=rec_out,reviews=[dict(x) for x in reviews])
+    training=q("""SELECT e.name,e.department,e.job_title,et.module_key,et.module_version,et.status,et.score,et.completed_at,et.refresher_due
+                  FROM employee_training et JOIN employees e ON e.id=et.employee_id
+                  WHERE et.organisation_id=? AND et.site_id=? AND e.active=1 ORDER BY e.name,et.module_key""",(u["organisation_id"],site["id"]))
+    training_out=[]
+    for row in training:
+        x=dict(row); x["module_title"]=TRAINING_MODULES.get(x["module_key"],{}).get("title",x["module_key"]); training_out.append(x)
+    return jsonify(site=dict(site),organisation=dict(org()),start=start,end=end,daily_checks=daily_out,temperatures=[dict(x) for x in temps],records=rec_out,reviews=[dict(x) for x in reviews],training=training_out)
 
 
 # -----------------------------------------------------------------------------
@@ -2771,6 +3202,145 @@ def bookings_overview():
     peak_time = max(peak, key=peak.get) if peak else "â"
     return jsonify(date=day, bookings=[dict(x) for x in rows], covers=covers, booking_count=len(active), peak_time=peak_time, peak_covers=peak.get(peak_time,0) if peak else 0)
 
+
+
+def _public_base_url():
+    return os.environ.get("PUBLIC_BASE_URL", "").strip().rstrip("/") or request.url_root.rstrip("/")
+
+
+def _booking_manage_token(booking):
+    token=(booking.get("manage_token") or "").strip()
+    if token: return token
+    token=secrets.token_urlsafe(32)
+    execute("UPDATE bookings SET manage_token=? WHERE id=?",(token,booking["id"]))
+    return token
+
+
+def _render_booking_text(template, booking, site):
+    values={
+        "guest_first_name": (booking.get("guest_name") or "Guest").split()[0],
+        "guest_name": booking.get("guest_name") or "Guest",
+        "venue_name": site.get("name") or "our restaurant",
+        "booking_date": booking.get("booking_date") or "",
+        "booking_time": str(booking.get("booking_time") or "")[:5],
+        "party_size": str(booking.get("party_size") or ""),
+        "booking_reference": str(booking.get("id") or ""),
+    }
+    text=template or ""
+    for k,v in values.items(): text=text.replace("{{"+k+"}}",str(v))
+    return text
+
+
+def _booking_email_html(site, settings, booking, heading, message, button_label="Manage reservation", button_url=""):
+    logo=(settings.get("logo_url") or "").strip()
+    logo_html=f'<img src="{escape(logo)}" alt="{escape(site.get("name") or "Venue")}" style="max-width:180px;max-height:70px;margin-bottom:24px">' if logo else f'<div style="font-size:22px;font-weight:800;letter-spacing:.08em;margin-bottom:24px">{escape(site.get("name") or "Venue")}</div>'
+    button=f'<p style="margin:28px 0"><a href="{escape(button_url)}" style="display:inline-block;background:#1d5a47;color:white;text-decoration:none;padding:13px 20px;border-radius:8px;font-weight:700">{escape(button_label)}</a></p>' if button_url else ''
+    details=f'''<div style="background:#f4f7f5;border:1px solid #dfe8e2;border-radius:12px;padding:18px;margin:24px 0"><strong>{escape(str(booking.get("booking_date") or ""))}</strong><br>{escape(str(booking.get("booking_time") or "")[:5])} &nbsp;Â·&nbsp; {escape(str(booking.get("party_size") or ""))} guests<br><span style="color:#718079">Reference #{escape(str(booking.get("id") or ""))}</span></div>'''
+    return f'''<!doctype html><html><body style="margin:0;background:#f4f7f5;font-family:Arial,sans-serif;color:#17221e"><div style="max-width:620px;margin:0 auto;padding:36px 18px"><div style="background:white;border:1px solid #dfe8e2;border-radius:18px;padding:34px">{logo_html}<h1 style="font-size:26px;margin:0 0 16px">{escape(heading)}</h1><p style="font-size:16px;line-height:1.6;color:#46534e">{escape(message).replace(chr(10),'<br>')}</p>{details}{button}<p style="font-size:13px;color:#718079;margin-top:28px">{escape(settings.get("cancellation_policy") or "Please contact the restaurant if you need any assistance with your reservation.")}</p></div><p style="text-align:center;color:#89958f;font-size:11px;margin:18px">Reservation communications powered by Alport Hospitality Solutions</p></div></body></html>'''
+
+
+def _deposit_amount(settings, party_size):
+    if int(party_size or 0) < int(settings.get("deposit_min_party") or 1): return 0.0
+    kind=(settings.get("deposit_type") or "none").lower(); value=float(settings.get("deposit_value") or 0)
+    if kind=="per_person": return round(value*int(party_size),2)
+    if kind=="fixed": return round(value,2)
+    return 0.0
+
+
+def stripe_connected_request(method,path,account_id,data=None):
+    key=os.environ.get("STRIPE_SECRET_KEY","").strip()
+    if not key: raise RuntimeError("Stripe is not configured")
+    r=requests.request(method,"https://api.stripe.com/v1"+path,auth=(key,""),headers={"Stripe-Account":account_id},data=data or {},timeout=20)
+    payload=r.json() if r.content else {}
+    if not r.ok: raise RuntimeError(((payload.get("error") or {}).get("message") or "Stripe request failed"))
+    return payload
+
+
+@app.get("/api/bookings/communications")
+@login_required
+def booking_communications_get():
+    u,site=user(),current_site(); return jsonify(settings=dict(booking_settings_for(u["organisation_id"],site["id"])))
+
+
+@app.post("/api/bookings/communications")
+@login_required
+@manager_required
+def booking_communications_save():
+    u,site=user(),current_site(); d=request.get_json() or {}
+    fields=["logo_url","confirmation_subject","confirmation_message","review_subject","review_message","cancellation_policy"]
+    execute("UPDATE booking_settings SET "+",".join(f+"=?" for f in fields)+",updated_at=? WHERE organisation_id=? AND site_id=?",tuple([str(d.get(f) or "") for f in fields]+[now(),u["organisation_id"],site["id"]]))
+    return jsonify(ok=True)
+
+
+@app.post("/api/bookings/connect-payments")
+@login_required
+@manager_required
+def booking_connect_payments():
+    u,site=user(),current_site(); settings=booking_settings_for(u["organisation_id"],site["id"])
+    account=(settings.get("stripe_connect_account_id") or "").strip()
+    try:
+        if not account:
+            created=stripe_request("POST","/accounts",{"type":"express","country":"GB","capabilities[card_payments][requested]":"true","capabilities[transfers][requested]":"true","metadata[organisation_id]":str(u["organisation_id"]),"metadata[site_id]":str(site["id"])})
+            account=created["id"]
+            execute("UPDATE booking_settings SET stripe_connect_account_id=?,updated_at=? WHERE organisation_id=? AND site_id=?",(account,now(),u["organisation_id"],site["id"]))
+        link=stripe_request("POST","/account_links",{"account":account,"refresh_url":_public_base_url()+"/app","return_url":_public_base_url()+"/app","type":"account_onboarding"})
+        return jsonify(ok=True,url=link["url"])
+    except Exception as exc: return jsonify(error=str(exc)),400
+
+
+@app.get("/manage-reservation/<token>")
+def manage_reservation_page(token):
+    b=q("SELECT b.*,s.name site_name,s.address site_address FROM bookings b JOIN sites s ON s.id=b.site_id WHERE b.manage_token=?",(token,),True)
+    if not b: return "Reservation not found",404
+    settings=dict(booking_settings_for(b["organisation_id"],b["site_id"]))
+    return render_template("manage_reservation.html",booking=b,settings=settings)
+
+
+@app.post("/manage-reservation/<token>")
+def manage_reservation_action(token):
+    b=q("SELECT b.*,s.name site_name,s.address site_address FROM bookings b JOIN sites s ON s.id=b.site_id WHERE b.manage_token=?",(token,),True)
+    if not b: return "Reservation not found",404
+    settings=dict(booking_settings_for(b["organisation_id"],b["site_id"])); action=request.form.get("action") or "update"
+    try: arrival=datetime.fromisoformat(f"{b['booking_date']}T{str(b['booking_time'])[:5]}")
+    except: arrival=datetime.now()
+    hours=max(0,(arrival-datetime.now()).total_seconds()/3600)
+    if action=="cancel":
+        if hours < int(settings.get("cancellation_notice_hours") or 0):
+            return render_template("manage_reservation.html",booking=b,settings=settings,error="Online cancellation is no longer available for this booking. Please contact the restaurant directly."),400
+        execute("UPDATE bookings SET status='Cancelled',cancelled_at=?,updated_at=? WHERE id=?",(now(),now(),b["id"]))
+        return render_template("manage_reservation.html",booking=dict(b),settings=settings,success="Your reservation has been cancelled.")
+    if hours < int(settings.get("amendment_notice_hours") or 0):
+        return render_template("manage_reservation.html",booking=b,settings=settings,error="Online changes are no longer available for this booking. Please contact the restaurant directly."),400
+    new_date=request.form.get("booking_date") if int(settings.get("guest_can_change_date") or 0) else b["booking_date"]
+    new_time=request.form.get("booking_time") if int(settings.get("guest_can_change_time") or 0) else b["booking_time"]
+    new_party=int(request.form.get("party_size") or b["party_size"]) if int(settings.get("guest_can_change_party") or 0) else int(b["party_size"])
+    duration=int(b["duration_minutes"] or settings.get("default_duration") or 120)
+    options=booking_available_tables(b["organisation_id"],b["site_id"],new_date,new_time,new_party,duration,exclude_booking_id=b["id"])
+    if not options: return render_template("manage_reservation.html",booking=b,settings=settings,error="That change is not available. Please choose another time or contact the restaurant."),409
+    table_id=options[0]["id"]
+    execute("UPDATE bookings SET booking_date=?,booking_time=?,party_size=?,table_id=?,special_requests=?,dietary_requirements=?,updated_at=? WHERE id=?",(new_date,new_time,new_party,table_id,request.form.get("special_requests") or "",request.form.get("dietary_requirements") or "",now(),b["id"]))
+    updated=q("SELECT b.*,s.name site_name,s.address site_address FROM bookings b JOIN sites s ON s.id=b.site_id WHERE b.id=?",(b["id"],),True)
+    return render_template("manage_reservation.html",booking=updated,settings=settings,success="Your reservation has been updated.")
+
+
+@app.post("/api/bookings/<int:booking_id>/deposit-checkout")
+@login_required
+@manager_required
+def booking_deposit_checkout(booking_id):
+    u,site=user(),current_site(); b=q("SELECT * FROM bookings WHERE id=? AND organisation_id=? AND site_id=?",(booking_id,u["organisation_id"],site["id"]),True)
+    if not b:return jsonify(error="Booking not found"),404
+    settings=dict(booking_settings_for(u["organisation_id"],site["id"])); account=(settings.get("stripe_connect_account_id") or "").strip()
+    if not account:return jsonify(error="Connect the restaurant payment account first"),400
+    amount=float(b.get("deposit_required") or _deposit_amount(settings,b["party_size"]))
+    if amount<=0:return jsonify(error="No deposit is required for this booking"),400
+    try:
+        manage=_public_base_url()+"/manage-reservation/"+_booking_manage_token(b)
+        data={"mode":"payment","success_url":manage+"?payment=success","cancel_url":manage,"customer_email":b.get("guest_email") or None,"line_items[0][price_data][currency]":"gbp","line_items[0][price_data][product_data][name]":f"Reservation deposit â {site['name']}","line_items[0][price_data][unit_amount]":str(int(round(amount*100))),"line_items[0][quantity]":"1","metadata[booking_id]":str(b["id"])}
+        data={k:v for k,v in data.items() if v is not None}
+        checkout=stripe_connected_request("POST","/checkout/sessions",account,data)
+        execute("UPDATE bookings SET deposit_required=?,deposit_status='Payment requested',deposit_checkout_session_id=?,updated_at=? WHERE id=?",(amount,checkout["id"],now(),booking_id))
+        return jsonify(ok=True,url=checkout["url"])
+    except Exception as exc:return jsonify(error=str(exc)),400
 
 @app.post("/api/bookings")
 @login_required
@@ -2801,14 +3371,22 @@ def create_booking():
         options = booking_available_tables(u["organisation_id"],site["id"],booking_date,booking_time,party,duration)
         table_id = options[0]["id"] if options else None
     guest_id = upsert_guest(u["organisation_id"], name, email, phone, bool(d.get("marketing_consent")))
-    booking_id = execute("""INSERT INTO bookings(organisation_id,site_id,guest_id,booking_date,booking_time,party_size,duration_minutes,status,source,table_id,guest_name,guest_email,guest_phone,special_requests,dietary_requirements,internal_notes,marketing_consent,created_at,updated_at)
-                            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                         (u["organisation_id"],site["id"],guest_id,booking_date,booking_time,party,duration,d.get("status") or "Confirmed",d.get("source") or "Manager",table_id,name,email,phone,d.get("special_requests") or "",d.get("dietary_requirements") or "",d.get("internal_notes") or "",1 if d.get("marketing_consent") else 0,now(),now()))
+    manage_token=secrets.token_urlsafe(32)
+    deposit_required=_deposit_amount(settings,party)
+    deposit_status="Required" if deposit_required>0 else "Not required"
+    booking_id = execute("""INSERT INTO bookings(organisation_id,site_id,guest_id,booking_date,booking_time,party_size,duration_minutes,status,source,table_id,guest_name,guest_email,guest_phone,special_requests,dietary_requirements,internal_notes,marketing_consent,manage_token,deposit_required,deposit_status,created_at,updated_at)
+                          VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                         (u["organisation_id"],site["id"],guest_id,booking_date,booking_time,party,duration,d.get("status") or "Confirmed",d.get("source") or "Manager",table_id,name,email,phone,d.get("special_requests") or "",d.get("dietary_requirements") or "",d.get("internal_notes") or "",1 if d.get("marketing_consent") else 0,manage_token,deposit_required,deposit_status,now(),now()))
+    booking=q("SELECT * FROM bookings WHERE id=?",(booking_id,),True)
     if email and int(settings.get("confirmation_enabled") or 0):
-        result=send_alport_email(email,f"Booking confirmed â {site['name']}",f"Hi {name},\n\nYour table at {site['name']} is confirmed for {party} guest(s) on {booking_date} at {booking_time}.\n\nWe look forward to welcoming you.")
+        subject=_render_booking_text(settings.get("confirmation_subject") or "Your reservation is confirmed â {{venue_name}}",booking,site)
+        message=_render_booking_text(settings.get("confirmation_message") or "Thank you for choosing {{venue_name}}. We look forward to welcoming you.",booking,site)
+        manage_url=_public_base_url()+"/manage-reservation/"+manage_token
+        text=f"{message}\n\n{booking_date} at {booking_time} Â· {party} guests\n\nManage reservation: {manage_url}"
+        result=send_alport_email(email,subject,text,_booking_email_html(site,settings,booking,"Your reservation is confirmed",message,"Manage reservation",manage_url))
         if result["ok"]:
             execute("UPDATE bookings SET confirmation_sent_at=? WHERE id=?",(now(),booking_id))
-            execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,booking_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],guest_id,booking_id,"Confirmation",email,f"Booking confirmed â {site['name']}","Sent",result["id"],now()))
+            execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,booking_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],guest_id,booking_id,"Confirmation",email,subject,"Sent",result["id"],now()))
     audit("Created","booking",booking_id,f"{name} Â· {party} Â· {booking_date} {booking_time}")
     return jsonify(ok=True,id=booking_id,table_id=table_id)
 
@@ -2878,9 +3456,13 @@ def get_booking_settings():
 @manager_required
 def save_booking_settings():
     u,site=user(),current_site();d=request.get_json() or {};booking_settings_for(u["organisation_id"],site["id"])
-    fields=["booking_interval","default_duration","turnaround_minutes","max_party_size","max_covers_per_interval","min_notice_minutes","advance_days","review_delay_hours","lapsed_guest_weeks","confirmation_enabled","reminder_enabled","review_enabled","retention_enabled"]
+    fields=["booking_interval","default_duration","turnaround_minutes","max_party_size","max_covers_per_interval","min_notice_minutes","advance_days","review_delay_hours","lapsed_guest_weeks","confirmation_enabled","reminder_enabled","review_enabled","retention_enabled","cancellation_notice_hours","amendment_notice_hours","guest_can_change_date","guest_can_change_time","guest_can_change_party","large_party_threshold","deposit_type","deposit_value","deposit_min_party","cancellation_policy"]
+    integer_fields={"booking_interval","default_duration","turnaround_minutes","max_party_size","max_covers_per_interval","min_notice_minutes","advance_days","review_delay_hours","lapsed_guest_weeks","confirmation_enabled","reminder_enabled","review_enabled","retention_enabled","cancellation_notice_hours","amendment_notice_hours","guest_can_change_date","guest_can_change_time","guest_can_change_party","large_party_threshold","deposit_min_party"}
     vals=[]
-    for f in fields: vals.append(int(d.get(f,0)))
+    for f in fields:
+        if f in integer_fields: vals.append(int(d.get(f,0) or 0))
+        elif f=="deposit_value": vals.append(float(d.get(f,0) or 0))
+        else: vals.append(str(d.get(f) or ""))
     execute("UPDATE booking_settings SET "+",".join(f+"=?" for f in fields)+",updated_at=? WHERE organisation_id=? AND site_id=?",tuple(vals+[now(),u["organisation_id"],site["id"]]))
     return jsonify(ok=True)
 
@@ -2946,7 +3528,10 @@ def send_booking_review(booking_id):
     if not b["guest_email"]:return jsonify(error="Guest has no email address"),400
     public_url=(os.environ.get("PUBLIC_BASE_URL") or request.url_root.rstrip("/")).rstrip("/")
     link=f"{public_url}/booking-feedback/{booking_id}"
-    result=send_alport_email(b["guest_email"],f"How was your visit to {site['name']}?",f"Hi {b['guest_name']},\n\nThank you for visiting {site['name']}. We would really value your feedback.\n\nShare your feedback: {link}\n\nThank you.")
+    settings=dict(booking_settings_for(u["organisation_id"],site["id"]))
+    subject=_render_booking_text(settings.get("review_subject") or "Thank you for dining with us â {{venue_name}}",b,site)
+    message=_render_booking_text(settings.get("review_message") or "Thank you for joining us. We would really appreciate hearing about your experience.",b,site)
+    result=send_alport_email(b["guest_email"],subject,f"{message}\n\nShare your feedback: {link}",_booking_email_html(site,settings,b,"Thank you for dining with us",message,"Share your feedback",link))
     if not result["ok"]:return jsonify(error="Review email could not be sent"),502
     execute("UPDATE bookings SET review_sent_at=? WHERE id=?",(now(),booking_id));execute("INSERT INTO guest_communications(organisation_id,site_id,guest_id,booking_id,communication_type,recipient,subject,status,provider_id,sent_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(u["organisation_id"],site["id"],b["guest_id"],booking_id,"Review",b["guest_email"],f"How was your visit to {site['name']}?","Sent",result["id"],now()));return jsonify(ok=True)
 
