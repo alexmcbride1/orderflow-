@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Staff Onboarding | Alport Hospitality Solutions</title>
+<style>
+:root{--green:#183f32;--ink:#17211d;--muted:#748079;--line:#dce5df;--bg:#f5f4ed;--card:#fff;--good:#23684f;--bad:#a3473e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{width:min(900px,calc(100% - 28px));margin:auto;padding:28px 0 60px}.brand{text-align:center;margin-bottom:28px}.brand b{font-family:Georgia,serif;font-size:38px;letter-spacing:7px;color:var(--green)}.brand span{display:block;font-size:10px;letter-spacing:5px;margin-top:5px}.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;margin:14px 0}.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:2px;font-weight:900;color:var(--green)}h1{font-family:Georgia,serif;font-size:42px;line-height:1;margin:8px 0 14px;color:var(--green)}h2{margin:0 0 8px;font-size:21px}p{line-height:1.55;color:var(--muted)}.notice{background:#eef3ef;border:1px solid #d7e2db;border-radius:14px;padding:14px;line-height:1.5;font-size:13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-size:11px;font-weight:800;margin:10px 0 5px}input,select,textarea{width:100%;padding:13px;border:1px solid var(--line);border-radius:11px;background:#fff;font:inherit}.btn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:12px 15px;font-weight:850;cursor:pointer}.btn.primary{background:var(--green);color:#fff;border-color:var(--green)}.progress{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.pill{font-size:10px;font-weight:850;border-radius:999px;padding:7px 10px;background:#f1f4f2;border:1px solid var(--line)}.pill.good{background:#e8f3ed;color:var(--good)}.module{margin-top:14px}.lesson{padding:10px 0;border-bottom:1px solid var(--line);font-size:13px;line-height:1.5}.question{margin:18px 0;padding-top:14px;border-top:1px solid var(--line)}.option{display:flex;gap:10px;align-items:flex-start;padding:9px 0;font-size:13px}.option input{width:auto;margin-top:2px}.result{margin-top:10px;font-weight:850}.small{font-size:11px;color:var(--muted)}@media(max-width:650px){.wrap{width:min(100% - 20px,900px);padding-top:18px}.card{padding:18px;border-radius:18px}.grid{grid-template-columns:1fr}h1{font-size:34px}.brand b{font-size:30px}}
+</style>
+</head>
+<body><div class="wrap">
+<div class="brand"><b>ALPORT</b><span>HOSPITALITY SOLUTIONS</span></div>
+<div class="card"><div class="eyebrow">Secure staff onboarding</div><h1>Welcome, {{ onboarding.name }}.</h1><p>{{ onboarding.organisation_name }} has invited you to complete onboarding for {{ onboarding.site_name }}.</p><div class="progress"><span class="pill {% if onboarding.personal_completed_at %}good{% endif %}">Payroll details</span><span class="pill {% if onboarding.training_completed_at %}good{% endif %}">Induction training</span><span class="pill">Manager right-to-work check</span></div><div class="notice"><b>Before you start:</b> enter your own details accurately. Your employer uses these details for employment and payroll administration. This secure page does not ask for card details or online-banking passwords.</div></div>
+
+<div class="card" id="detailsCard"><h2>1. Personal & payroll details</h2><p>Complete this once. Sensitive values are encrypted before being stored by the application.</p>
+<form id="detailsForm">
+<div class="grid"><div><label>Date of birth</label><input name="date_of_birth" type="date" required></div><div><label>National Insurance number</label><input name="ni_number" autocomplete="off" placeholder="QQ123456C" required></div></div>
+<label>Home address</label><textarea name="address" rows="3" required></textarea>
+<div class="grid"><div><label>Bank account name</label><input name="bank_account_name" autocomplete="off" required></div><div><label>Sort code</label><input name="bank_sort_code" inputmode="numeric" autocomplete="off" placeholder="12-34-56" required></div></div>
+<label>Account number</label><input name="bank_account_number" inputmode="numeric" autocomplete="off" placeholder="12345678" required>
+<div class="grid"><div><label>Emergency contact name</label><input name="emergency_name" required></div><div><label>Emergency contact phone</label><input name="emergency_phone" type="tel" required></div></div>
+<div class="grid"><div><label>P45</label><select name="p45_status"><option value="Provided">I will provide / have provided a P45</option><option value="No P45">I do not have a P45</option></select></div><div><label>Student loan</label><select name="student_loan"><option value="None declared">None / not applicable</option><option>Plan 1</option><option>Plan 2</option><option>Plan 4</option><option>Plan 5</option><option>Postgraduate loan</option></select></div></div>
+<label>Starter declaration (if your employer needs a starter checklist)</label><select name="starter_declaration"><option value="">Select if applicable</option><option value="A">A - This is my first job since 6 April and I have not received taxable benefits/pension</option><option value="B">B - This is now my only job, but I have had another job or taxable benefits since 6 April</option><option value="C">C - I have another job and/or receive a State/occupational pension</option></select>
+<label class="option"><input type="checkbox" required> <span>I confirm these details are accurate and understand they will be provided to my employer for employment and payroll administration.</span></label>
+<button class="btn primary" type="submit">Save secure details</button><div class="result" id="detailsResult"></div>
+</form></div>
+
+<div class="card"><h2>2. Compulsory induction training</h2><p>Complete every assigned module and achieve at least 80% on each assessment. This online induction supports your employer's training system; you must also follow the site-specific instruction, supervision and safe methods you are given at work.</p></div>
+{% for module in modules %}
+<div class="card module" id="module-{{module.module_key}}"><div class="eyebrow">{{ module.status }}</div><h2>{{ module.title }}</h2><p>{{ module.summary }}</p>
+{% for lesson in module.lessons %}<div class="lesson"><b>{{ loop.index }}.</b> {{ lesson }}</div>{% endfor %}
+<form class="trainingForm" data-key="{{module.module_key}}">
+{% for q in module.questions %}<div class="question"><b>{{ loop.index }}. {{ q.q }}</b>{% set qi=loop.index0 %}{% for option in q.options %}<label class="option"><input type="radio" name="q{{qi}}" value="{{loop.index0}}" required> <span>{{option}}</span></label>{% endfor %}</div>{% endfor %}
+<button class="btn primary" type="submit">Submit assessment</button><div class="result"></div></form>
+{% if module.status == 'Complete' %}<div class="notice"><b>Completed.</b> Score {{ '%.0f'|format(module.score) }}%. Refresher due {{ module.refresher_due }}.</div>{% endif %}
+</div>
+{% endfor %}
+<div class="card"><h2>3. Manager checks</h2><p>Your manager must separately complete the appropriate right-to-work check before employment and provide any site-specific instruction, supervision and task training required for your role. Your Alport training record is automatically available in the venue's EHO & Compliance area.</p></div>
+</div>
+<script>
+const token={{ onboarding.token|tojson }};
+async function send(url,body){let r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Unable to save');return d}
+document.getElementById('detailsForm').addEventListener('submit',async e=>{e.preventDefault();let out=document.getElementById('detailsResult');try{let body=Object.fromEntries(new FormData(e.target).entries());await send('/staff-onboarding/'+encodeURIComponent(token)+'/details',body);out.textContent='Details saved securely.';out.style.color='var(--good)'}catch(err){out.textContent=err.message;out.style.color='var(--bad)'}});
+document.querySelectorAll('.trainingForm').forEach(form=>form.addEventListener('submit',async e=>{e.preventDefault();let key=form.dataset.key,out=form.querySelector('.result'),answers=[];for(let i=0;;i++){let el=form.querySelector('input[name="q'+i+'"]:checked');if(!form.querySelector('input[name="q'+i+'"]'))break;if(!el){out.textContent='Answer every question.';return}answers.push(Number(el.value))}try{let d=await send('/staff-onboarding/'+encodeURIComponent(token)+'/training/'+encodeURIComponent(key),{answers});out.textContent=d.passed?'Passed - '+d.score+'%. Training record saved.':'Score '+d.score+'%. You need 80% to pass. Review the module and try again.';out.style.color=d.passed?'var(--good)':'var(--bad)';if(d.passed)setTimeout(()=>location.reload(),900)}catch(err){out.textContent=err.message;out.style.color='var(--bad)'}}));
+</script></body></html>
